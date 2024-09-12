@@ -145,7 +145,7 @@ function updateStudent(req, res) {
 function deleteStudent(req, res) {
     try {
         const id = req.params.id;
-        con.query(DELETE_QUERY,[id], (err, result) => {
+        con.query(DELETE_QUERY, [id], (err, result) => {
             if (err) {
                 console.log(err)
                 res.status(409).send(err.sqlMessage)
@@ -166,25 +166,25 @@ function deleteStudent(req, res) {
 
 }
 
-function getSingleStudent(req,res)  {
+function getSingleStudent(req, res) {
     try {
-     const id = req.params.id;
-     con.query(SINGLE_GET_QUERY,[id], (err, result) => {
-         if (err) {
-             res.status(409).send(err.sqlMessage)
-             return
-         }else {
-             res.status(200).send(result[0])
-         }
-     })
+        const id = req.params.id;
+        con.query(SINGLE_GET_QUERY, [id], (err, result) => {
+            if (err) {
+                res.status(409).send(err.sqlMessage)
+                return
+            } else {
+                res.status(200).send(result[0])
+            }
+        })
     } catch (error) {
-         console.log(error)
+        console.log(error)
     }
 }
 
-router.get('/',getStudent)
-router.post('/',insertStudent)
-router.put('/:id',updateStudent)
+router.get('/', getStudent)
+router.post('/', insertStudent)
+router.put('/:id', updateStudent)
 router.delete('/:id', deleteStudent)
 router.get('/:id', getSingleStudent)
 

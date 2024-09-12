@@ -10,8 +10,8 @@ const http = require('http');
 const app = express()
 const mysql = require('mysql');
 
-app.get('/',(req,res) => {
-    res.render("pages/index.ejs")
+app.get('/', (req, res) => {
+    res.render("pages/login.ejs")
 })
 
 app.set('views', path.join(__dirname, 'views'));
@@ -39,9 +39,9 @@ app.use(session({
     }
 }));
 
-app.use('/api/user/',userApiRouter);
-app.use('/api/student/',studentApiRouter);
-app.use('/api/block',blockApiROuter);
+app.use('/api/user/', userApiRouter);
+app.use('/api/student/', studentApiRouter);
+app.use('/api/block', blockApiROuter);
 
 
 app.use(function (req, res, next) {

@@ -104,12 +104,12 @@ function updateUser(req, res) {
             }
             if (result.affectedRows != 0) {
                 con.query(SINGLE_GET_QUERY, [id], (err2, result2) => {
-                        if (err2) {
-                            res.status(409).send(err2.sqlMessage)
-                            return
-                        }
-                        res.status(200).send(result2[0])
-                    })
+                    if (err2) {
+                        res.status(409).send(err2.sqlMessage)
+                        return
+                    }
+                    res.status(200).send(result2[0])
+                })
             }
         })
 
@@ -143,10 +143,10 @@ function deleteUser(req, res) {
 
 }
 
-function getSingleUser (req, res) {
+function getSingleUser(req, res) {
     try {
         const id = req.params.id;
-        con.query(SINGLE_GET_QUERY,[id], (err, result) => {
+        con.query(SINGLE_GET_QUERY, [id], (err, result) => {
             if (err) {
                 res.status(409).send(err.sqlMessage)
                 return
@@ -162,7 +162,7 @@ function getSingleUser (req, res) {
 router.get('/', getUser)
 router.post('/', insertUser)
 router.put('/:id', updateUser)
-router.delete('/:id',deleteUser)
-router.get('/:id',getSingleUser)
+router.delete('/:id', deleteUser)
+router.get('/:id', getSingleUser)
 
 module.exports = router;

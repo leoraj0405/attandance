@@ -57,7 +57,7 @@ function insertBlock(req, res) {
             name
         } = req.body;
 
-        con.query(INSERT_QUERY,[name], (err, result) => {
+        con.query(INSERT_QUERY, [name], (err, result) => {
             console.log(INSERT_QUERY)
             if (err) {
                 res.status(409).send(err.sqlMessage)
@@ -81,7 +81,7 @@ function updateBlock(req, res) {
         const UPDATE_QUERY = /*sql*/` UPDATE blocks SET name = ?, 
                                         updatedAt = current_timestamp()
                                          WHERE id = ${id}`
-        con.query(UPDATE_QUERY,[name], (err, result) => {
+        con.query(UPDATE_QUERY, [name], (err, result) => {
             console.log(UPDATE_QUERY)
             if (err) {
                 console.log(err)
@@ -110,7 +110,7 @@ function updateBlock(req, res) {
 function deleteBlock(req, res) {
     try {
         const id = req.params.id;
-        con.query(DELETE_QUERY,[id], (err, result) => {
+        con.query(DELETE_QUERY, [id], (err, result) => {
             if (err) {
                 // console.log(err)
                 res.status(409).send(err.sqlMessage)
@@ -131,25 +131,25 @@ function deleteBlock(req, res) {
 
 }
 
-function getSingleBlock(req,res)  {
+function getSingleBlock(req, res) {
     try {
-     const id = req.params.id;
-     con.query(SINGLE_GET_QUERY,[id], (err, result) => {
-         if (err) {
-             res.status(409).send(err.sqlMessage)
-             return
-         }else {
-             res.status(200).send(result[0])
-         }
-     })
+        const id = req.params.id;
+        con.query(SINGLE_GET_QUERY, [id], (err, result) => {
+            if (err) {
+                res.status(409).send(err.sqlMessage)
+                return
+            } else {
+                res.status(200).send(result[0])
+            }
+        })
     } catch (error) {
-         console.log(error)
+        console.log(error)
     }
 }
 
-router.get('/',getBlock)
-router.post('/',insertBlock)
-router.put('/:id',updateBlock)
+router.get('/', getBlock)
+router.post('/', insertBlock)
+router.put('/:id', updateBlock)
 router.delete('/:id', deleteBlock)
 router.get('/:id', getSingleBlock)
 
