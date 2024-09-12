@@ -159,10 +159,76 @@ function getSingleUser(req, res) {
     }
 }
 
+function loginUser(req, res) {
+    try {
+        const {
+            userId,
+            password
+        } = req.body;
+
+        con.query(/*sql*/` SELECT firstName FROM user WHERE userId = ? AND password = ?`,
+            [userId, password],async (err, result) => {
+                if (err) {
+                    res.status(409).send(err.sqlMessage)
+                    return
+                }
+                if(result.length > 0) {
+                    req.session.isLogged = true;
+                    req.session.data = result[0].firstName;
+                    res.status(200).send('SUCCESS ')
+                }
+                else {
+                    req.session.isLogged = false;
+                    req.session.data = null;
+                    res.status(409).send('Invalid user and/or password')
+                }
+                
+            })
+
+
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+function homeUser(req, res) {
+    try {
+        if(req.session.isLogged) {
+            const result = req.session.data
+            res.send("Welcome "+ result)
+        }
+        else {
+            res.send("Please Login again")
+            return
+        }
+    } catch (error) {
+       console.error(error) 
+    }
+}
+
+function logoutUser (req,res) {
+    try {
+        req.session.destroy((err) => {
+            if (err) {
+                res.send(err)
+                return
+            }
+            res.send('session destroy')
+          });
+        
+    } catch (error) {
+        console.error(error)
+    }
+}
+
 router.get('/', getUser)
 router.post('/', insertUser)
 router.put('/:id', updateUser)
 router.delete('/:id', deleteUser)
 router.get('/:id', getSingleUser)
+router.post('/login', loginUser)
+router.get('/login/home',homeUser)
+router.get('/login/logout',logoutUser)
+
 
 module.exports = router;

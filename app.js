@@ -10,16 +10,22 @@ const http = require('http');
 const app = express()
 const mysql = require('mysql');
 
-app.get('/', (req, res) => {
-    res.render("pages/login.ejs")
+const con = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'Root1234@',
+    database: 'attendance'
 })
+
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 const userApiRouter = require('./router/api/user')
 const studentApiRouter = require('./router/api/student')
-const blockApiROuter = require('./router/api/block')
+const blockApiRouter = require('./router/api/block')
+const roomApiRouter = require('./router/api/room')
+const attendanceRouter = require('./router/api/dayAttendance')
 
 
 app.use(logger('dev'))
@@ -41,7 +47,11 @@ app.use(session({
 
 app.use('/api/user/', userApiRouter);
 app.use('/api/student/', studentApiRouter);
-app.use('/api/block', blockApiROuter);
+app.use('/api/block', blockApiRouter);
+app.use('/api/room/',roomApiRouter);
+app.use('/api/attendance',attendanceRouter);
+
+
 
 
 app.use(function (req, res, next) {
