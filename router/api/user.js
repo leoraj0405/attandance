@@ -195,10 +195,10 @@ function homeUser(req, res) {
     try {
         if(req.session.isLogged) {
             const result = req.session.data
-            res.send("Welcome "+ result)
+            res.status(200).send("Welcome "+ result)
         }
         else {
-            res.send("Please Login again")
+            res.status(409).send("Please Login again")
             return
         }
     } catch (error) {
@@ -227,7 +227,7 @@ router.put('/:id', updateUser)
 router.delete('/:id', deleteUser)
 router.get('/:id', getSingleUser)
 router.post('/login', loginUser)
-router.get('/login/home',homeUser)
+router.get('/authorized/home',homeUser)
 router.get('/login/logout',logoutUser)
 
 

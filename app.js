@@ -5,27 +5,21 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var session = require('express-session');
+var FileStore = require('session-file-store')(session);
 
 const http = require('http');
 const app = express()
-const mysql = require('mysql');
-
-const con = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'Root1234@',
-    database: 'attendance'
-})
-
-
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
 
 const userApiRouter = require('./router/api/user')
 const studentApiRouter = require('./router/api/student')
 const blockApiRouter = require('./router/api/block')
 const roomApiRouter = require('./router/api/room')
 const attendanceRouter = require('./router/api/dayAttendance')
+
+var fileStoreOptions = {};
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
 
 app.use(logger('dev'))
@@ -36,7 +30,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(session({
-    // store: new FileStore(fileStoreOptions),
+    store: new FileStore(fileStoreOptions),
     secret: 'attendance',
     resave: true,
     saveUninitialized: true,
@@ -52,6 +46,45 @@ app.use('/api/room/',roomApiRouter);
 app.use('/api/attendance',attendanceRouter);
 
 
+app.get('/sh/login',(req,res) => {
+    try {
+        res.render('pages/login.ejs')
+    } catch (error) {
+        console.error(error)
+    }
+
+})
+
+app.get('/sh/home',(req,res) => {
+    try {
+        if(req.session.isLogged == true) {
+            const userName = req.session.data
+            console.log(userName)
+            res.render('pages/home.ejs',{userName})
+        }
+
+    } catch (error) {
+        console.error(error)
+    }
+})
+
+app.get('/sh/logout',(req,res) => {
+    try {
+        if(req.session.isLogged == true) {
+            req.session.destroy((err) => {
+                if(err) {
+                    console.log(err)
+                    return
+                }
+                res.redirect('http://localhost:4000/sh/login')
+            })
+        }else{
+            res.redirect("http://localhost:4000/sh/login")
+        }
+    } catch (error) {
+        console.error(error)
+    }
+})
 
 
 app.use(function (req, res, next) {
