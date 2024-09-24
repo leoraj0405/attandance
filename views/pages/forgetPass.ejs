@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head') %>
+        <style>
+            .mh-100 {
+                border: 1px solid black;
+                border-radius: 20px;
+                margin-top: 2cm;
+                margin-left: 26%;
+                box-sizing: border-box;
+            }
+
+            .form {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .w-75 {
+                border: none;
+                background-color: whitesmoke;
+                border-radius: 20px;
+            }
+
+            .back-color {
+                background-color: rgb(234, 232, 232);
+            }
+
+            .margin-left {
+                margin-left: 130px;
+            }
+
+            button {
+                margin-top: 40px;
+            }
+        </style>
+</head>
+
+<body>
+    <div class="mh-100 w-50 p-3">
+        <div class="form">
+            <h2>Change your password</h2>
+            <label for="userId" class="w-75 p-3 back-color"><b>USER ID </b> </label>
+            <input type="text" id="userId" class="w-75 p-3">
+            <label for="pass" class="w-75 p-3 back-color"><b> NEW PASSWORD </b> </label>
+            <input type="password" name="pass" class="w-75 p-3" id="pass">
+            <button type="button" class="btn btn-success p-2" onclick="updatePass()">Submit</button>
+        </div>
+    </div>
+    <%- include('../partials/footer') %>
+</body>
+
+</html>

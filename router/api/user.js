@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const mysql = require('mysql');
+const { use } = require('./user');
 
 const con = mysql.createConnection({
     host: 'localhost',
@@ -31,6 +32,11 @@ const INSERT_QUERY = /*sql*/` INSERT INTO user
 
 const SINGLE_GET_QUERY = /*sql*/`SELECT * FROM user WHERE id = ?`
 
+UPDATE_PASS_QUERY = /*sql*/`UPDATE user SET password = ? WHERE id = ?`;
+
+GET_UDERID_QUERY = /*sql*/`SELECT id, userId FROM user`
+
+
 function getUser(req, res) {
     try {
         con.query(GET_QUERY, (err, result) => {
@@ -48,7 +54,7 @@ function getUser(req, res) {
 
 function insertUser(req, res) {
     try {
-        const {
+        var {
             firstName,
             lastName,
             phoneNo,
@@ -57,7 +63,7 @@ function insertUser(req, res) {
             password,
         } = req.body;
 
-        const userInput = [
+        var userInput = [
             firstName,
             lastName,
             phoneNo,
@@ -65,16 +71,21 @@ function insertUser(req, res) {
             userId,
             password
         ]
-        con.query(INSERT_QUERY, userInput, (err, result) => {
-            if (err) {
-                res.status(409).send(err.sqlMessage)
-                return
-            }
-            if (result.affectedRows != 0) {
-                res.status(200).send("insert successfully")
-            }
-        })
+        if (firstName.length > 0 && lastName.length > 0 && phoneNo.length > 0 && email.length > 0 && userId.length > 0 && password.length > 0) {
+            con.query(INSERT_QUERY, userInput, (err, result) => {
+                if (err) {
+                    res.status(409).send(err.sqlMessage)
+                    return
+                }
+                if (result.affectedRows != 0) {
+                    res.status(200).send("insert successfully")
+                }
+            })
 
+        } else {
+            res.status(409).send('Input empty')
+            return
+        }
     } catch (error) {
         console.error(error)
         return
@@ -88,7 +99,7 @@ function updateUser(req, res) {
         const columnName = []
         const values = []
         allowedUpdateKey.forEach((keys) => {
-            keyvalue = req.body[keys]
+            var keyvalue = req.body[keys]
             if (keyvalue !== undefined) {
                 values.push(keyvalue)
                 columnName.push(`${keys} = ?`)
@@ -116,7 +127,6 @@ function updateUser(req, res) {
     } catch (error) {
         console.error(error)
     }
-
 }
 
 function deleteUser(req, res) {
@@ -159,6 +169,44 @@ function getSingleUser(req, res) {
     }
 }
 
+function forgetPass(req, res) {
+    try {
+        const id = req.params.id;
+        const pass = req.body.password;
+        const responseData = {}
+
+        con.query(GET_UDERID_QUERY,(err2 ,result2) => {
+            if(err2) {
+                res.status(409).send(err2.sqlMessage)
+                return
+            }
+            responseData.userId = result2
+        })
+        con.query(UPDATE_PASS_QUERY, [pass, id], (err, result) => {
+            if (err) {
+                res.status(409).send(err.sqlMessage)
+                return
+            }
+            if (result.affectedRows > 0) {
+                con.query(SINGLE_GET_QUERY, [id], (err3, result3) => {
+                    if(err3) {
+                        res.status(409).send(err3.sqlMessage)
+                        return
+                    }
+                    responseData.data = result3[0]
+                    res.status(200).send(responseData)
+                })  
+            }
+            
+        })
+
+
+
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 function loginUser(req, res) {
     try {
         const {
@@ -166,13 +214,13 @@ function loginUser(req, res) {
             password
         } = req.body;
 
-        con.query(/*sql*/` SELECT firstName FROM user WHERE userId = ? AND password = ?`,
-            [userId, password],async (err, result) => {
+        con.query(/*sql*/` SELECT firstName FROM user WHERE userId = ? AND password = ? `,
+            [userId, password], async (err, result) => {
                 if (err) {
                     res.status(409).send(err.sqlMessage)
                     return
                 }
-                if(result.length > 0) {
+                if (result.length > 0) {
                     req.session.isLogged = true;
                     req.session.data = result[0].firstName;
                     res.status(200).send('SUCCESS ')
@@ -182,7 +230,7 @@ function loginUser(req, res) {
                     req.session.data = null;
                     res.status(409).send('Invalid user and/or password')
                 }
-                
+
             })
 
 
@@ -193,20 +241,20 @@ function loginUser(req, res) {
 
 function homeUser(req, res) {
     try {
-        if(req.session.isLogged) {
+        if (req.session.isLogged) {
             const result = req.session.data
-            res.status(200).send("Welcome "+ result)
+            res.status(200).send("Welcome " + result)
         }
         else {
             res.status(409).send("Please Login again")
             return
         }
     } catch (error) {
-       console.error(error) 
+        console.error(error)
     }
 }
 
-function logoutUser (req,res) {
+function logoutUser(req, res) {
     try {
         req.session.destroy((err) => {
             if (err) {
@@ -214,8 +262,8 @@ function logoutUser (req,res) {
                 return
             }
             res.send('session destroy')
-          });
-        
+        });
+
     } catch (error) {
         console.error(error)
     }
@@ -227,8 +275,8 @@ router.put('/:id', updateUser)
 router.delete('/:id', deleteUser)
 router.get('/:id', getSingleUser)
 router.post('/login', loginUser)
-router.get('/authorized/home',homeUser)
-router.get('/login/logout',logoutUser)
-
+router.get('/authorized/home', homeUser)
+router.get('/login/logout', logoutUser)
+router.put('/forgetPass/:id', forgetPass)
 
 module.exports = router;

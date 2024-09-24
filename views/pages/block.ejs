@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <%- include('../partials/head') %>
+    <style>
+
+    </style>
+</head>
+
+<body>
+  <a href="/sh/logout">Logout</a>
+  <div class="d-flex flex-column mb-3">
+    <% for(var i=0; i < data.length;i++) { %>
+      <a class="p-2" href="/sh/attendance/room/userRoom/<%=data[i].id %>" id="blockId"><%=data[i].name %></a>
+      <% } %>
+  </div>
+  <%- include('../partials/footer') %>
+  <script>
+  </script>
+</body>
+
+</html>

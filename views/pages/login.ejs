@@ -3,16 +3,53 @@
 
 <head>
     <%- include('../partials/head') %>
+        <style>
+            .mh-100 {
+                border: 1px solid black;
+                border-radius: 20px;
+                margin-top: 2cm;
+                margin-left: 26%;
+                box-sizing: border-box;
+            }
+
+            .form {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            .w-75 {
+                border: none;
+                background-color: whitesmoke;
+                border-radius: 20px;
+            }
+            .back-color {
+                background-color: rgb(234, 232, 232);
+            }
+            .margin-left{
+                margin-left: 130px;
+            }
+        </style>
 </head>
 
 <body>
-    <div class="container">
-        <label for="userId">User Id : </label>
-        <input type="text" id="userId">
-        <label for="pass">Password : </label>
-        <input type="password" name="pass" id="pass">
-        <button type="button" onclick="loginUser()">Submit</button>
+    <div class="mh-100 w-50 p-3">
+        <div class="form">
+            <h2>LOGIN</h2>
+            <label for="userId" class="w-75 p-3 back-color"><b>USER ID </b> </label>
+            <input type="text" id="userId" class="w-75 p-3">
+            <label for="pass" class="w-75 p-3 back-color"><b>PASSWORD </b> </label>
+            <input type="password" name="pass" class="w-75 p-3" id="pass">
+            <div class="d-flex flex-column mb-3">
+                <a class="p-2 margin-left"  href="#">Forget Password?</a>
+                <button type="button" class="btn btn-success p-2" onclick="loginUser()">Submit</button>
+                <span class="p-2">Dont have an account ? <a href="/sh/signup">Sign up Now</a></span>
+            </div>
+        </div>
+
     </div>
+    <footer>
+        <%- include('../partials/footer') %>
+    </footer>
     <script>
         function loginUser() {
 
@@ -35,10 +72,10 @@
             };
 
             fetch("http://localhost:4000/api/user/login", requestOptions)
-                .then( (response) => {
-                    if(response.status === 200) {
+                .then((response) => {
+                    if (response.status === 200) {
                         window.location.replace("http://localhost:4000/sh/home");
-                    }else {
+                    } else {
                         window.location.replace("http://localhost:4000/sh/login");
 
                     }
@@ -47,5 +84,4 @@
         }
     </script>
 </body>
-
 </html>

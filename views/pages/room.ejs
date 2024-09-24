@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<%- include('../partials/head') %>
+</head>
+<body>
+    <div class="d-flex flex-column mb-3">
+        <% for(var i=0; i < data.length;i++) { %>
+          <a class="p-2" href="#" id="blockId"><%=data[i].roomNo %></a>
+          <% } %>
+      </div>
+    </body>
+</html>

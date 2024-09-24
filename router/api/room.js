@@ -12,7 +12,7 @@ const con = mysql.createConnection({
 const GET_QUERY = /*sql*/`SELECT *, 
                     DATE_FORMAT(createdAt, "%D %M %Y") 
                     AS
-                    createdAt FROM room WHERE deletedAt IS NULL`
+                    createdAt FROM room WHERE deletedAt IS NULL AND blockId = ?`
 
 const INSERT_QUERY = /*sql*/`INSERT INTO room (roomNo, blockId) VALUES (?,?)`
 
@@ -29,9 +29,10 @@ const updatedKey = [
 
 function getRoom(req, res) {
     try {
-
-        con.query(GET_QUERY, (err, result) => {
+        const id = req.params.id;
+        con.query(GET_QUERY,[id], (err, result) => {
             if (err) {
+                console.log(err)
                 res.status(409).send(err.sqlMessage)
                 return
             }
@@ -146,7 +147,7 @@ function getSingleRoom(req, res) {
     }
 }
 
-router.get('/', getRoom)
+router.get('/block/:id', getRoom)
 router.post('/', insertRoom)
 router.put('/:id', updateRoom)
 router.delete('/:id', deleteRoom)

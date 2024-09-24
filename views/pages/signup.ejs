@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head') %>
+        <style>
+            h2 {
+                margin-left: 40%;
+            }
+
+            .w-50 {
+                margin-left: 26%;
+            }
+
+            .sr-only {
+                font-weight: bold;
+            }
+        </style>
+</head>
+
+<body>
+    <div class="w-50 p-3 ">
+
+        <div class="form-inline">
+            <h2>Sinup</h2>
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="firstName" class="sr-only">First Name </label>
+                <input type="text" class="form-control" id="firstName">
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="lastName" class="sr-only">Last Name </label>
+                <input type="text" class="form-control" id="lastName">
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="phoneNo" class="sr-only">Phone No</label>
+                <input type="number" class="form-control" id="phoneNo">
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="emailId" class="sr-only">Email </label>
+                <input type="email" class="form-control" id="emailId">
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="userId" class="sr-only">User Id</label>
+                <input type="text" class="form-control" id="userId">
+            </div>
+
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="pass" class="sr-only">Password</label>
+                <input type="password" class="form-control" id="pass">
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="confirmPass" class="sr-only">Confirm Password</label>
+                <input type="password" class="form-control" id="confirmPass">
+            </div>
+            <div class="d-flex justify-content-around">
+                <a class="btn btn-warning mb-2" href="/login">Cencel</a>
+                <button type="button" class="btn btn-primary mb-2" onclick="signupUser()">Submit</button>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <%- include('../partials/footer') %>
+    </footer>
+    <script>
+        function signupUser() {
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("Cookie", "connect.sid=s%3Ag5yIF0Gt0AEmkIs39kicMi1_6RXh9Iqx.3NmbrTqVIOXyBTrn%2F3SbbxH3JKsn8HsXb0F5KwLEz3k");
+
+            const fname = document.getElementById('firstName').value;
+            const lname = document.getElementById('lastName').value;
+            const phoneNo = document.getElementById('phoneNo').value;
+            const emailId = document.getElementById('emailId').value;
+            const userId = document.getElementById('userId').value;
+            const pass = document.getElementById('pass').value;
+            const confirmPass = document.getElementById('confirmPass').value;
+            var finalPass = 0
+
+            if (pass == confirmPass) {
+                finalPass = pass
+            }
+
+            const raw = JSON.stringify({
+                "firstName": fname,
+                "lastName": lname,
+                "phoneNo": phoneNo,
+                "email": emailId,
+                "userId": userId,
+                "password": finalPass
+            });
+
+            const requestOptions = {
+                method: "POST",
+                headers: myHeaders,
+                body: raw,
+                redirect: "follow"
+            };
+
+            let request = fetch("http://localhost:4000/api/user", requestOptions)
+            .then(async (response) => {
+                    if(response.status == 200) {
+                        window.location.replace('http://localhost:4000/sh/login')
+                    }else {
+                       await alert(response.text())
+                    }
+                })
+        }
+    </script>
+</body>
+
+</html>

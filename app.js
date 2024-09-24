@@ -16,6 +16,11 @@ const blockApiRouter = require('./router/api/block')
 const roomApiRouter = require('./router/api/room')
 const attendanceRouter = require('./router/api/dayAttendance')
 
+const userUiRouter = require('./router/ui/csUser');
+const blockUiRouter = require('./router/ui/csBlock');
+const roomuiRouter = require('./router/ui/csRoom')
+
+
 var fileStoreOptions = {};
 
 app.set('views', path.join(__dirname, 'views'));
@@ -28,9 +33,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({ extended: true }));
-
 app.use(session({
-    store: new FileStore(fileStoreOptions),
+    // store: new FileStore(fileStoreOptions),
     secret: 'attendance',
     resave: true,
     saveUninitialized: true,
@@ -42,50 +46,12 @@ app.use(session({
 app.use('/api/user/', userApiRouter);
 app.use('/api/student/', studentApiRouter);
 app.use('/api/block', blockApiRouter);
-app.use('/api/room/',roomApiRouter);
-app.use('/api/attendance',attendanceRouter);
+app.use('/api/room/', roomApiRouter);
+app.use('/api/attendance', attendanceRouter);
 
-
-app.get('/sh/login',(req,res) => {
-    try {
-        res.render('pages/login.ejs')
-    } catch (error) {
-        console.error(error)
-    }
-
-})
-
-app.get('/sh/home',(req,res) => {
-    try {
-        if(req.session.isLogged == true) {
-            const userName = req.session.data
-            console.log(userName)
-            res.render('pages/home.ejs',{userName})
-        }
-
-    } catch (error) {
-        console.error(error)
-    }
-})
-
-app.get('/sh/logout',(req,res) => {
-    try {
-        if(req.session.isLogged == true) {
-            req.session.destroy((err) => {
-                if(err) {
-                    console.log(err)
-                    return
-                }
-                res.redirect('http://localhost:4000/sh/login')
-            })
-        }else{
-            res.redirect("http://localhost:4000/sh/login")
-        }
-    } catch (error) {
-        console.error(error)
-    }
-})
-
+app.use('/sh', userUiRouter);
+app.use('/sh/attendance', blockUiRouter);
+app.use('/sh/attendance/room',roomuiRouter);
 
 app.use(function (req, res, next) {
     next(createError(404));
