@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head') %>
+</head>
+
+<body>
+    <div class="d-flex flex-column mb-3">
+        <table class="table">
+            <thead class="thead-light">
+                <tr>
+                    <th scope="col">Account No</th>
+                    <th scope="col">Name </th>
+                    <th scope="col">Attendance</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for(var i=0; i < data.length;i++) { %>
+                    <tr>
+                        <td scope="row">
+                            <%= data[i].accNo %>
+                        </td>
+                        <td>
+                            <%= data[i].firstName %>
+                                <%= data[i].lastName %>
+                        </td>
+                        <td>
+                            <table class="table table-bordered">
+                                <thead>
+                                  <tr>
+                                    <th scope="col">Present</th>
+                                    <th scope="col">Absent</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <td><input type="checkbox" name="" id=""></td>
+                                    <td><input type="checkbox" name="" id=""></td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                        </td>
+                    </tr>
+                    <% } %>
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>

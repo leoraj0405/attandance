@@ -14,6 +14,12 @@ const GET_QUERY = /*sql*/`SELECT *,
                     AS
                     createdAt FROM student WHERE deletedAt IS NULL`
 
+const GET_ROOM_WISE_QUERY = /*sql*/`SELECT *, 
+                    DATE_FORMAT(createdAt, "%D %M %Y") 
+                    AS
+                    createdAt FROM student WHERE deletedAt IS NULL AND roomId = ?`
+
+
 const INSERT_QUERY = /*sql*/`INSERT INTO student (
                     accNo, 
                     firstName, 
@@ -45,6 +51,21 @@ function getStudent(req, res) {
     try {
 
         con.query(GET_QUERY, (err, result) => {
+            if (err) {
+                res.status(409).send(err.sqlMessage)
+                return
+            }
+            res.status(200).send(result)
+        })
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+function getRoomStudent(req, res) {
+    try {
+        const id = req.params.id;
+        con.query(GET_ROOM_WISE_QUERY,[id], (err, result) => {
             if (err) {
                 res.status(409).send(err.sqlMessage)
                 return
@@ -183,6 +204,7 @@ function getSingleStudent(req, res) {
 }
 
 router.get('/', getStudent)
+router.get('/room/:id',getRoomStudent)
 router.post('/', insertStudent)
 router.put('/:id', updateStudent)
 router.delete('/:id', deleteStudent)

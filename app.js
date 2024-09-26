@@ -18,8 +18,8 @@ const attendanceRouter = require('./router/api/dayAttendance')
 
 const userUiRouter = require('./router/ui/csUser');
 const blockUiRouter = require('./router/ui/csBlock');
-const roomuiRouter = require('./router/ui/csRoom')
-
+const roomuiRouter = require('./router/ui/csRoom');
+const studentUiRouter = require('./router/ui/csStudent');
 
 var fileStoreOptions = {};
 
@@ -52,6 +52,7 @@ app.use('/api/attendance', attendanceRouter);
 app.use('/sh', userUiRouter);
 app.use('/sh/attendance', blockUiRouter);
 app.use('/sh/attendance/room',roomuiRouter);
+app.use('/sh/attendance/stud',studentUiRouter);
 
 app.use(function (req, res, next) {
     next(createError(404));

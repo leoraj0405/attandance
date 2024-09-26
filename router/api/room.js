@@ -9,10 +9,15 @@ const con = mysql.createConnection({
     database: 'attendance'
 })
 
-const GET_QUERY = /*sql*/`SELECT *, 
+const GET_BLOCK_QUERY = /*sql*/`SELECT *, 
                     DATE_FORMAT(createdAt, "%D %M %Y") 
                     AS
                     createdAt FROM room WHERE deletedAt IS NULL AND blockId = ?`
+
+const GET_QUERY = /*sql*/`SELECT *, 
+                    DATE_FORMAT(createdAt, "%D %M %Y") 
+                    AS
+                    createdAt FROM room WHERE deletedAt IS NULL`
 
 const INSERT_QUERY = /*sql*/`INSERT INTO room (roomNo, blockId) VALUES (?,?)`
 
@@ -27,10 +32,27 @@ const updatedKey = [
     "blockId",
 ]
 
+function getBlockRoom(req, res) {
+    try {
+        const id = req.params.id;
+        con.query(GET_BLOCK_QUERY, [id], (err, result) => {
+            if (err) {
+                console.log(err)
+                res.status(409).send(err.sqlMessage)
+                return
+            }
+            res.status(200).send(result)
+        })
+    } catch (error) {
+        console.error(error)
+    }
+
+}
+
 function getRoom(req, res) {
     try {
         const id = req.params.id;
-        con.query(GET_QUERY,[id], (err, result) => {
+        con.query(GET_QUERY, [id], (err, result) => {
             if (err) {
                 console.log(err)
                 res.status(409).send(err.sqlMessage)
@@ -75,7 +97,7 @@ function updateRoom(req, res) {
         const values = []
         updatedKey.forEach((key) => {
             const keyValue = req.body[key];
-            if(keyValue !== undefined) {
+            if (keyValue !== undefined) {
                 values.push(keyValue)
                 columns.push(`${key} = ?`)
             }
@@ -147,7 +169,8 @@ function getSingleRoom(req, res) {
     }
 }
 
-router.get('/block/:id', getRoom)
+router.get('/',getRoom)
+router.get('/block/:id', getBlockRoom)
 router.post('/', insertRoom)
 router.put('/:id', updateRoom)
 router.delete('/:id', deleteRoom)
