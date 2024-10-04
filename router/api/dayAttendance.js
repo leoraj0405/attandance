@@ -58,7 +58,6 @@ function insertdayattendance(req, res) {
             date
         ]
         con.query(INSERT_QUERY, insertColumns, (err, result) => {
-            console.log(INSERT_QUERY)
             if (err) {
                 res.status(409).send(err.sqlMessage)
                 return

@@ -214,7 +214,7 @@ function loginUser(req, res) {
             password
         } = req.body;
 
-        con.query(/*sql*/` SELECT firstName FROM user WHERE userId = ? AND password = ? `,
+        con.query(/*sql*/` SELECT id,firstName FROM user WHERE userId = ? AND password = ? `,
             [userId, password], async (err, result) => {
                 if (err) {
                     res.status(409).send(err.sqlMessage)
@@ -222,7 +222,7 @@ function loginUser(req, res) {
                 }
                 if (result.length > 0) {
                     req.session.isLogged = true;
-                    req.session.data = result[0].firstName;
+                    req.session.data = result[0];
                     res.status(200).send('SUCCESS ')
                 }
                 else {

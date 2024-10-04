@@ -15,7 +15,8 @@ router.get('/login',(req,res) => {
 router.get('/home',(req,res) => {
     try {
         if(req.session.isLogged == true) {
-            const userName = req.session.data
+            const userName = req.session.data.firstName
+            console.log(req.session.data)
             res.render('pages/home.ejs',{userName})
         }
 

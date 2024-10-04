@@ -3,9 +3,26 @@
 
 <head>
     <%- include('../partials/head') %>
+        <style>
+            .border-none {
+                list-style-type: none;
+                padding-left: 0;
+            }
+        </style>
 </head>
 
 <body>
+
+    <div class="h-50 d-inline-block"></div>
+    <div class="w-100 p-3 d-flex justify-content-center">
+    </div>
+    <div class="w-100 p-3 d-flex justify-content-center">
+        <input type="date" name="todayDate" id="todayDate" class="btn btn-info">
+    </div>
+    <div class="w-100 p-3 d-flex justify-content-center">
+        <li class="border-none" value="<%=id %>" id="warden">Attendance taken by <%=firstName %>
+        </li>
+    </div>
     <div class="d-flex flex-column mb-3">
         <table class="table">
             <thead class="thead-light">
@@ -22,30 +39,83 @@
                             <%= data[i].accNo %>
                         </td>
                         <td>
-                            <%= data[i].firstName %>
-                                <%= data[i].lastName %>
+                            <li class="border-none" value="<%=data[i].id %>" name="student">
+                                <%=data[i].firstName %>
+                            </li>
                         </td>
                         <td>
-                            <table class="table table-bordered">
+                            <table class="table table-borderless">
                                 <thead>
-                                  <tr>
-                                    <th scope="col">Present</th>
-                                    <th scope="col">Absent</th>
-                                  </tr>
+                                    <tr>
+                                        <th scope="col">Present</th>
+                                        <th scope="col">Absent</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
-                                  <tr>
-                                    <td><input type="checkbox" name="" id=""></td>
-                                    <td><input type="checkbox" name="" id=""></td>
-                                  </tr>
+                                    <tr>
+                                        <td><input type="checkbox" name="options" value="1"></td>
+                                        <td><input type="checkbox" name="options" value="0"></td>
+                                    </tr>
                                 </tbody>
-                              </table>
+                            </table>
                         </td>
                     </tr>
                     <% } %>
             </tbody>
         </table>
+        <div class="w-100 p-3 d-flex justify-content-center">
+            <button onclick="attendance()" class="btn btn-success">Submit</button>
+        </div>
+
     </div>
+    <script>
+        function attendance() {
+            const appearance = [];
+            const students = [];
+            const checkboxs = document.querySelectorAll('input[name = "options"]:checked');
+            checkboxs.forEach((checkboxInput) => {
+                appearance.push(checkboxInput.value);
+            });
+            const roomStud = document.querySelectorAll('li[name="student"]');
+            roomStud.forEach((stud) => {
+                students.push(stud.value);
+            });
+            const todayDate = document.getElementById('todayDate').value;
+            const warden = document.getElementById('warden').value;
+            // console.log(students)
+
+            for (let i = 0; i < students.length; i++) {
+                // console.log(`student value: ${students[i]}, appearance value: ${appearance[i]}`);
+                const myHeaders = new Headers();
+                myHeaders.append("Content-Type", "application/json");
+                myHeaders.append("Cookie", "connect.sid=s%3A0FBGyvDQt12m2t3TO-XjJI6gJ8xNdBFn.xp64Qp7hK3iQAjYNPj7I1L97j1MVY6yhLK5FJ3JjAhw");
+
+                const raw = JSON.stringify({
+                    "studentId": students[i],
+                    "wardenId": warden,
+                    "appearance": appearance[i],
+                    "date": todayDate
+                });
+
+                const requestOptions = {
+                    method: "POST",
+                    headers: myHeaders,
+                    body: raw,
+                    redirect: "follow"
+                };
+
+                var request = fetch("http://localhost:4000/api/attendance", requestOptions)
+            }
+            request.then(async (response) => {
+                if (response.status == 200) {
+                    await alert("Done ")
+                } else {
+                    await alert(" OOPS!! Something error Try again ")
+                }
+            })
+
+        }
+    </script>
 </body>
 
 </html>
