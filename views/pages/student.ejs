@@ -8,6 +8,9 @@
                 list-style-type: none;
                 padding-left: 0;
             }
+            .border-trasnprant {
+                border: transparent;
+            }
         </style>
 </head>
 
@@ -49,12 +52,17 @@
                                     <tr>
                                         <th scope="col">Present</th>
                                         <th scope="col">Absent</th>
+                                        <th scope="col">Leave</th>
+                                        <td scope="col"><b>reason</b><br> <p>(If the student take leave give the reason here) </p></td>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td><input type="checkbox" name="options" value="1"></td>
-                                        <td><input type="checkbox" name="options" value="0"></td>
+                                        <td><input type="checkbox" name="options" value="p"></td>
+                                        <td><input type="checkbox" name="options" value="a"></td>
+                                        <td><input type="checkbox" name="options" value="l"></td>
+                                        <td><input type="text" name="reason"></td>
+    
                                     </tr>
                                 </tbody>
                             </table>
@@ -72,6 +80,7 @@
         function attendance() {
             const appearance = [];
             const students = [];
+            const reason = [];
             const checkboxs = document.querySelectorAll('input[name = "options"]:checked');
             checkboxs.forEach((checkboxInput) => {
                 appearance.push(checkboxInput.value);
@@ -80,8 +89,15 @@
             roomStud.forEach((stud) => {
                 students.push(stud.value);
             });
+
+            const reasonArr = document.querySelectorAll('input[name = "reason"]');
+            reasonArr.forEach((key) => {
+                reason.push(key.value)
+            })
+            // console.log(reason)
             const todayDate = document.getElementById('todayDate').value;
             const warden = document.getElementById('warden').value;
+            
             // console.log(students)
 
             for (let i = 0; i < students.length; i++) {
@@ -94,7 +110,8 @@
                     "studentId": students[i],
                     "wardenId": warden,
                     "appearance": appearance[i],
-                    "date": todayDate
+                    "date": todayDate,
+                    "reason":reason[i]
                 });
 
                 const requestOptions = {

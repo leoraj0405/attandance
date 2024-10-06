@@ -10,7 +10,6 @@ router.get('/:id',async (req,res) =>{
             const id = req.params.id;
             const response = await fetch(`http://localhost:4000/api/student/room/${id}`)
             const data = await response.json();
-            // console.log(data)
             res.render('pages/student.ejs',{data, ...warden})
         }else {
             res.redirect('http://localhost:4000/sh/login')

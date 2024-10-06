@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const mysql = require('mysql');
-const { use } = require('./user');
 
 const con = mysql.createConnection({
     host: 'localhost',
@@ -33,8 +32,6 @@ const INSERT_QUERY = /*sql*/` INSERT INTO user
 const SINGLE_GET_QUERY = /*sql*/`SELECT * FROM user WHERE id = ?`
 
 UPDATE_PASS_QUERY = /*sql*/`UPDATE user SET password = ? WHERE id = ?`;
-
-GET_UDERID_QUERY = /*sql*/`SELECT id, userId FROM user`
 
 
 function getUser(req, res) {
@@ -173,15 +170,7 @@ function forgetPass(req, res) {
     try {
         const id = req.params.id;
         const pass = req.body.password;
-        const responseData = {}
-
-        con.query(GET_UDERID_QUERY,(err2 ,result2) => {
-            if(err2) {
-                res.status(409).send(err2.sqlMessage)
-                return
-            }
-            responseData.userId = result2
-        })
+        
         con.query(UPDATE_PASS_QUERY, [pass, id], (err, result) => {
             if (err) {
                 res.status(409).send(err.sqlMessage)
@@ -189,15 +178,14 @@ function forgetPass(req, res) {
             }
             if (result.affectedRows > 0) {
                 con.query(SINGLE_GET_QUERY, [id], (err3, result3) => {
-                    if(err3) {
+                    if (err3) {
                         res.status(409).send(err3.sqlMessage)
                         return
                     }
-                    responseData.data = result3[0]
-                    res.status(200).send(responseData)
-                })  
+                    res.status(200).send(result3)
+                })
             }
-            
+
         })
 
 

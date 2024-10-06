@@ -11,7 +11,7 @@ const con = mysql.createConnection({
 
 const GET_QUERY = /*sql*/`SELECT * FROM dayattendance`
 
-const INSERT_QUERY = /*sql*/`INSERT INTO dayattendance (studentId, wardenId, appearance, date) VALUES (?,?,?,?)`
+const INSERT_QUERY = /*sql*/`INSERT INTO dayattendance (studentId, wardenId, appearance, date, reason) VALUES (?,?,?,?,?)`
 
 const SINGLE_GET_QUERY = /*sql*/`SELECT * FROM dayattendance WHERE id = ?`
 
@@ -23,7 +23,8 @@ const updatedKey = [
     "studentId",
     "wardenId",
     "appearance",
-    "date"
+    "date",
+    "reason"
 ]
 
 function getdayattendance(req, res) {
@@ -48,14 +49,16 @@ function insertdayattendance(req, res) {
             studentId,
             wardenId,
             appearance,
-            date
+            date,
+            reason,
         } = req.body;
 
         const insertColumns = [            
             studentId,
             wardenId,
             appearance,
-            date
+            date,
+            reason
         ]
         con.query(INSERT_QUERY, insertColumns, (err, result) => {
             if (err) {

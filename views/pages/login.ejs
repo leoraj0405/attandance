@@ -40,7 +40,7 @@
             <label for="pass" class="w-75 p-3 back-color"><b>PASSWORD </b> </label>
             <input type="password" name="pass" class="w-75 p-3" id="pass">
             <div class="d-flex flex-column mb-3">
-                <a class="p-2 margin-left"  href="#">Forget Password?</a>
+                <a class="p-2 margin-left"  href="/sh/warden/forgetPass">Forget Password?</a>
                 <button type="button" class="btn btn-success p-2" onclick="loginUser()">Submit</button>
                 <span class="p-2">Dont have an account ? <a href="/sh/signup">Sign up Now</a></span>
             </div>
@@ -76,7 +76,7 @@
                     if (response.status === 200) {
                         window.location.replace("http://localhost:4000/sh/home");
                     } else {
-                        window.location.replace("http://localhost:4000/sh/login");
+                        alert('Login Failed try again !')                
 
                     }
                 })
