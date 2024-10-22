@@ -19,7 +19,13 @@ const GET_QUERY = /*sql*/`SELECT *,
                     AS
                     createdAt FROM room WHERE deletedAt IS NULL`
 
-const INSERT_QUERY = /*sql*/`INSERT INTO room (roomNo, blockId) VALUES (?,?)`
+const INSERT_QUERY = /*sql*/`
+                            INSERT INTO 
+                            room 
+                            (roomNo, blockId, isActive) 
+                            VALUES (?,?,?)
+                            ON DUPLICATE KEY UPDATE
+                            `
 
 const SINGLE_GET_QUERY = /*sql*/`SELECT * FROM room WHERE id = ?`
 
@@ -28,10 +34,10 @@ const DELETE_QUERY = /*sql*/` UPDATE room SET
                                  WHERE id = ?`
 
 const updatedKey = [
-    "roomNo",
-    "blockId",
+    'roomNo',
+    'blockId',
+    'isActive'
 ]
-
 function getBlockRoom(req, res) {
     try {
         const id = req.params.id;
@@ -71,9 +77,10 @@ function insertRoom(req, res) {
         const {
             roomNo,
             blockId,
+            isActive,
         } = req.body;
 
-        con.query(INSERT_QUERY, [roomNo, blockId], (err, result) => {
+        con.query(INSERT_QUERY, [roomNo, blockId, isActive], (err, result) => {
             console.log(INSERT_QUERY)
             if (err) {
                 res.status(409).send(err.sqlMessage)

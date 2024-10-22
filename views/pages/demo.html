@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa; /* Light background color */
+        }
+        .container {
+            max-width: 400px; /* Set a max width for the form */
+            margin-top: 100px; /* Center vertically */
+            padding: 20px;
+            background-color: #ffffff; /* White background for the form */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Light shadow */
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 class="text-center">Forgot Password</h2>
+    <p class="text-center">Please enter your email address to receive a password reset link.</p>
+    <form id="forgot-password-form">
+        <div class="form-group">
+            <label for="email">Email address</label>
+            <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Send Reset Link</button>
+    </form>
+    <div class="text-center mt-3">
+        <a href="login.html">Back to Login</a>
+    </div>
+</div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+
+
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>
+        Generate a n-digit 
+          number using JavaScript
+    </title>
+    <style>
+        body {
+            text-align: center;
+        }
+
+        h1 {
+            color: green;
+        }
+
+        #geeks {
+            color: green;
+            font-size: 29px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <p>
+
+        <!-- min and max are 5 digit so-->
+        Click on the button to 
+          generate random 6 digit 
+          number
+    </p>
+    <button onclick="gfg();">
+        click here
+    </button>
+    <p id="geeks">
+    </p>
+    <script>
+        let up = document.getElementById('GFG_UP');
+        let down = document.getElementById('geeks');
+
+        function gfg() {
+            let minm = 100000;
+            let maxm = 999999;
+            down.innerHTML = Math.floor(Math
+                .random() * (maxm - minm + 1)) + minm;
+        } 
+    </script>
+</body>
+
+</html>

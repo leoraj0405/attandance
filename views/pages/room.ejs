@@ -1,13 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<%- include('../partials/head') %>
+  <%- include('../partials/head') %>
 </head>
+
 <body>
-    <div class="d-flex flex-column mb-3">
-        <% for(var i=0; i < data.length;i++) { %>
-          <a class="p-2" href="/sh/attendance/stud/<%=data[i].id %>" id="blockId"><%=data[i].roomNo %></a>
-          <% } %>
+  <%- include('../partials/header') %>
+    </div>
+    <div class="d-flex justify-content-center">
+      <div class="w-25 p-3">
+          <label for="roomId"><b>Rooms</b></label>
+          <table class="table table-borderless">
+            <tbody>
+              <tr>
+                <% for(var i=0; i < data.length;i++) { %>
+                  <td>
+                  <a class="p-2 btn btn-light card w-100 p-3" href="/sh/attendance/stud/<%=data[i].id %>" id="roomId">
+                    <%=data[i].roomNo %>
+                  </a>
+                </td>
+                <% if(i==4 || i==9 || i==13 || i==17) { %>
+                </tr><tr>
+                  <% } %>
+                  <% } %>
+                </tr>
+
       </div>
-    </body>
+    </div>
+
+    <script>
+      function backward() {
+        window.location.replace("http://localhost:4000/sh/attendance");
+
+      }
+
+    </script>
+</body>
+
 </html>

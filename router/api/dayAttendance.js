@@ -60,6 +60,15 @@ function insertdayattendance(req, res) {
             date,
             reason
         ]
+        con.query(/*sql*/`SELECT date FROM dayattendance WHERE date = ?`,[date], (err1, result1) => {
+            if(err1){
+                res.status(409).send(err1)
+                return
+            }
+            if(result1.length != 0) {
+                res.status(409).send('Already put the attendance for that date')
+                return
+            }
         con.query(INSERT_QUERY, insertColumns, (err, result) => {
             if (err) {
                 res.status(409).send(err.sqlMessage)
@@ -69,6 +78,8 @@ function insertdayattendance(req, res) {
                 res.status(200).send("INSERTED")
             }
         })
+
+    })
 
     } catch (error) {
         console.error(error)

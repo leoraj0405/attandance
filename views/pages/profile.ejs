@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../partials/head') %>
+    <style>
+      .center {
+        text-align: center;
+      }
+      .bold {
+        font-weight: bold;
+      }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header') %>
+    <table class="table table-bordered center">
+        <tbody>
+          <tr>
+            <td scope="col"><b>ID</b></td>
+            <td scope="col"><%= data.userId %></td>
+          </tr>
+          <tr>
+            <td scope="col"><b>First Name </b></td>
+            <td scope="col"><%= data.firstName %></td>
+          </tr>
+          <tr>
+            <td scope="col"><b>Last Name </b></td>
+            <td scope="col"><%= data.lastName %></td>
+          </tr>
+          <tr>
+            <td scope="col"><b>Phone Number </b></td>
+            <td scope="col"><%= data.phoneNo %></td>
+
+          </tr>
+          <tr>
+            <td scope="col"><b>Email ID </b></td>
+            <td scope="col"><%= data.email %></td>
+
+          </tr>
+        </tbody>
+      </table>
+</body>
+</html>

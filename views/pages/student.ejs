@@ -8,131 +8,151 @@
                 list-style-type: none;
                 padding-left: 0;
             }
+
             .border-trasnprant {
                 border: transparent;
+            }
+
+            .back-color {
+                background-color: rgb(234, 232, 232);
+            }
+
+            input[type="checkbox"] {
+                height: 30px;
+                width: 30px;
             }
         </style>
 </head>
 
 <body>
+    <%- include('../partials/header') %>
+        <div class="container-main container">
+            <div class="container-fluid">
+                <div class="w-100 p-3 d-flex justify-content-center">
+                    <input type="date" name="todayDate" id="todayDate" class="btn btn-info">
+                </div>
+                <div class="w-100 p-3 d-flex justify-content-center">
+                    <li class="border-none" value="<%=id %>" id="warden">Attendance taken by <%=firstName %>
+                    </li>
+                </div>
+                <div class="d-flex flex-column mb-3">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Account No</th>
+                                <th scope="col">Name </th>
+                                <th scope="col">Present</th>
+                                <th scope="col">Absent</th>
+                                <th scope="col">Leave</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if( data.length==0 ) { %>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td><p>No students in the Room</p></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <% }else { %>
+                                    <% for(var i=0; i < data.length;i++) { %>
+                                        <tr>
+                                            <td scope="row">
+                                                <%= data[i].accNo %>
+                                            </td>
+                                            <td>
+                                                <li class="border-none" value="<%=data[i].id %>" name="student">
+                                                    <%=data[i].firstName %>
+                                                </li>
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" name="options" value="p">
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" name="options" value="a">
 
-    <div class="h-50 d-inline-block"></div>
-    <div class="w-100 p-3 d-flex justify-content-center">
-    </div>
-    <div class="w-100 p-3 d-flex justify-content-center">
-        <input type="date" name="todayDate" id="todayDate" class="btn btn-info">
-    </div>
-    <div class="w-100 p-3 d-flex justify-content-center">
-        <li class="border-none" value="<%=id %>" id="warden">Attendance taken by <%=firstName %>
-        </li>
-    </div>
-    <div class="d-flex flex-column mb-3">
-        <table class="table">
-            <thead class="thead-light">
-                <tr>
-                    <th scope="col">Account No</th>
-                    <th scope="col">Name </th>
-                    <th scope="col">Attendance</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% for(var i=0; i < data.length;i++) { %>
-                    <tr>
-                        <td scope="row">
-                            <%= data[i].accNo %>
-                        </td>
-                        <td>
-                            <li class="border-none" value="<%=data[i].id %>" name="student">
-                                <%=data[i].firstName %>
-                            </li>
-                        </td>
-                        <td>
-                            <table class="table table-borderless">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Present</th>
-                                        <th scope="col">Absent</th>
-                                        <th scope="col">Leave</th>
-                                        <td scope="col"><b>reason</b><br> <p>(If the student take leave give the reason here) </p></td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td><input type="checkbox" name="options" value="p"></td>
-                                        <td><input type="checkbox" name="options" value="a"></td>
-                                        <td><input type="checkbox" name="options" value="l"></td>
-                                        <td><input type="text" name="reason"></td>
-    
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </td>
-                    </tr>
-                    <% } %>
-            </tbody>
-        </table>
-        <div class="w-100 p-3 d-flex justify-content-center">
-            <button onclick="attendance()" class="btn btn-success">Submit</button>
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" name="options" value="l"><br>
+                                                <input type="text" class="form-control" name="reason">
+
+                                            </td>
+                                            <td>
+                                                <a href="#"> <span class="fa fa-edit"></span></a>
+                                                <a href="#"><span class="fa fa-info-circle"></span></a>
+                                            </td>
+                                        </tr>
+                                        <% } %>
+                                            <% } %>
+
+                        </tbody>
+                    </table>
+                    <div class="w-100 p-3 d-flex justify-content-center">
+                        <button onclick="attendance()" class="btn btn-success">Submit</button>
+                    </div>
+
+                </div>
+            </div>
         </div>
+        <script>
+            const today = new Date().toISOString().split('T')[0];
 
-    </div>
-    <script>
-        function attendance() {
-            const appearance = [];
-            const students = [];
-            const reason = [];
-            const checkboxs = document.querySelectorAll('input[name = "options"]:checked');
-            checkboxs.forEach((checkboxInput) => {
-                appearance.push(checkboxInput.value);
-            });
-            const roomStud = document.querySelectorAll('li[name="student"]');
-            roomStud.forEach((stud) => {
-                students.push(stud.value);
-            });
-
-            const reasonArr = document.querySelectorAll('input[name = "reason"]');
-            reasonArr.forEach((key) => {
-                reason.push(key.value)
-            })
-            // console.log(reason)
-            const todayDate = document.getElementById('todayDate').value;
-            const warden = document.getElementById('warden').value;
-            
-            // console.log(students)
-
-            for (let i = 0; i < students.length; i++) {
-                // console.log(`student value: ${students[i]}, appearance value: ${appearance[i]}`);
-                const myHeaders = new Headers();
-                myHeaders.append("Content-Type", "application/json");
-                myHeaders.append("Cookie", "connect.sid=s%3A0FBGyvDQt12m2t3TO-XjJI6gJ8xNdBFn.xp64Qp7hK3iQAjYNPj7I1L97j1MVY6yhLK5FJ3JjAhw");
-
-                const raw = JSON.stringify({
-                    "studentId": students[i],
-                    "wardenId": warden,
-                    "appearance": appearance[i],
-                    "date": todayDate,
-                    "reason":reason[i]
+            function attendance() {
+                const todayDate = document.getElementById('todayDate').value
+                const warden = document.getElementById('warden').value;
+                const appearance = [];
+                const students = [];
+                const reason = [];
+                const checkboxs = document.querySelectorAll('input[name = "options"]:checked');
+                checkboxs.forEach((checkboxInput) => {
+                    appearance.push(checkboxInput.value);
+                });
+                const roomStud = document.querySelectorAll('li[name="student"]');
+                roomStud.forEach((stud) => {
+                    students.push(stud.value);
                 });
 
-                const requestOptions = {
-                    method: "POST",
-                    headers: myHeaders,
-                    body: raw,
-                    redirect: "follow"
-                };
+                const reasonArr = document.querySelectorAll('input[name = "reason"]');
+                reasonArr.forEach((key) => {
+                    reason.push(key.value)
+                })
+                console.log(todayDate, warden, students, appearance, reason)
 
-                var request = fetch("http://localhost:4000/api/attendance", requestOptions)
-            }
-            request.then(async (response) => {
-                if (response.status == 200) {
-                    await alert("Done ")
-                } else {
-                    await alert(" OOPS!! Something error Try again ")
+                for (let i = 0; i < students.length; i++) {
+                    const myHeaders = new Headers();
+                    myHeaders.append("Content-Type", "application/json");
+                    myHeaders.append("Cookie", "connect.sid=s%3A0FBGyvDQt12m2t3TO-XjJI6gJ8xNdBFn.xp64Qp7hK3iQAjYNPj7I1L97j1MVY6yhLK5FJ3JjAhw");
+
+                    const raw = JSON.stringify({
+                        "studentId": students[i],
+                        "wardenId": warden,
+                        "appearance": appearance[i],
+                        "date": todayDate,
+                        "reason": reason[i]
+                    });
+
+                    const requestOptions = {
+                        method: "POST",
+                        headers: myHeaders,
+                        body: raw,
+                        redirect: "follow"
+                    };
+
+                    var request = fetch("http://localhost:4000/api/attendance", requestOptions)
                 }
-            })
+                request.then(async (response) => {
+                    if (response.status == 200) {
+                        await alert("Done ")
+                    } else {
+                        await alert("OOPS!! Something Error!")
+                    }
+                })
 
-        }
-    </script>
+            }
+        </script>
 </body>
 
 </html>

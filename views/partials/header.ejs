@@ -1,5 +1,12 @@
-<nav class="navbar navbar-light bg-light">
-  <h1> <%=userName.toUpperCase() %>
-  </h1>
-  <a href="/sh/logout">Logout</a>
+<nav class="navbar navbar-light bg-light justify-content-between">
+  <marquee direction="right"><h2>Sacred Heart Hostel</h2></marquee>
+  <div class="w-100 p-3">
+  <div class="d-flex flex-row-reverse">
+    <div class="p-2"><a href="/sh/logout">Logout</a></div>
+    <div class="p-2"><b><%=user.firstName %></b></div>
+
+  </div>
+</div>
+  
+    
 </nav>

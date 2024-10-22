@@ -3,21 +3,50 @@
 
 <head>
   <%- include('../partials/head') %>
-    <style>
-
-    </style>
 </head>
 
 <body>
-  <a href="/sh/logout">Logout</a>
-  <div class="d-flex flex-column mb-3">
-    <% for(var i=0; i < data.length;i++) { %>
-      <a class="p-2" href="/sh/attendance/room/<%=data[i].id %>" id="blockId"><%=data[i].name %></a>
-      <% } %>
-  </div>
-  <%- include('../partials/footer') %>
-  <script>
-  </script>
+  <%- include('../partials/header') %>
+    <!-- <nav class="navbar navbar-light bg-light">
+    <a class="navbar-brand" href="#">Add Block</a>
+  </nav> -->
+    <div class="w-100 p-3">
+      <div class="d-flex justify-content-around">
+        <div></div>
+        <div></div>
+        <div></div>
+        <button class="btn btn-secondary" onclick="backward()">Back <span class="fa fa-angle-right"></span></button>
+      </div>
+    </div>
+    <div class="d-flex justify-content-center">
+      <div class="w-50 p-3">
+        <label for="blockId"><b>Blocks</b></label>
+          <table class="table table-borderless">
+            <tbody >
+              <tr>
+              <% for(var i=0; i < data.length;i++) { %>
+                  <td>
+                    <a class="col btn btn-light card" href="/sh/attendance/room/<%=data[i].id %>" id="blockId">
+                      <%=data[i].name %>
+                    </a>
+                  </td>
+                  <% if(i==4 || i==9 || i==13  || i==17 || i==20) { %>
+                  </tr>
+                  <tr>
+                    <% } %>
+                    <% } %>
+                  </tr>
+
+            </tbody>
+          </table>
+      </div>
+    </div>
+    <%- include('../partials/footer') %>
+      <script>
+        function backward() {
+          window.location.replace("http://localhost:4000/sh/home");
+        }
+      </script>
 </body>
 
 </html>

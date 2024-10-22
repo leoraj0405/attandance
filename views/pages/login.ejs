@@ -4,57 +4,90 @@
 <head>
     <%- include('../partials/head') %>
         <style>
-            .mh-100 {
-                border: 1px solid black;
-                border-radius: 20px;
-                margin-top: 2cm;
-                margin-left: 26%;
-                box-sizing: border-box;
+            body {
+                background-color: #f7f7f7;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
             }
 
-            .form {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
+            .login-form {
+                background: #fff;
+                padding: 30px;
+                border-radius: 10px;
+                box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
             }
-            .w-75 {
-                border: none;
-                background-color: whitesmoke;
-                border-radius: 20px;
+
+            .form-control:focus {
+                box-shadow: none;
+                border-color: #007bff;
             }
-            .back-color {
-                background-color: rgb(234, 232, 232);
+
+            .input-group-text {
+                background-color: #fff;
+                border-left: 0;
             }
-            .margin-left{
-                margin-left: 130px;
+
+            .input-group .form-control {
+                border-right: 0;
+            }
+
+            .input-group .toggle-password {
+                cursor: pointer;
             }
         </style>
 </head>
 
 <body>
-    <div class="mh-100 w-50 p-3">
-        <div class="form">
-            <h2>LOGIN</h2>
-            <label for="userId" class="w-75 p-3 back-color"><b>USER ID </b> </label>
-            <input type="text" id="userId" class="w-75 p-3">
-            <label for="pass" class="w-75 p-3 back-color"><b>PASSWORD </b> </label>
-            <input type="password" name="pass" class="w-75 p-3" id="pass">
-            <div class="d-flex flex-column mb-3">
-                <a class="p-2 margin-left"  href="/sh/warden/forgetPass">Forget Password?</a>
-                <button type="button" class="btn btn-success p-2" onclick="loginUser()">Submit</button>
-                <span class="p-2">Dont have an account ? <a href="/sh/signup">Sign up Now</a></span>
+    <div class="login-form col-md-4">
+        <h3 class="text-center mb-4">Login</h3>
+        <div>
+            <div class="mb-3">
+                <label for="email" class="form-label">User Id</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                    <input type="text" class="form-control" id="userId" placeholder="Enter your User ID" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                    <input type="password" class="form-control" id="password" placeholder="Enter your password"
+                        required>
+                    <span class="input-group-text toggle-password"><i class="fas fa-eye-slash"></i></span>
+                </div>
+            </div>
+            <div class="d-grid">
+                <button type="button" class="btn btn-primary" onclick="loginUser()">Login</button>
+            </div>
+
+            <div class="text-center mt-3">
+                <a href="/sh/warden/restPassword">Forgot password?</a> | <a href="/sh/signup">Sign up</a>
             </div>
         </div>
-
     </div>
-    <footer>
-        <%- include('../partials/footer') %>
-    </footer>
     <script>
+        document.querySelector('.toggle-password').addEventListener('click', function () {
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
+        });
+
+
         function loginUser() {
 
             const userId = document.getElementById('userId').value;
-            const pass = document.getElementById('pass').value;
+            const pass = document.getElementById('password').value;
 
             const myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
@@ -76,7 +109,7 @@
                     if (response.status === 200) {
                         window.location.replace("http://localhost:4000/sh/home");
                     } else {
-                        alert('Login Failed try again !')                
+                        alert('Login Failed try again !')
 
                     }
                 })
@@ -84,4 +117,5 @@
         }
     </script>
 </body>
+
 </html>

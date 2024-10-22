@@ -1,13 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <%- include('../partials/head'); %>
-</head>
-<body class="container">
-<%- include('../partials/header') %>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-<div>
-  <a href="/sh/attendance">take Attendance</a>
-</div>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+      }
+
+      /* Sidebar styling */
+      .sidebar {
+        width: 250px;
+        background-color: white;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding: 20px;
+      }
+
+      .sidebar h2 {
+        color: black;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .sidebar ul {
+        list-style: none;
+      }
+
+      .sidebar ul li {
+        margin-bottom: 20px;
+      }
+
+      .sidebar ul li a {
+        color: black;
+        text-decoration: none;
+        font-size: 18px;
+        display: block;
+        padding: 10px;
+        transition: background 0.3s ease;
+      }
+
+      .sidebar ul li a:hover {
+        background-color: #dcc7c7;
+        border-radius: 5px;
+      }
+
+      /* Main content styling */
+      .content {
+        margin-left: 270px;
+        padding: 20px;
+      }
+
+      .content h1 {
+        margin-bottom: 20px;
+      }
+
+      .content p {
+        font-size: 18px;
+      }
+    </style>
+</head>
+
+<body class="container">
+  <div>
+    <div class="sidebar">
+      <h2>Menu</h2>
+      <ul>
+        <li>
+          <a href="/sh/attendance">Take Attendance</a>
+        </li>
+        <li><a href="/sh/warden/<%=user.id %>">Profile</a></li>
+        <li><a href="#">Student List</a></li>
+        <% if(admin){ %>
+          <li><a href="#">Edit</a></li>
+       <% } %>
+        <li><a href="/sh/logout">Logout</a></li>
+      </ul>
+    </div>
+
+    <div class="content">
+      <h1>
+        Welcome <%=user.firstName.toUpperCase() %>
+      </h1>
+      <p>This is Sacred Heart hostel </p>
+    </div>
+
+  </div>
 </body>
+
 </html>

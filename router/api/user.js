@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const mysql = require('mysql');
+const nodemailer = require('nodemailer');
+const randomstring = require("randomstring");
+
 
 const con = mysql.createConnection({
     host: 'localhost',
@@ -25,31 +28,35 @@ const GET_QUERY = /*sql*/ `SELECT *,
                             WHERE deletedAt IS NULL`
 
 const INSERT_QUERY = /*sql*/` INSERT INTO user 
-                                ( firstName, lastName, phoneNo, email, userId, password) 
+                                ( firstName, lastName, phoneNo, email, userId, password, isAdmin) 
                                 VALUES
-                                (?,?,?,?,?,?)`
+                                (?,?,?,?,?,?,?) 
+                                ON DUPLICATE KEY UPDATE 
+                                firstName = VALUES(firstName),
+                                lastName = VALUES(lastName),
+                                phoneNo = VALUES(phoneNo),
+                                email = VALUES(email),
+                                password = VALUES(password),
+                                isAdmin = VALUES (isAdmin)`
 
 const SINGLE_GET_QUERY = /*sql*/`SELECT * FROM user WHERE id = ?`
 
-UPDATE_PASS_QUERY = /*sql*/`UPDATE user SET password = ? WHERE id = ?`;
-
 
 function getUser(req, res) {
-    try {
-        con.query(GET_QUERY, (err, result) => {
-            if (err) {
-                res.status(409).send(err.sqlMessage)
-                return
-            }
-            const name = result[0].firstName
-            res.status(200).send(result)
-        })
-    } catch (error) {
-        console.error(error)
+        try {
+            con.query(GET_QUERY, (err, result) => {
+                if (err) {
+                    res.status(409).send(err.sqlMessage)
+                    return
+                }
+                res.status(200).send(result)
+            })
+        } catch (error) {
+            console.error(error)
+        }
     }
-}
 
-function insertUser(req, res) {
+function insertorUpdateUser(req, res) {
     try {
         var {
             firstName,
@@ -58,6 +65,7 @@ function insertUser(req, res) {
             email,
             userId,
             password,
+            isAdmin
         } = req.body;
 
         var userInput = [
@@ -66,9 +74,10 @@ function insertUser(req, res) {
             phoneNo,
             email,
             userId,
-            password
+            password,
+            isAdmin
         ]
-        if (firstName.length > 0 && lastName.length > 0 && phoneNo.length > 0 && email.length > 0 && userId.length > 0 && password.length > 0) {
+        if (firstName.length > 0 && lastName.length > 0 && phoneNo.length > 0 && email.length > 0 && userId.length > 0 && password.length > 0 && isAdmin.length > 0) {
             con.query(INSERT_QUERY, userInput, (err, result) => {
                 if (err) {
                     res.status(409).send(err.sqlMessage)
@@ -86,43 +95,6 @@ function insertUser(req, res) {
     } catch (error) {
         console.error(error)
         return
-    }
-
-}
-
-function updateUser(req, res) {
-    try {
-        const id = req.params.id;
-        const columnName = []
-        const values = []
-        allowedUpdateKey.forEach((keys) => {
-            var keyvalue = req.body[keys]
-            if (keyvalue !== undefined) {
-                values.push(keyvalue)
-                columnName.push(`${keys} = ?`)
-            }
-        })
-        const UPDATE_QUERY =  /*sql*/`UPDATE user SET ${columnName},
-                                        updatedAt = CURRENT_TIMESTAMP() 
-                                        WHERE id = ${id}`
-        con.query(UPDATE_QUERY, values, (err, result) => {
-            if (err) {
-                res.status(409).send(err.sqlMessage)
-                return
-            }
-            if (result.affectedRows != 0) {
-                con.query(SINGLE_GET_QUERY, [id], (err2, result2) => {
-                    if (err2) {
-                        res.status(409).send(err2.sqlMessage)
-                        return
-                    }
-                    res.status(200).send(result2[0])
-                })
-            }
-        })
-
-    } catch (error) {
-        console.error(error)
     }
 }
 
@@ -166,44 +138,77 @@ function getSingleUser(req, res) {
     }
 }
 
-function forgetPass(req, res) {
+ function restPassword(req, res) {
     try {
-        const id = req.params.id;
-        const pass = req.body.password;
-        
-        con.query(UPDATE_PASS_QUERY, [pass, id], (err, result) => {
-            if (err) {
-                res.status(409).send(err.sqlMessage)
+        const {
+            email,
+        } = req.body;
+
+        const randomString =  randomstring.generate({
+            length: 6
+        });     
+        console.log(randomString)
+
+        con.query(/*sql*/`SELECT email FROM user WHERE email = ?`,[email], (err1, result1) => {
+            if (result1 == 0 ){
+                res.status(409).send('Invalid Email Id')
                 return
-            }
-            if (result.affectedRows > 0) {
-                con.query(SINGLE_GET_QUERY, [id], (err3, result3) => {
-                    if (err3) {
-                        res.status(409).send(err3.sqlMessage)
+            } 
+            con.query(/*sql*/`UPDATE user SET password = ? WHERE email = ?`,
+                [randomString, email],
+                (err, result) => {
+                    if (err) {
+                        res.status(409).send(err.sqlMessage)
                         return
                     }
-                    res.status(200).send(result3)
+                    console.log(result)
+                    if(result.affectedRows == 0){
+                        console.log(result)
+                        res.status(409).send('API Error : Reset Password Unsccessfull')
+                        return
+                    } 
+                   const transporter = nodemailer.createTransport({
+                        service: 'gmail',
+                        auth: {
+                            user: 'leo006401@gmail.com',
+                            pass: 'brvp easj ulag yjum'
+                        }
+                    });
+                    const mailOptions = {
+                        from: 'leo006401@gmail.com',
+                        to: email,
+                        subject: 'Send By SH Team',
+                        text: `Your new password is ${randomString}`
+                    }
+            
+                     transporter.sendMail(mailOptions, (err, info) => {
+                        if(err){
+                            res.status(409).send('Email Error : '+err.message)
+                        }else{
+                            res.status(200).send('Password Reseted Your password sent to your email')
+                        }
+    
+                    })
                 })
-            }
-
+    
+    
         })
-
-
-
+        
     } catch (error) {
         console.log(error)
     }
 }
 
-function loginUser(req, res) {
+async function loginUser(req, res) {
     try {
         const {
             userId,
             password
         } = req.body;
 
-        con.query(/*sql*/` SELECT id,firstName FROM user WHERE userId = ? AND password = ? `,
-            [userId, password], async (err, result) => {
+         const query = /*sql*/` SELECT id,firstName,isAdmin FROM user WHERE userId = ? AND password = ? `
+
+         await con.query(query, [userId, password], async (err, result) => {
                 if (err) {
                     res.status(409).send(err.sqlMessage)
                     return
@@ -258,13 +263,11 @@ function logoutUser(req, res) {
 }
 
 router.get('/', getUser)
-router.post('/', insertUser)
-router.put('/:id', updateUser)
+router.post('/', insertorUpdateUser)
 router.delete('/:id', deleteUser)
 router.get('/:id', getSingleUser)
 router.post('/login', loginUser)
 router.get('/authorized/home', homeUser)
 router.get('/login/logout', logoutUser)
-router.put('/forgetPass/:id', forgetPass)
-
+router.put('/restPassword', restPassword)
 module.exports = router;
