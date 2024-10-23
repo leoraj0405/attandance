@@ -34,7 +34,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
-    // store: new FileStore(fileStoreOptions),
+    store: new FileStore(fileStoreOptions),
     secret: 'attendance',
     resave: true,
     saveUninitialized: true,

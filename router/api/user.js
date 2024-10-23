@@ -3,7 +3,7 @@ const router = express.Router();
 const mysql = require('mysql');
 const nodemailer = require('nodemailer');
 const randomstring = require("randomstring");
-
+const otpGenerator = require('otp-generator')
 
 const con = mysql.createConnection({
     host: 'localhost',
@@ -39,22 +39,21 @@ const INSERT_QUERY = /*sql*/` INSERT INTO user
                                 password = VALUES(password),
                                 isAdmin = VALUES (isAdmin)`
 
-const SINGLE_GET_QUERY = /*sql*/`SELECT * FROM user WHERE id = ?`
 
 
 function getUser(req, res) {
-        try {
-            con.query(GET_QUERY, (err, result) => {
-                if (err) {
-                    res.status(409).send(err.sqlMessage)
-                    return
-                }
-                res.status(200).send(result)
-            })
-        } catch (error) {
-            console.error(error)
-        }
+    try {
+        con.query(GET_QUERY, (err, result) => {
+            if (err) {
+                res.status(409).send(err.sqlMessage)
+                return
+            }
+            res.status(200).send(result)
+        })
+    } catch (error) {
+        console.error(error)
     }
+}
 
 function insertorUpdateUser(req, res) {
     try {
@@ -125,7 +124,7 @@ function deleteUser(req, res) {
 function getSingleUser(req, res) {
     try {
         const id = req.params.id;
-        con.query(SINGLE_GET_QUERY, [id], (err, result) => {
+        con.query(/*sql*/`SELECT * FROM user WHERE id = ?`, [id], (err, result) => {
             if (err) {
                 res.status(409).send(err.sqlMessage)
                 return
@@ -138,22 +137,22 @@ function getSingleUser(req, res) {
     }
 }
 
- function restPassword(req, res) {
+function restPassword(req, res) {
     try {
         const {
             email,
         } = req.body;
 
-        const randomString =  randomstring.generate({
+        const randomString = randomstring.generate({
             length: 6
-        });     
+        });
         console.log(randomString)
 
-        con.query(/*sql*/`SELECT email FROM user WHERE email = ?`,[email], (err1, result1) => {
-            if (result1 == 0 ){
+        con.query(/*sql*/`SELECT email FROM user WHERE email = ?`, [email], (err1, result1) => {
+            if (result1 == 0) {
                 res.status(409).send('Invalid Email Id')
                 return
-            } 
+            }
             con.query(/*sql*/`UPDATE user SET password = ? WHERE email = ?`,
                 [randomString, email],
                 (err, result) => {
@@ -162,12 +161,12 @@ function getSingleUser(req, res) {
                         return
                     }
                     console.log(result)
-                    if(result.affectedRows == 0){
+                    if (result.affectedRows == 0) {
                         console.log(result)
                         res.status(409).send('API Error : Reset Password Unsccessfull')
                         return
-                    } 
-                   const transporter = nodemailer.createTransport({
+                    }
+                    const transporter = nodemailer.createTransport({
                         service: 'gmail',
                         auth: {
                             user: 'leo006401@gmail.com',
@@ -180,20 +179,20 @@ function getSingleUser(req, res) {
                         subject: 'Send By SH Team',
                         text: `Your new password is ${randomString}`
                     }
-            
-                     transporter.sendMail(mailOptions, (err, info) => {
-                        if(err){
-                            res.status(409).send('Email Error : '+err.message)
-                        }else{
+
+                    transporter.sendMail(mailOptions, (err, info) => {
+                        if (err) {
+                            res.status(409).send('Email Error : ' + err.message)
+                        } else {
                             res.status(200).send('Password Reseted Your password sent to your email')
                         }
-    
+
                     })
                 })
-    
-    
+
+
         })
-        
+
     } catch (error) {
         console.log(error)
     }
@@ -206,25 +205,25 @@ async function loginUser(req, res) {
             password
         } = req.body;
 
-         const query = /*sql*/` SELECT id,firstName,isAdmin FROM user WHERE userId = ? AND password = ? `
+        const query = /*sql*/` SELECT id,firstName,isAdmin FROM user WHERE userId = ? AND password = ? `
 
-         await con.query(query, [userId, password], async (err, result) => {
-                if (err) {
-                    res.status(409).send(err.sqlMessage)
-                    return
-                }
-                if (result.length > 0) {
-                    req.session.isLogged = true;
-                    req.session.data = result[0];
-                    res.status(200).send('SUCCESS ')
-                }
-                else {
-                    req.session.isLogged = false;
-                    req.session.data = null;
-                    res.status(409).send('Invalid user and/or password')
-                }
+        await con.query(query, [userId, password], async (err, result) => {
+            if (err) {
+                res.status(409).send(err.sqlMessage)
+                return
+            }
+            if (result.length > 0) {
+                req.session.isLogged = true;
+                req.session.data = result[0];
+                res.status(200).send('SUCCESS ')
+            }
+            else {
+                req.session.isLogged = false;
+                req.session.data = null;
+                res.status(409).send('Invalid user and/or password')
+            }
 
-            })
+        })
 
 
     } catch (error) {
@@ -262,6 +261,114 @@ function logoutUser(req, res) {
     }
 }
 
+function generateOtp(req, res) {
+
+    try {
+        const {
+            emailId
+        } = req.body
+    
+        const otp = otpGenerator.generate(6,
+            { upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false });
+    
+        con.query(/*sql*/`SELECT email FROM user WHERE email = ?`, [emailId], (err, result) => {
+            if (err) {
+                res.status(409).send(err.sqlMessage)
+                return
+            }
+            if (result.length == 0) {
+                res.status(409).send('Invalid Email ID')
+                return
+            }
+    
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: 'leo006401@gmail.com',
+                    pass: 'brvp easj ulag yjum'
+                }
+            });
+    
+            const mailOptions = {
+                from: 'leo006401@gmail.com',
+                to: emailId,
+                subject: 'Send By SH team',
+                text: `Your new otp is ${otp}`,
+                attachments: [
+                    {
+                        filename: 'demo.txt',
+                        path: './demo.txt'
+                    },
+                ]
+            }
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.log(error)
+                    return
+                }
+    
+                req.session.data = {
+                    email : emailId,
+                    otp: otp
+                };
+                // const currentOtp = req.session.data.otp;
+                res.status(200).send('OTP sent to you ' + info.response)
+    
+            });
+        })
+      
+    } catch (error) {
+        console.error(error)
+    }
+
+}
+function validateOtp(req, res) {
+    try {
+        const {
+            otp,
+            emailId
+        } = req.body
+    
+        const currentOtp = req.session.data.otp;
+        const currentEmail = req.session.data.email;
+
+        if (currentOtp == otp && emailId == currentEmail) {
+            req.session.isOtpVerifyed = true
+            res.status(200).send('Verifyed OTP')
+        } else {
+            req.session.isOtpVerifyed = false
+            res.status(409).send('Invalid OTP')
+        }
+    } catch (error) {
+       console.error(error) 
+    }
+
+}
+
+function restPassword2(req, res) {
+    try {
+        const {
+            emailId,
+            password
+        } = req.body;
+        if(req.session.isOtpVerifyed) {
+            // console.log(req.session.isOtpVerifyed)
+            con.query(/*sql*/`UPDATE user SET password = ? WHERE email = ?`,[password, emailId], (err, result) =>{
+                if (err){
+                    res.status(409).send(err.sqlMessage)
+                    return
+                }
+                if(result.affectedRows > 0) {
+                    res.status(200).send('Password Updated')
+                }
+            });
+        }
+    } catch (error) {
+        console.error(error)
+    }
+    
+}
+
 router.get('/', getUser)
 router.post('/', insertorUpdateUser)
 router.delete('/:id', deleteUser)
@@ -270,4 +377,7 @@ router.post('/login', loginUser)
 router.get('/authorized/home', homeUser)
 router.get('/login/logout', logoutUser)
 router.put('/restPassword', restPassword)
+router.post('/warden/generateOtp', generateOtp)
+router.post('/warden/validate/otp', validateOtp)
+router.put('/restPassword2', restPassword2)
 module.exports = router;

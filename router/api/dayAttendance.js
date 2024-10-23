@@ -9,9 +9,8 @@ const con = mysql.createConnection({
     database: 'attendance'
 })
 
-const GET_QUERY = /*sql*/`SELECT * FROM dayattendance`
-
-const INSERT_QUERY = /*sql*/`INSERT INTO dayattendance (studentId, wardenId, appearance, date, reason) VALUES (?,?,?,?,?)`
+const INSERT_QUERY = /*sql*/`INSERT INTO dayattendance(studentId, wardenId, appearance, date, reason, roomId, blockId) VALUES (?, ?, ?, ?, ?, ?, ?);
+`
 
 const SINGLE_GET_QUERY = /*sql*/`SELECT * FROM dayattendance WHERE id = ?`
 
@@ -24,13 +23,27 @@ const updatedKey = [
     "wardenId",
     "appearance",
     "date",
-    "reason"
+    "reason",
+    "roomId",
+    "blockId"
 ]
 
 function getdayattendance(req, res) {
-    try {
+    const queryArr = []
+    
+    try {     
+        const {roomId, blockId} = req.query
 
-        con.query(GET_QUERY, (err, result) => {
+        if(roomId) {
+            queryArr.push(' roomId = ? ')
+        }
+        if(blockId){
+            queryArr.push(' blockId = ?')
+        }
+
+        const queryStr = queryArr.length ? `WHERE ${queryArr.join('AND')}` : ``
+        con.query(/*sql*/`SELECT * FROM dayattendance ${queryStr}`,[roomId, blockId], (err, result) => {
+
             if (err) {
                 res.status(409).send(err.sqlMessage)
                 return
@@ -51,15 +64,21 @@ function insertdayattendance(req, res) {
             appearance,
             date,
             reason,
+            roomId,
+            blockId
         } = req.body;
+        
 
         const insertColumns = [            
             studentId,
             wardenId,
             appearance,
             date,
-            reason
+            reason,
+            roomId,
+            blockId
         ]
+
         con.query(/*sql*/`SELECT date FROM dayattendance WHERE date = ?`,[date], (err1, result1) => {
             if(err1){
                 res.status(409).send(err1)
@@ -125,8 +144,25 @@ function updatedayattendance(req, res) {
 
 }
 
+function getSingleAttendance(req, res) {
+try {
+        const {date} = req.query;
+        con.query(/*sql*/`SELECT * FROM dayattendance WHERE date = ? `, [date], (err, result) => {
+    
+            if (err) {
+                res.status(409).send(err.sqlMessage)
+                return
+            }
+            res.status(200).send(result)
+        })
+    
+} catch (error) {
+    console.error(error)
+}
+}
+
 router.get('/', getdayattendance)
 router.post('/', insertdayattendance)
 router.put('/:id', updatedayattendance)
-
+router.get('/single', getSingleAttendance)
 module.exports = router;

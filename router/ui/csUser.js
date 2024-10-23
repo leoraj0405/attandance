@@ -57,14 +57,17 @@ router.get('/warden/restPassword', async (req, res) => {
 
 router.get('/warden/:id',async (req, res) => {
     try {
+        console.log('ok2')
         const id = req.params.id;
         const response = await fetch(`http://localhost:4000/api/user/${id}`)
         const data = await response.json();
-        // console.log(data)
         res.render('pages/profile.ejs',{data})
     } catch (error) {
         console.error(error)
     }
+})
+router.get('/warden/method2/restPassword2',(req, res) => {
+    res.render('pages/restPassword2.ejs')
 })
 
 

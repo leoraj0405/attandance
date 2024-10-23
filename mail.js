@@ -1,15 +1,14 @@
 var nodemailer = require('nodemailer');
-var randomstring = require("randomstring");
+const otpGenerator = require('otp-generator')
 
-const randomString =  randomstring.generate({
-    length: 6
-});
+const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false });
+
 
 var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: 'leo006401@gmail.com',
-        pass: 'howg wzcj zrtz ijyw'
+        pass: 'brvp easj ulag yjum'
     }
 });
 
@@ -17,7 +16,7 @@ var mailOptions = {
   from: 'leo006401@gmail.com',
   to: 'leoraj04065@gmail.com',
   subject: 'Send By SH Team',
-  html: `<h1>SH Team</h1><p>Your new password is <b>${randomString}</b></p>`,
+  html: `<h1>SH Team</h1><p>Your new otp is <b>${otp}</b></p>`,
   attachments: [
     {
       filename: 'demo.txt', 
