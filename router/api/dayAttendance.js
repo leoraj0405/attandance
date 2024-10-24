@@ -30,26 +30,69 @@ const updatedKey = [
 
 function getdayattendance(req, res) {
     const queryArr = []
-    
-    try {     
-        const {roomId, blockId} = req.query
+    const responseData = {
+        roomTotalCountInBlock: '',
+        studTotalCountInRoom: '',
+        todayPutAttStudCountInRoom: '',
+        todayPutAttRoomCountInBlock: '',
+        result: []
+    }
+    try {
+        const { roomId, blockId, date } = req.query
+        console.log(date)
 
-        if(roomId) {
+        if (roomId) {
             queryArr.push(' roomId = ? ')
         }
-        if(blockId){
+        if (blockId) {
             queryArr.push(' blockId = ?')
         }
 
-        const queryStr = queryArr.length ? `WHERE ${queryArr.join('AND')}` : ``
-        con.query(/*sql*/`SELECT * FROM dayattendance ${queryStr}`,[roomId, blockId], (err, result) => {
+        const queryStr = queryArr.length ? ` AND ${queryArr.join('AND')}` : ``
+    console.log(queryStr)
+        // con.query(/*sql*/`SELECT count(roomId) AS roomAttCount FROM dayattendance WHERE date = ? AND blockId = ? `, [date, blockId], async (err1, result1) => {
+        //     if (err1) {
+        //         console.log(result1)
+        //         res.status(409).send(err1.sqlMessage)
+        //         return
+        //     }
+            con.query(/*sql*/`SELECT count(studentId) AS studAttCount FROM dayattendance WHERE date = ? AND roomId = ? `, [date, roomId], (err2, result2) => {
+                if (err2) {
+                    res.status(409).send(err2.sqlMessage)
+                    return
+                }
+                // console.log(result2[0].studAttCount)
+                con.query(/*sql*/`SELECT count(id) AS studCount FROM student WHERE roomId = ?`, [roomId], (err3, result3) => {
+                    if (err3) {
+                        res.status(409).send(err3.sqlMessage)
+                        return
+                    }
+                    // console.log(result3[0].studCount)
+                    // con.query(/*sql*/`SELECT count(roomId) AS roomCount FROM dayattendance WHERE blockId = ?`, [roomId], (err4, result4) => {
+                    //     if (err4) {
+                    //         res.status(409).send(err4.sqlMessage)
+                    //         return
+                    //     }
+                        // console.log(result4[0].roomCount)
+                        con.query(/*sql*/`SELECT * FROM dayattendance WHERE date = ? ${queryStr}`, [date, roomId], (err, result) => {
+                            if (err) {
+                                res.status(409).send(err.sqlMessage)
+                                return
+                            }
+                            // console.log(result)
+                            responseData.result = result
+                            responseData.studTotalCountInRoom = result3[0].studCount
+                            // responseData.roomTotalCountInBlock = result4[0].roomCount
+                            responseData.todayPutAttStudCountInRoom = result2[0].studAttCount
+                            // responseData.todayPutAttRoomCountInBlock = result1[0].roomAttCount
+                            res.status(200).send(responseData)
 
-            if (err) {
-                res.status(409).send(err.sqlMessage)
-                return
-            }
-            res.status(200).send(result)
-        })
+                        })
+                    })
+                })
+        //     })
+        // })
+
     } catch (error) {
         console.error(error)
     }
@@ -67,9 +110,9 @@ function insertdayattendance(req, res) {
             roomId,
             blockId
         } = req.body;
-        
 
-        const insertColumns = [            
+
+        const insertColumns = [
             studentId,
             wardenId,
             appearance,
@@ -79,26 +122,22 @@ function insertdayattendance(req, res) {
             blockId
         ]
 
-        con.query(/*sql*/`SELECT date FROM dayattendance WHERE date = ?`,[date], (err1, result1) => {
-            if(err1){
-                res.status(409).send(err1)
-                return
-            }
-            if(result1.length != 0) {
+        con.query(/*sql*/`SELECT date FROM dayattendance WHERE date = ? AND studentId = ?`, [date, studentId], (err1, result1) => {
+            if (err1) {
                 res.status(409).send('Already put the attendance for that date')
                 return
             }
-        con.query(INSERT_QUERY, insertColumns, (err, result) => {
-            if (err) {
-                res.status(409).send(err.sqlMessage)
-                return
-            }
-            if (result.affectedRows != 0) {
-                res.status(200).send("INSERTED")
-            }
-        })
+            con.query(INSERT_QUERY, insertColumns, (err, result) => {
+                if (err) {
+                    res.status(409).send('Already put the attendance for that date ' + err.sqlMessage)
+                    return
+                }
+                if (result.affectedRows != 0) {
+                    res.status(200).send("INSERTED")
+                }
+            })
 
-    })
+        })
 
     } catch (error) {
         console.error(error)
@@ -113,7 +152,7 @@ function updatedayattendance(req, res) {
         const values = []
         updatedKey.forEach((key) => {
             const keyValue = req.body[key];
-            if(keyValue !== undefined) {
+            if (keyValue !== undefined) {
                 values.push(keyValue)
                 columns.push(`${key} = ?`)
             }
@@ -145,20 +184,20 @@ function updatedayattendance(req, res) {
 }
 
 function getSingleAttendance(req, res) {
-try {
-        const {date} = req.query;
+    try {
+        const { date } = req.query;
         con.query(/*sql*/`SELECT * FROM dayattendance WHERE date = ? `, [date], (err, result) => {
-    
+
             if (err) {
                 res.status(409).send(err.sqlMessage)
                 return
             }
             res.status(200).send(result)
         })
-    
-} catch (error) {
-    console.error(error)
-}
+
+    } catch (error) {
+        console.error(error)
+    }
 }
 
 router.get('/', getdayattendance)

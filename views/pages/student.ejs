@@ -21,6 +21,11 @@
                 height: 30px;
                 width: 30px;
             }
+
+            .hidden-input {
+            display: none;
+        }
+
         </style>
 </head>
 
@@ -64,6 +69,8 @@
                                                 <%= data[i].accNo %>
                                             </td>
                                             <td>
+                                                <input type="text" class="hidden-input" value="<%=data[i].blockId %>" name="block">
+                                                <input type="text" class="hidden-input" value="<%=data[i].roomId %>" name="room">
                                                 <li class="border-none" value="<%=data[i].id %>" name="student">
                                                     <%=data[i].firstName %>
                                                 </li>
@@ -106,6 +113,8 @@
                 const appearance = [];
                 const students = [];
                 const reason = [];
+                const blocks = [];
+                const rooms = [];
                 const checkboxs = document.querySelectorAll('input[name = "options"]:checked');
                 checkboxs.forEach((checkboxInput) => {
                     appearance.push(checkboxInput.value);
@@ -114,13 +123,18 @@
                 roomStud.forEach((stud) => {
                     students.push(stud.value);
                 });
-
+                const studBlock = document.querySelectorAll('input[name="block"]');
+                studBlock.forEach((block) => {
+                    blocks.push(block.value);
+                })
+                const studRoom = document.querySelectorAll('input[name="room"]');
+                studRoom.forEach((room) => {
+                    rooms.push(room.value);
+                })
                 const reasonArr = document.querySelectorAll('input[name = "reason"]');
                 reasonArr.forEach((key) => {
                     reason.push(key.value)
                 })
-                console.log(todayDate, warden, students, appearance, reason)
-
                 for (let i = 0; i < students.length; i++) {
                     const myHeaders = new Headers();
                     myHeaders.append("Content-Type", "application/json");
@@ -131,7 +145,9 @@
                         "wardenId": warden,
                         "appearance": appearance[i],
                         "date": todayDate,
-                        "reason": reason[i]
+                        "reason": reason[i],
+                        "blockId" : blocks[i],
+                        "roomId" : rooms[i]
                     });
 
                     const requestOptions = {
@@ -145,9 +161,9 @@
                 }
                 request.then(async (response) => {
                     if (response.status == 200) {
-                        await alert("Done ")
+                         alert("Done ")
                     } else {
-                        await alert("OOPS!! Something Error!")
+                         alert(await response.text())
                     }
                 })
 

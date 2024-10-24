@@ -3,42 +3,122 @@
 
 <head>
   <%- include('../partials/head') %>
-  <style>
-    .wid{
-      width: 2cm;
-    }
-  </style>
+    <style>
+      .wid {
+        width: 2cm;
+      }
+
+      .no-border {
+        border: none;
+        outline: none;
+        padding: 10px;
+        font-size: 16px;
+        background-color: rgb(234, 232, 232);
+      }
+
+      .round {
+        width: 20px;
+        height: 20px;
+        border: 1px solid black;
+        border-radius: 50%;
+      }
+      .box1 {
+        background-color: green;
+      }
+      .box2 {
+        background-color: orange;
+      }
+      .box3 {
+        background-color: red;
+      }
+    </style>
 </head>
 
 <body>
   <%- include('../partials/header') %>
+    <div id="dateBlock" class="w-100 p-3 d-flex flex-row-reverse">
+      <div>
+        <input type="date" id="todayDate" class="no-border">
+      </div>
     </div>
     <div class="d-flex justify-content-center">
       <div class="w-25 p-3">
-          <label for="roomId"><b>Rooms</b></label>
-          <table class="table table-borderless">
-            <tbody>
-              <tr>
-                <% for(var i=0; i < data.length;i++) { %>
-                  <td>
-                  <a class="p-2 btn btn-light high card wid  " href="/sh/attendance/stud/<%=data[i].id %>" id="roomId">
+        <label for="roomId"><b>Rooms</b></label>
+        <table class="table table-borderless">
+          <tbody>
+            <tr>
+              <% for(var i=0; i < data.length;i++) { %>
+                <td>
+                  <a class="p-2 btn btn-light high card wid" aria-valuenow="<%=data[i].id %>"
+                    href="/sh/attendance/stud/<%=data[i].id %>" name="room" id="<%=data[i].id %>">
                     <%=data[i].roomNo %>
                   </a>
+
                 </td>
                 <% if(i==4 || i==9 || i==13 || i==17) { %>
-                </tr><tr>
-                  <% } %>
-                  <% } %>
-                </tr>
+            </tr>
+            <tr>
+              <% } %>
+                <% } %>
+            </tr>
+          </tbody>
+        </table>
 
+        <div class="definiton"> 
+          <div><div class=" round box1"></div>Full Attendance</div>
+          <div><div class="round box2"></div>10 to 90 Percentage Attendance</div>
+          <div><div class="round box3"></div>No Attendance</div>
+        </div>
+    
       </div>
+
     </div>
 
-    <script>
-      function backward() {
-        window.location.replace("http://localhost:4000/sh/attendance");
 
-      }
+    <script>
+      const roomInBlock = []
+      const today = new Date();
+      const date = today.toISOString().split('T')[0];
+
+      document.getElementById('todayDate').value = date;
+
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const blockId = urlParams.get('block')
+
+      const rooms = document.querySelectorAll('[name="room"]')
+      rooms.forEach((roomId) => {
+        roomInBlock.push(roomId.ariaValueNow)
+      })
+      console.log(blockId)
+      console.log(date)
+      console.log(roomInBlock)
+
+        roomInBlock.forEach(async (roomId) => {
+          const response = await fetch(`http://localhost:4000/api/attendance?roomId=${roomId}&date=${date}`)
+          const data = await response.json();
+          console.log(data)
+
+          const total = data.studTotalCountInRoom
+          const attCount = data.todayPutAttStudCountInRoom
+
+          const percentage = (attCount/total) * 100
+
+          console.log(percentage)
+
+          if(percentage == 100) {
+            document.getElementById(roomId).style.backgroundColor = 'green'
+          }  
+           else if(percentage > 0 ) {
+            document.getElementById(roomId).style.backgroundColor = 'orange'
+          } else {
+            document.getElementById(roomId).style.backgroundColor = 'red'
+          }
+
+        })
+
+  
+
 
     </script>
 </body>
