@@ -6,6 +6,7 @@ const randomstring = require("randomstring");
 const otpGenerator = require('otp-generator');
 const email = require('../../emailBody');
 const { ContentInstance } = require('twilio/lib/rest/content/v1/content');
+const { get } = require('http');
 
 
 
@@ -275,21 +276,43 @@ function logoutUser(req, res) {
 
 function generateOtpAndSendOtp(req, res) {
     try {
+        const currentTime = new Date().getTime();
+
         const {
             emailId
         } = req.body
         if (emailId.lenght == 0) {
-            rs.status(400).send('Not a Email')
+            rs.status(400).send('Invalid email input')
             return
         }
-        con.query(/*sql*/`SELECT email FROM user WHERE email = ? AND deletedAt IS NULL`, [emailId], (err, result) => {
+        con.query(/*sql*/`SELECT unBlockTime FROM user WHERE email = ? AND deletedAt IS NULL`, [emailId], (err, result) => {
             if (err) {
                 console.log(err)
-                res.status(503).send(err.sqlMessage)
+                res.status(502).send(err.sqlMessage)
                 return
             }
-            if (result.length == 0) {
-                res.status(404).send('Invalid Email ID')
+            const unBlockTime = new Date(result[0].unBlockTime).getTime();
+            if (currentTime >= unBlockTime) {
+                con.query(/*sql*/`UPDATE user SET unBlockTime = null, otpAttempt = 0 WHERE email = ?`, (emailId), (unBlockErr, unBlockResult) => {
+                    if (unBlockErr) {
+                        res.status(502).send(unBlockErr.sqlMessage)
+                        return
+                    }
+                })
+            }
+            // con.query(/*sql*/`SELECT email,unBlockTime FROM user WHERE email = ? AND deletedAt IS NULL`, [emailId], (err1, result1) => {
+            //     if (err1) {
+            //         console.log(err1)
+            //         res.status(502).send(err1.sqlMessage)
+            //         return
+            //     }
+            // if (!result1.length) {
+            //     res.status(404).send('Invalid Email ID')
+            //     return
+            // }
+            const isBlocked = result1[0].unBlockTime
+            if (isBlocked) {
+                res.status(401).send('User Blocked')
                 return
             }
             const otp = otpGenerator.generate(lengthOfotp, patternOfOtp);
@@ -303,18 +326,16 @@ function generateOtpAndSendOtp(req, res) {
             transporter.sendMail(mailOptions, (error, info) => {
                 if (error) {
                     console.log(error)
-                    res.status(502).send(error.message)
-                    return
                 }
                 con.query(/*sql*/`UPDATE user SET otp = ? WHERE email = ?`,
                     [otp, emailId],
                     (otpUpdateErr, otpUpdateRes) => {
                         if (otpUpdateErr) {
-                            res.status(503).send(otpUpdateErr.sqlMessage)
+                            res.status(502).send(otpUpdateErr.sqlMessage)
                             return
                         }
                         if (otpUpdateRes.affectedRows == 0) {
-                            res.status(503).send('Not updated in DB')
+                            res.status(502).send('Not updated in DB')
                             return
                         }
                         res.status(200).send('OTP sent to you ' + info.response)
@@ -322,6 +343,7 @@ function generateOtpAndSendOtp(req, res) {
                     })
             });
         })
+    })
 
     } catch (error) {
         console.error(error)
@@ -330,78 +352,83 @@ function generateOtpAndSendOtp(req, res) {
 }
 function validateOtpSavePassword(req, res) {
     try {
-        const {
-            otp,
-            emailId,
-            password
-        } = req.body
-        let attempts = 0;
-        if (attempts > 3) {
-            con.query(/*sql*/` UPDATE user SET unBlockTime = DATE_ADD(NOW(), INTERVAL 3 HOUR) WHERE email = ?`, [emailId], (blockErr, blockResult) => {
-                if (blockErr) {
-                    res.status(503).send(blockErr.sqlMessage)
-                    return
-                }
-                if (blockResult.affectedRows == 0) {
-                    res.status(503).send('No row Affected')
-                    return
-                }
-                res.status(200).send('You blocked for next 3 hours ')
-            });
-            return
-        }
-        const pattern = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
-        const emailValied = emailId.match(pattern);
+        const currentTime = new Date().getTime();
+        const otpAttemptMax = 3;
+        const { otp, emailId, password } = req.body;
 
-        if (emailValied === null || otp.length === 0 || otp.length < 6) {
-            res.status(400).send('Not a Email || otp')
-            return
+        if (!emailId || !otp || otp.length < 6) {
+            res.status(400).send('Invalid Email or OTP');
+            return;
         }
-        con.query(/*sql*/`SELECT otp, unBlockTime FROM user WHERE otp = ?`, [otp], (err, result) => {
-            if (err) {
-                console.log(err)
-                res.status(503).send(err.sqlMessage)
-                return
+
+        con.query(`SELECT otp, otpAttempt, unBlockTime FROM user WHERE email = ?`, [emailId], (getOtpErr, getOtpResult) => {
+            if (getOtpErr) {
+                res.status(502).send(getOtpErr.sqlMessage);
+                return;
             }
-            if (result.length === 0 || result.length === undefined) {
-               var currentAttempt = ++attempts
-                console.log(currentAttempt)
-                res.status(404).send('Invalid OTP')
-                return
+
+            if (!getOtpResult.length) {
+                res.status(404).send('Invalid Email');
+                return;
             }
-            const unBlockTime = new Date(result[0].unBlockTime).getTime()
-            const currentTime = new Date().getTime()
-            if (currentTime > unBlockTime) {
-                const currentOtp = result[0].otp
-                if (currentOtp !== otp) {
-                    res.status(404).send('Invalid OTP')
-                    return
-                }
-                con.query(/*sql*/`UPDATE user SET password = ? WHERE email = ?`, [password, emailId], (err2, result2) => {
-                    if (err2) {
-                        res.status(503).send(err2.sqlMessage)
-                        return
+
+            const userOtp = getOtpResult[0].otp;
+            const unBlockTime = new Date(getOtpResult[0].unBlockTime).getTime();
+            const currentOtpAttempt = getOtpResult[0].otpAttempt || 0;
+
+
+
+            if (currentTime < unBlockTime) {
+                res.status(401).send('You are blocked. Try again after the unblock time.');
+                return;
+            }
+
+            if (currentOtpAttempt >= otpAttemptMax) {
+                con.query(`UPDATE user SET unBlockTime = DATE_ADD(NOW(), INTERVAL 3 HOUR) WHERE email = ?`, [emailId], (blockErr, blockResult) => {
+                    if (blockErr) {
+                        res.status(502).send(blockErr.sqlMessage);
+                        return;
                     }
-                    if (result2.affectedRows > 0) {
-                        con.query(/*sql*/`UPDATE user SET otp = null`, (err3, result3) => {
-                            if (err3) {
-                                res.status(503).send(err3.sqlMessage)
-                                return
-                            }
-                                res.status(200).send('Password Updated')
-                        })
-                    }
+                    res.status(401).send('You are blocked for the next 3 hours.');
                 });
-            }else {
-                res.status(401).send('You are in Block List. You can reset Your Password after 3 hours')
-                return
+                return;
             }
-        })
 
+            if (userOtp !== otp) {
+                con.query(`UPDATE user SET otpAttempt = otpAttempt + 1 WHERE email = ?`, [emailId], (attemptErr) => {
+                    if (attemptErr) {
+                        res.status(502).send(attemptErr.sqlMessage);
+                        return;
+                    }
+                    res.status(404).send('Invalid OTP');
+                });
+                return;
+            }
+            con.query(`UPDATE user SET password = ? WHERE email = ?`, [password, emailId], (restErr, restResult) => {
+                if (restErr) {
+                    res.status(502).send(restErr.sqlMessage);
+                    return;
+                }
+
+                if (restResult.affectedRows > 0) {
+                    con.query(`UPDATE user SET otp = NULL, unBlockTime = NULL, otpAttempt = 0 WHERE email = ?`, [emailId], (mtOtpErr) => {
+                        if (mtOtpErr) {
+                            res.status(502).send(mtOtpErr.sqlMessage);
+                            return;
+                        }
+                        res.status(200).send('Password Updated');
+                    });
+                } else {
+                    res.status(500).send('Password update failed');
+                }
+            });
+        });
     } catch (error) {
-        console.error(error)
+        console.error(error);
+        res.status(500).send('Internal Server Error');
     }
 }
+
 router.get('/', getUser)
 router.post('/', insertorUpdateUser)
 router.delete('/:id', deleteUser)
