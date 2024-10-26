@@ -1,29 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const mysql = require('mysql');
-const nodemailer = require('nodemailer');
 const randomstring = require("randomstring");
 const otpGenerator = require('otp-generator');
-const email = require('../../emailBody');
-const { ContentInstance } = require('twilio/lib/rest/content/v1/content');
-const { get } = require('http');
+const sendMail = require('../../utils/email');
+const execQuery = require('../../utils/query');
 
-
-
-const lengthOfotp = 6;
-const patternOfOtp = {
+const LENGTH_OF_OTP = 6;
+const PATRERN_OF_OTP = {
     upperCaseAlphabets: true,
     specialChars: false,
     lowerCaseAlphabets: false
 }
 
 
-const con = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'Root1234@',
-    database: 'attendance'
-})
 
 const allowedUpdateKey = [
     'firstName',
@@ -168,7 +157,7 @@ function restPassword(req, res) {
             }
             con.query(/*sql*/`UPDATE user SET password = ? WHERE email = ?`,
                 [randomString, email],
-                (err, result) => {
+                async (err, result) => {
                     if (err) {
                         res.status(409).send(err.sqlMessage)
                         return
@@ -179,28 +168,17 @@ function restPassword(req, res) {
                         res.status(409).send('API Error : Reset Password Unsccessfull')
                         return
                     }
-                    const transporter = nodemailer.createTransport({
-                        service: 'gmail',
-                        auth: {
-                            user: 'leo006401@gmail.com',
-                            pass: 'brvp easj ulag yjum'
-                        }
-                    });
                     const mailOptions = {
-                        from: 'leo006401@gmail.com',
                         to: email,
                         subject: 'Send By SH Team',
                         text: `Your new password is ${randomString}`
                     }
 
-                    transporter.sendMail(mailOptions, (err, info) => {
-                        if (err) {
-                            res.status(409).send('Email Error : ' + err.message)
-                        } else {
-                            res.status(200).send('Password Reseted Your password sent to your email')
-                        }
-
-                    })
+                    try {
+                        const emailResult = await sendMail(mailOptions)                        
+                    } catch (error) {
+                        console.log(error)
+                    }
                 })
 
 
@@ -274,82 +252,64 @@ function logoutUser(req, res) {
     }
 }
 
-function generateOtpAndSendOtp(req, res) {
-    try {
-        const currentTime = new Date().getTime();
+async function processOtp(req, res) {
 
-        const {
-            emailId
-        } = req.body
-        if (emailId.lenght == 0) {
+    const currentTime = new Date().getTime();
+    const {
+        emailId
+    } = req.body
+
+    try {
+        // Validate email length
+        if (emailId.length == 0) {
             rs.status(400).send('Invalid email input')
             return
         }
-        con.query(/*sql*/`SELECT unBlockTime FROM user WHERE email = ? AND deletedAt IS NULL`, [emailId], (err, result) => {
-            if (err) {
-                console.log(err)
-                res.status(502).send(err.sqlMessage)
+
+        const userResult = await execQuery(/*sql*/`SELECT 
+            email,
+            unBlockTime 
+            FROM user 
+            WHERE email = ? 
+            AND deletedAt IS NULL`, [emailId])            
+            
+        if (!userResult.length) {
+            res.status(404).send('Invalid Email ID')
+            return
+        }
+
+        const unBlockTime = new Date( userResult[0].unBlockTime).getTime();
+
+        if (currentTime >= unBlockTime) {
+            const otp = otpGenerator.generate(LENGTH_OF_OTP, PATRERN_OF_OTP);
+            const otpUpdateRes = await execQuery(/*sql*/`UPDATE user 
+                SET otp = ?
+                    unBlockTime = null, 
+                    otpAttempt = 0 
+                WHERE email = ? 
+                AND deletedAt IS NULL`, [otp, emailId])
+
+            if (otpUpdateRes.affectedRows == 0) {
+                res.status(502).send('Not updated in DB')
                 return
             }
-            const unBlockTime = new Date(result[0].unBlockTime).getTime();
-            if (currentTime >= unBlockTime) {
-                con.query(/*sql*/`UPDATE user SET unBlockTime = null, otpAttempt = 0 WHERE email = ?`, (emailId), (unBlockErr, unBlockResult) => {
-                    if (unBlockErr) {
-                        res.status(502).send(unBlockErr.sqlMessage)
-                        return
-                    }
-                })
-            }
-            // con.query(/*sql*/`SELECT email,unBlockTime FROM user WHERE email = ? AND deletedAt IS NULL`, [emailId], (err1, result1) => {
-            //     if (err1) {
-            //         console.log(err1)
-            //         res.status(502).send(err1.sqlMessage)
-            //         return
-            //     }
-            // if (!result1.length) {
-            //     res.status(404).send('Invalid Email ID')
-            //     return
-            // }
-            const isBlocked = result1[0].unBlockTime
-            if (isBlocked) {
-                res.status(401).send('User Blocked')
-                return
-            }
-            const otp = otpGenerator.generate(lengthOfotp, patternOfOtp);
-            const transporter = nodemailer.createTransport(email.emailUserAndPassword);
+
             const mailOptions = {
-                from: email.fromAddress,
                 to: emailId,
                 subject: 'Send By SH team for rest password ',
                 text: `Your new otp is ${otp}`
             }
-            transporter.sendMail(mailOptions, (error, info) => {
-                if (error) {
-                    console.log(error)
-                }
-                con.query(/*sql*/`UPDATE user SET otp = ? WHERE email = ?`,
-                    [otp, emailId],
-                    (otpUpdateErr, otpUpdateRes) => {
-                        if (otpUpdateErr) {
-                            res.status(502).send(otpUpdateErr.sqlMessage)
-                            return
-                        }
-                        if (otpUpdateRes.affectedRows == 0) {
-                            res.status(502).send('Not updated in DB')
-                            return
-                        }
-                        res.status(200).send('OTP sent to you ' + info.response)
-
-                    })
-            });
-        })
-    })
-
+            await sendMail(mailOptions)
+            res.status(200).send('OTP sent : ' + info.response)
+        } else {
+            res.status(401).send('user blocked')
+        }
     } catch (error) {
         console.error(error)
+        res.status(500).send(error.message)
     }
-
 }
+
 function validateOtpSavePassword(req, res) {
     try {
         const currentTime = new Date().getTime();
@@ -437,7 +397,8 @@ router.post('/login', loginUser)
 router.get('/authorized/home', homeUser)
 router.get('/login/logout', logoutUser)
 router.put('/restPassword', restPassword)
-router.post('/warden/generateOtp', generateOtpAndSendOtp)
+
+router.post('/warden/processotp', processOtp)
 router.put('/warden/validate/otp', validateOtpSavePassword)
 
 module.exports = router;
