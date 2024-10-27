@@ -3,32 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Get Query String Value</title>
-    <script>
-        window.onload = function() {
-            // Get the URL query string
-            const queryString = window.location.href;
-
-            // Create a URLSearchParams object to work with the query string
-            const urlParams = new URLSearchParams(queryString);
-
-            // Get the value of a specific query parameter
-            const name = urlParams.get('name');
-            const age = urlParams.get('age');
-
-            // Log the values to the console
-            console.log("Name:", name);
-            console.log("Age:", age);
-
-            // Show the values in the HTML
-            document.getElementById("name").textContent = name;
-            document.getElementById("age").textContent = age;
-        }
-    </script>
+    <title>Document</title>
 </head>
 <body>
-    <h1>URL Query String Parameters</h1>
-    <p>Name: <span id="name"></span></p>
-    <p>Age: <span id="age"></span></p>
+    <input type="radio" name="leo" value="1">
+    <input type="radio" name="leo" value="2">
+
+    <button onclick="sub()"> sub</button>
+
+    <script>
+        function sub(){
+            const leo = document.querySelector('input[name="leo"]:checked').value
+            console.log(leo)
+        }
+    </script>
 </body>
 </html>

@@ -2,22 +2,21 @@ const express = require('express');
 const router = express.Router();
 const execQuery = require('../../utils/query');
 
-const SINGLE_GET_QUERY = /*sql*/`SELECT * FROM blocks WHERE id = ?`
+const SINGLE_GET_QUERY = /*sql*/`SELECT * FROM department WHERE id = ?`
 
-const DELETE_QUERY = /*sql*/` UPDATE blocks SET
+const DELETE_QUERY = /*sql*/` UPDATE department SET
                                 deletedAt = CURRENT_TIMESTAMP()
                                  WHERE id = ?`
 
-async function getBlock(req, res) {
+async function getDepartment(req, res) {
     try {
-
-        const getBlock = await execQuery(/*sql*/`SELECT 
+        const getDepartment = await execQuery(/*sql*/`SELECT 
                 *, DATE_FORMAT(createdAt, "%D %M %Y") 
                 AS createdAt 
-                FROM blocks 
+                FROM department 
                 WHERE deletedAt IS NULL`)
-        if (getBlock.length !== 0) {
-            res.status(200).send(getBlock)
+        if (getDepartment.length !== 0) {
+            res.status(200).send(getDepartment)
         } else {
             return res.status(404).send('Not Founded')
         }
@@ -28,15 +27,15 @@ async function getBlock(req, res) {
 
 }
 
-async function insertBlock(req, res) {
+async function insertDepartment(req, res) {
     const {
         name
     } = req.body;
     try {
-        const insertBlock = await execQuery( /*sql*/`INSERT 
-                INTO blocks (name)
+        const insertDepartment = await execQuery( /*sql*/`INSERT 
+                INTO department (name)
                 VALUES (?) `, [name])
-        if (insertBlock.affectedRows !== 0) {
+        if (insertDepartment.affectedRows !== 0) {
             res.status(200).send("INSERTED")
         } else {
             return res.status(304).send('Not Modified')
@@ -47,18 +46,17 @@ async function insertBlock(req, res) {
     }
 
 }
-
-async function updateBlock(req, res) {
+async function updateDepartment(req, res) {
     try {
         const id = req.params.id;
         const name = req.body.name;
-        const updateBlock = await execQuery( /*sql*/` 
-                    UPDATE blocks 
+        const updateDepartment = await execQuery( /*sql*/` 
+                    UPDATE department 
                     SET name = ?, 
                     updatedAt = current_timestamp()
                     WHERE id = ?`, [name, id])
 
-        if (updateBlock.affectedRows !== 0) {
+        if (updateDepartment.affectedRows !== 0) {
             const getUpdatedBlock = await execQuery(SINGLE_GET_QUERY, [id])
             if (getUpdatedBlock.length !== 0) {
                 res.status(200).send(getUpdatedBlock[0])
@@ -75,12 +73,11 @@ async function updateBlock(req, res) {
     }
 
 }
-
-async function deleteBlock(req, res) {
+async function deleteDepartment(req, res) {
     const id = req.params.id;
     try {
-        const deleteBlock = await execQuery(DELETE_QUERY, [id])
-        if (deleteBlock.affectedRows !== 0) {
+        const deleteDepartment = await execQuery(DELETE_QUERY, [id])
+        if (deleteDepartment.affectedRows !== 0) {
             res.status(200).send("DELETED")
         }
         else {
@@ -93,14 +90,13 @@ async function deleteBlock(req, res) {
     }
 
 }
-
-async function getSingleBlock(req, res) {
+async function getSingleDepartment(req, res) {
     const id = req.params.id;
     try {
-        const getSingleBlock = await execQuery(SINGLE_GET_QUERY, [id])
+        const getSingleDepartment = await execQuery(SINGLE_GET_QUERY, [id])
 
-        if (getSingleBlock.length !== 0) {
-            res.status(200).send(getSingleBlock[0])
+        if (getSingleDepartment.length !== 0) {
+            res.status(200).send(getSingleDepartment[0])
         } else {
             return res.status(404).send('Not Founded')
         }
@@ -109,11 +105,10 @@ async function getSingleBlock(req, res) {
         return res.status(500).send(error.message)
     }
 }
-
-router.get('/', getBlock)
-router.post('/', insertBlock)
-router.put('/:id', updateBlock)
-router.delete('/:id', deleteBlock)
-router.get('/:id', getSingleBlock)
+router.get('/', getDepartment)
+router.post('/', insertDepartment)
+router.put('/:id', updateDepartment)
+router.delete('/:id', deleteDepartment)
+router.get('/:id', getSingleDepartment)
 
 module.exports = router;

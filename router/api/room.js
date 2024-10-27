@@ -1,78 +1,50 @@
 const express = require('express');
 const router = express.Router();
-const mysql = require('mysql');
+const execQuery = require('../../utils/query')
 
-const con = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'Root1234@',
-    database: 'attendance'
-})
-
-const GET_BLOCK_QUERY = /*sql*/`SELECT *, 
-                    DATE_FORMAT(createdAt, "%D %M %Y") 
-                    AS
-                    createdAt FROM room WHERE deletedAt IS NULL AND blockId = ?`
-
-const GET_QUERY = /*sql*/`SELECT *, 
-                    DATE_FORMAT(createdAt, "%D %M %Y") 
-                    AS
-                    createdAt FROM room WHERE deletedAt IS NULL`
-
-const INSERT_QUERY = /*sql*/`
-                            INSERT INTO 
-                            room 
-                            (roomNo, blockId, isActive) 
-                            VALUES (?,?,?)
-                            ON DUPLICATE KEY UPDATE
-                            `
-
-const SINGLE_GET_QUERY = /*sql*/`SELECT * FROM room WHERE id = ?`
-
-const DELETE_QUERY = /*sql*/` UPDATE room SET
-                                deletedAt = CURRENT_TIMESTAMP()
-                                 WHERE id = ?`
-
-const updatedKey = [
+const UPDATE_KEYS = [
     'roomNo',
     'blockId',
     'isActive'
 ]
-function getBlockRoom(req, res) {
+async function getBlockRoom(req, res) {
     try {
         const id = req.params.id;
-        con.query(GET_BLOCK_QUERY, [id], (err, result) => {
-            if (err) {
-                console.log(err)
-                res.status(409).send(err.sqlMessage)
-                return
-            }
-            res.status(200).send(result)
-        })
+        const getBlockRoom = await execQuery(/*sql*/`SELECT 
+                    *, DATE_FORMAT(createdAt, "%D %M %Y") 
+                    AS createdAt
+                    FROM room 
+                    WHERE blockId = ? AND deletedAt IS NULL`,
+            [id])
+
+        if (getBlockRoom.length !== 0) {
+            res.status(200).send(getBlockRoom)
+        } else {
+            return res.status(404).send('Not Founded')
+        }
     } catch (error) {
-        console.error(error)
+        return res.status(500).send(error.messege)
     }
 
 }
-
-function getRoom(req, res) {
+async function getRoom(req, res) {
+    const id = req.params.id;
     try {
-        const id = req.params.id;
-        con.query(GET_QUERY, [id], (err, result) => {
-            if (err) {
-                console.log(err)
-                res.status(409).send(err.sqlMessage)
-                return
-            }
-            res.status(200).send(result)
-        })
+        const getAllRoom = await execQuery(/*sql*/`SELECT *, 
+            DATE_FORMAT(createdAt, "%D %M %Y") 
+            AS
+            createdAt FROM room WHERE deletedAt IS NULL`, [id])
+        if (getAllRoom.length > 0) {
+            res.status(200).send(getAllRoom)
+        } else {
+            return res.status(404).send('Not Founded')
+        }
     } catch (error) {
-        console.error(error)
+        return res.status(500).send(error.messege)
     }
 
 }
-
-function insertRoom(req, res) {
+async function insertRoom(req, res) {
     try {
         const {
             roomNo,
@@ -80,103 +52,84 @@ function insertRoom(req, res) {
             isActive,
         } = req.body;
 
-        con.query(INSERT_QUERY, [roomNo, blockId, isActive], (err, result) => {
-            console.log(INSERT_QUERY)
-            if (err) {
-                res.status(409).send(err.sqlMessage)
-                return
-            }
-            if (result.affectedRows != 0) {
-                res.status(200).send("INSERTED")
-            }
-        })
-
+        const postOrPutroom = await execQuery( /*sql*/`INSERT INTO room 
+                                (roomNo, blockId, isActive, roomCount)
+                                VALUES (?, ?, ?, 
+                                (SELECT COUNT(*) FROM 
+                                (SELECT roomNo FROM room WHERE deletedAt IS NULL )
+                                 AS temp)
+                                 )`,
+            [roomNo, blockId, isActive])
+        if (postOrPutroom.affectedRows !== 0) {
+            res.status(200).send("Data Inserted")
+        } else {
+            return res.status(304).send('Not modified')
+        }
     } catch (error) {
-        console.error(error)
+        return res.status(500).send(error.messege)
     }
 
 }
-
-function updateRoom(req, res) {
+async function updateRoom(req, res) {
+    const id = req.params.id;
+    const columns = []
+    const values = []
     try {
-        const id = req.params.id;
-        const columns = []
-        const values = []
-        updatedKey.forEach((key) => {
+        UPDATE_KEYS.forEach((key) => {
             const keyValue = req.body[key];
             if (keyValue !== undefined) {
                 values.push(keyValue)
                 columns.push(`${key} = ?`)
             }
         })
-        const UPDATE_QUERY = /*sql*/` UPDATE room SET ${columns}, 
+        const updateRoom = await execQuery(/*sql*/` UPDATE room SET ${columns}, 
                                         updatedAt = current_timestamp()
-                                         WHERE id = ${id}`
-        con.query(UPDATE_QUERY, values, (err, result) => {
-            if (err) {
-                console.log(err)
-                res.status(409).send(err.sqlMessage)
-                return
+                                         WHERE id = ${id} AND deletedAt IS NULL`, values)
+
+        if (updateRoom.affectedRows != 0) {
+            const getUpdatedRoom = await execQuery( /*sql*/`SELECT * FROM room WHERE id = ?`, [id])
+            if (getUpdatedRoom.length !== 0) {
+                res.status(200).send(getUpdatedRoom[0])
             }
-            if (result.affectedRows != 0) {
-                con.query(SINGLE_GET_QUERY, [id],
-                    (err2, result2) => {
-                        if (err2) {
-                            console.log(err2)
-                            res.status(409).send(err2.sqlMessage)
-                            return
-                        }
-                        res.status(200).send(result2[0])
-                    })
-            }
-        })
+        } else {
+            return res.status(304).send('Not Modified')
+        }
 
     } catch (error) {
-        console.error(error)
+        return res.status(500).send(error.messege)
     }
 
 }
-function deleteRoom(req, res) {
+async function deleteRoom(req, res) {
+    const id = req.params.id;
     try {
-        const id = req.params.id;
-        con.query(DELETE_QUERY, [id], (err, result) => {
-            if (err) {
-                // console.log(err)
-                res.status(409).send(err.sqlMessage)
-                return
-            }
-
-            if (result.affectedRows > 0) {
-                res.status(200).send("DELETED")
-            }
-            else {
-                res.status(409).send(err.sqlMessage)
-                return
-            }
-        })
+        const deleRoom = await execQuery(/*sql*/`UPDATE room SET
+            deletedAt = CURRENT_TIMESTAMP()
+             WHERE id = ?`, [id])
+        if (deleRoom.affectedRows > 0) {
+            res.status(200).send("DELETED")
+        } else {
+            return res.status(304).send('Not Modified')
+        }
     } catch (error) {
-        console.error(error)
+        return res.status(500).send(error.messege)
     }
-
 }
-
-function getSingleRoom(req, res) {
+async function getSingleRoom(req, res) {
+    const id = req.params.id;
     try {
-        const id = req.params.id;
-        con.query(SINGLE_GET_QUERY, [id], (err, result) => {
-            if (err) {
-                res.status(409).send(err.sqlMessage)
-                return
-            } else {
-                res.status(200).send(result[0])
-            }
-        })
+        const getSingleRoom = await execQuery(/*sql*/`SELECT * FROM room WHERE id = ?`, [id])
+        if (getSingleRoom.length !== 0) {
+            res.status(200).send(result[0])
+        } else {
+            return res.status(404).send('Not Founded')
+        }
     } catch (error) {
-        console.log(error)
+        return res.status(500).send(error.messege)
     }
 }
 
-router.get('/',getRoom)
+router.get('/', getRoom)
 router.get('/block/:id', getBlockRoom)
 router.post('/', insertRoom)
 router.put('/:id', updateRoom)

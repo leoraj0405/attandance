@@ -15,6 +15,7 @@ const studentApiRouter = require('./router/api/student')
 const blockApiRouter = require('./router/api/block')
 const roomApiRouter = require('./router/api/room')
 const attendanceRouter = require('./router/api/dayAttendance')
+const departmentApiRouter = require('./router/api/department')
 
 const userUiRouter = require('./router/ui/csUser');
 const blockUiRouter = require('./router/ui/csBlock');
@@ -48,11 +49,12 @@ app.use('/api/student/', studentApiRouter);
 app.use('/api/block', blockApiRouter);
 app.use('/api/room/', roomApiRouter);
 app.use('/api/attendance', attendanceRouter);
+app.use('/api/department', departmentApiRouter)
 
 app.use('/sh', userUiRouter);
 app.use('/sh/attendance', blockUiRouter);
-app.use('/sh/attendance/room',roomuiRouter);
-app.use('/sh/attendance/stud',studentUiRouter);
+app.use('/sh/attendance/room', roomuiRouter);
+app.use('/sh/attendance/stud', studentUiRouter);
 
 app.use(function (req, res, next) {
     next(createError(404));

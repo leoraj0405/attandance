@@ -1,205 +1,112 @@
 const express = require('express');
 const router = express.Router();
-const mysql = require('mysql');
+const execQuery = require('../../utils/query');
 
-const con = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'Root1234@',
-    database: 'attendance'
-})
-
-const GET_QUERY = /*sql*/`SELECT *, 
-                    DATE_FORMAT(createdAt, "%D %M %Y") 
-                    AS
-                    createdAt FROM student WHERE deletedAt IS NULL`
-
-const GET_ROOM_WISE_QUERY = /*sql*/`SELECT *, 
-                    DATE_FORMAT(createdAt, "%D %M %Y") 
-                    AS
-                    createdAt FROM student WHERE deletedAt IS NULL AND roomId = ?`
-
-const INSERT_QUERY = /*sql*/`INSERT INTO student (
-                    accNo, 
-                    firstName, 
-                    lastName, 
-                    wardenId,
-                    blockId, roomId, departmentId, phoneNo, email, native) 
-                    VALUES (?,?,?,?,?,?,?,?,?,?) 
-                    ON DUPLICATE KEY UPDATE
-                    firstName = VALUES(firstName),
-                    lastName = VALUES(lastName),
-                    phoneNo = VALUES(phoneNo),
-                    email = VALUES(email),
-                    native = VALUES(native)`
-
-const SINGLE_GET_QUERY = /*sql*/`SELECT * FROM student WHERE id = ?`
-
-const DELETE_QUERY = /*sql*/` UPDATE student SET
-                                deletedAt = CURRENT_TIMESTAMP()
-                                 WHERE id = ?`
-
-
-function getStudent(req, res) {
+async function getStudent(req, res) {
     try {
-
-        con.query(GET_QUERY, (err, result) => {
-            if (err) {
-                res.status(409).send(err.sqlMessage)
-                return
-            }
-            res.status(200).send(result)
-        })
+        const getStudent = await execQuery( /*sql*/`SELECT *, 
+                    DATE_FORMAT(createdAt, "%D %M %Y") 
+                    AS
+                    createdAt FROM student WHERE deletedAt IS NULL`)
+        if (getStudent.length !== 0) {
+            res.status(200).send(getStudent)
+        } else {
+            return res.status(404).send('Not founded')
+        }
     } catch (error) {
-        console.error(error)
+        return res.status(500).send(error.message)
     }
 }
-
-function getRoomStudent(req, res) {
+async function getRoomStudent(req, res) {
+    const id = req.params.id;
     try {
-        const id = req.params.id;
-        con.query(GET_ROOM_WISE_QUERY,[id], (err, result) => {
-            if (err) {
-                res.status(409).send(err.sqlMessage)
-                return
-            }
-            res.status(200).send(result)
-        })
+        const getStudRoomWise = await execQuery(/*sql*/`SELECT *, 
+                            DATE_FORMAT(createdAt, "%D %M %Y") 
+                            AS
+                            createdAt FROM student
+                            WHERE deletedAt IS NULL AND roomId = ?`, [id])
+        console.log(getStudRoomWise)
+        if (getStudRoomWise.length !== 0) {
+            res.status(200).send(getStudRoomWise)
+        } else {
+            return res.status(404).send('Invalid Room')
+        }
     } catch (error) {
         console.error(error)
+        return res.status(500).send(error.message)
+
     }
 
 }
-
-function insertorUpdateStudent(req, res) {
+async function insertorUpdateStudent(req, res) {
+    const {
+        accNo, firstName, lastName, wardenId, blockId, roomId, departmentId, phoneNo, email, native,
+    } = req.body;
     try {
-        const {
-            accNo,
-            firstName,
-            lastName,
-            wardenId,
-            blockId,
-            roomId,
-            departmentId,
-            phoneNo,
-            email,
-            native,
-        } = req.body;
-
         const studentInput = [
-            accNo,
-            firstName,
-            lastName,
-            wardenId,
-            blockId,
-            roomId,
-            departmentId,
-            phoneNo,
-            email,
-            native
+            accNo, firstName, lastName, wardenId, blockId, roomId, departmentId, phoneNo, email, native
         ]
-        con.query(INSERT_QUERY, studentInput, (err, result) => {
-            if (err) {
-                // console.log(err)
-                res.status(409).send(err.sqlMessage)
-                return
-            }
-            if (result.affectedRows != 0) {
-                res.status(200).send("INSERTED")
-            }
-        })
+        const insertOrUpdateStud = await execQuery( /*sql*/`INSERT INTO student 
+                        (accNo, firstName, lastName, wardenId, blockId, roomId, departmentId, phoneNo, email, native) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+                        ON DUPLICATE KEY UPDATE
+                        firstName = VALUES(firstName),
+                        lastName = VALUES(lastName),
+                        phoneNo = VALUES(phoneNo),
+                        email = VALUES(email),
+                        blockId = VALUES(blockId),
+                        roomId = VALUES(roomId),
+                        departmentId = VALUES(departmentId),
+                        wardenId = VALUES(wardenId)
+                        native = VALUES(native)`, studentInput)
+
+        if (insertOrUpdateStud.affectedRows !== 0) {
+            res.status(200).send("Student Inserted")
+        } else {
+            return res.status(304).send('NotModified')
+        }
 
     } catch (error) {
-        console.error(error)
+        return res.status(500).send(error.message)
     }
 
 }
-
-// function updateStudent(req, res) {
-//     try {
-//         const id = req.params.id;
-//         const columnName = []
-//         const values = []
-//         updatedKeys.forEach((key) => {
-//             keyValue = req.body[key]
-//             if (keyValue !== undefined) {
-//                 values.push(keyValue)
-//                 columnName.push(` ${key} = ?`)
-//             }
-//         })
-//         // account cant be editable
-//         const UPDATE_QUERY = /*sql*/` UPDATE student SET ${columnName}, 
-//                                         updatedAt = CURRENT_TIMESTAMP() 
-//                                         WHERE id = ${id} `
-//         con.query(UPDATE_QUERY, values, (err, result) => {
-//             if (err) {
-//                 console.log(err)
-//                 res.status(409).send(err.sqlMessage)
-//                 return
-//             }
-//             if (result.affectedRows != 0) {
-//                 con.query(SINGLE_GET_QUERY, [id],
-//                     (err2, result2) => {
-//                         if (err2) {
-//                             console.log(err2)
-//                             res.status(409).send(err2.sqlMessage)
-//                             return
-//                         }
-//                         res.status(200).send(result2[0])
-//                     })
-//             }
-//         })
-
-//     } catch (error) {
-//         console.error(error)
-//     }
-
-// }
-
-function deleteStudent(req, res) {
+async function deleteStudent(req, res) {
+    const id = req.params.id;
     try {
-        const id = req.params.id;
-        con.query(DELETE_QUERY, [id], (err, result) => {
-            if (err) {
-                console.log(err)
-                res.status(409).send(err.sqlMessage)
-                return
-            }
+        const deleStudent = await execQuery(/*sql*/` UPDATE 
+            student SET
+            deletedAt = CURRENT_TIMESTAMP()
+             WHERE id = ?`, [id])
 
-            if (result.affectedRows > 0) {
-                res.status(200).send("DELETED")
-            }
-            else {
-                res.status(409).send(err.sqlMessage)
-                return
-            }
-        })
+        if (deleStudent.affectedRows !== 0) {
+            res.status(200).send("Deleted")
+        } else {
+            return res.status(304).send('Not Modified')
+        }
     } catch (error) {
-        console.error(error)
+        return res.status(500).send(error.message)
     }
 
 }
-
-function getSingleStudent(req, res) {
+async function getSingleStudent(req, res) {
+    const id = req.params.id;
     try {
-        const id = req.params.id;
-        con.query(SINGLE_GET_QUERY, [id], (err, result) => {
-            if (err) {
-                res.status(409).send(err.sqlMessage)
-                return
-            } else {
-                res.status(200).send(result[0])
-            }
-        })
+        const singleStud = await execQuery(/*sql*/`SELECT * FROM  student WHERE id = ? AND deletedAt IS NULL`, [id])
+        console.log(singleStud)
+        if (singleStud.length) {
+            res.status(200).send(singleStud[0])
+        }else {
+            return res.status(404).send('Not founed')
+        }
     } catch (error) {
-        console.log(error)
+       return res.status(500).send(error.message)
     }
 }
 
 router.get('/', getStudent)
-router.get('/room/:id',getRoomStudent)
+router.get('/room/:id', getRoomStudent)
 router.post('/', insertorUpdateStudent)
-// router.put('/:id', updateStudent)
 router.delete('/:id', deleteStudent)
 router.get('/:id', getSingleStudent)
 

@@ -46,28 +46,27 @@ router.get('/signup', (req, res) => {
     res.render('pages/signup.ejs')
 })
 
-router.get('/warden/restPassword', async (req, res) => {
-    try {
-        res.render('pages/restPassword.ejs')
+// router.get('/warden/restPassword', async (req, res) => {
+//     try {
+//         res.render('pages/restPassword.ejs')
 
-    } catch (error) {
-        console.error(error)
-    }
-})
+//     } catch (error) {
+//         console.error(error)
+//     }
+// })
 
-router.get('/warden/:id',async (req, res) => {
-    try {
-        console.log('ok2')
-        const id = req.params.id;
-        const response = await fetch(`http://localhost:4000/api/user/${id}`)
-        const data = await response.json();
-        res.render('pages/profile.ejs',{data})
-    } catch (error) {
-        console.error(error)
-    }
-})
-router.get('/warden/method2/restPassword2',(req, res) => {
-    res.render('pages/restPassword2.ejs')
+// router.get('/warden/:id',async (req, res) => {
+//     try {
+//         const id = req.params.id;
+//         const response = await fetch(`http://localhost:4000/api/user/${id}`)
+//         const data = await response.json();
+//         res.render('pages/profile.ejs',{data})
+//     } catch (error) {
+//         console.error(error)
+//     }
+// })
+router.get('/warden/restPassword',(req, res) => {
+    res.render('pages/restPassword.ejs')
 })
 
 
