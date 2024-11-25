@@ -67,23 +67,25 @@
                                             <label for="yourUsername" class="form-label">Username</label>
                                             <div class="input-group has-validation">
                                                 <span class="input-group-text" id="inputGroupPrepend">@</span>
-                                                <input type="text" name="username" class="form-control" value="<%=data.userId %>"
-                                                    id="yourUsername" required <%=inputType %>>
+                                                <input type="text" name="username" class="form-control"
+                                                    value="<%=data.userId %>" id="yourUsername" required <%=inputType
+                                                    %>>
                                                 <div class="invalid-feedback">Please choose a username.</div>
                                             </div>
                                         </div>
 
                                         <div class="col-12">
                                             <label for="yourPassword" class="form-label">Password</label>
-                                            <input type="password" name="password" class="form-control" value="<%=data.password %>"
-                                                id="yourPassword" required <%=inputType %>>
+                                            <input type="password" name="password" class="form-control"
+                                                value="<%=data.password %>" id="yourPassword" required <%=inputType %>>
                                             <div class="invalid-feedback">Please enter your password!</div>
                                         </div>
 
                                         <div class="col-12">
                                             <label for="yourConfirmPassword" class="form-label">Confirm Password</label>
-                                            <input type="password" name="ConfirmPassword" class="form-control" value="<%=data.password %>"
-                                                id="yourConfirmPassword" required <%=inputType %>>
+                                            <input type="password" name="ConfirmPassword" class="form-control"
+                                                value="<%=data.password %>" id="yourConfirmPassword" required
+                                                <%=inputType %>>
                                             <div class="invalid-feedback">Please re-enter your password!</div>
                                         </div>
 
@@ -104,9 +106,10 @@
 
                                         </div>
                                         <div class="col-12">
-                                            <label for="profile" class="form-label">Confirm Password</label>
+                                            <img src="/uploads/<%= profile%>" alt="Profile"
+                                            class="w-50 p-3">
                                             <input type="file" name="profile" class="form-control" id="profile"
-                                                required>
+                                                required>                                    
                                             <div class="invalid-feedback">Choose your Profile Picture</div>
                                         </div>
                                         <div class="col-12 d-flex justify-content-evenly">
@@ -166,7 +169,7 @@
             const isAdminDom = document.querySelector('input[name="isAdmin"]:checked');
             const myHeaders = new Headers();
 
-            if(passDom.value != confirmPassDom.value) {
+            if (passDom.value != confirmPassDom.value) {
                 return alert('Password not match')
             }
             const formdata = new FormData();
@@ -190,16 +193,15 @@
 
             fetch("http://localhost:4000/api/user", requestOptions)
                 .then(async (response) => {
-                    if(response.status == 200) {
+                    if (response.status == 200) {
                         alert('User Added')
-                    }else {
-                        alert( await response.text())
+                    } else {
+                        alert(await response.text())
                         return
                     }
                 });
         }
     </script>
-
 
 </body>
 

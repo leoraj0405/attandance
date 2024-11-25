@@ -26,7 +26,7 @@ router.get('/addad',(req, res) => {
                         const user = req.session.data
                         const admin = req.session.data.isAdmin;
                         const pageName = 'Add'
-                        res.render('pages/users/userAdd.ejs', {pageName, data : {}, user, admin, inputType:{}})
+                        res.render('pages/users/userAdd.ejs', {pageName, profile:'', data : {}, user, admin, inputType:{}})
                 } else {
                         res.redirect('http://localhost:4000/sh/login')
                 }

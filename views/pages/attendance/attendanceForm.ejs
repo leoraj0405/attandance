@@ -70,9 +70,7 @@
         </div>
         <div class="container-main container">
             <div class="container-fluid">
-                <div class="w-100 p-3 d-flex justify-content-center">
-                    <input type="date" name="todayDate" id="todayDate" class="btn">
-                </div>
+                
                 <div class="w-100 p-3 d-flex justify-content-center">
                     <li class="border-none" value="<%=user.id %>" id="warden">Attendance taken by <%=user.firstName %>
                     </li>
@@ -195,16 +193,11 @@
                 </div>
             </div>
         </div>`
-            console.log(studInfo)
             document.getElementById('alart').innerHTML = studInfo
             const alertModal = new bootstrap.Modal(document.getElementById('customAlertModal'));
             alertModal.show();
 
         }
-
-        const today = new Date().toISOString().split('T')[0];
-        const todayDateDom = document.getElementById('todayDate')
-        todayDateDom.value = today
         function attendance() {
             const wardenDom = document.getElementById('warden').value;
             const appearance = [];
