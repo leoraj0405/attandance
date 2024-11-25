@@ -39,7 +39,7 @@ async function insertBlock(req, res) {
         if (insertBlock.affectedRows !== 0) {
             res.status(200).send("INSERTED")
         } else {
-            return res.status(304).send('Not Modified')
+            return res.status(400).send('Not Modified')
         }
     } catch (error) {
         console.error(error)
@@ -66,7 +66,7 @@ async function updateBlock(req, res) {
                 return res.status(404).send('Not Founded')
             }
         } else {
-            return res.status(304).send('Not Modifed')
+            return res.status(400).send('Not Modifed')
         }
 
     } catch (error) {
@@ -84,7 +84,7 @@ async function deleteBlock(req, res) {
             res.status(200).send("DELETED")
         }
         else {
-            res.status(304).send('Not modified')
+            res.status(400).send('Not modified')
             return
         }
     } catch (error) {

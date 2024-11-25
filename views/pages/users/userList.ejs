@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../../partials/head') %>
+        <style>
+            .no-border-button {
+                border: none;
+                background: none;
+                padding: 10px 20px;
+                cursor: pointer;
+                font-size: 16px;
+                color: #333;
+            }
+
+            .border-none {
+                border: none;
+                background: none;
+                text-decoration: none;
+                color: inherit;
+            }
+        </style>
+</head>
+
+<body>
+
+    <!-- ======= Header ======= -->
+    <header id="header" class="header fixed-top d-flex align-items-center">
+        <%- include('../../partials/header') %>
+    </header><!-- End Header -->
+
+    <!-- ======= Sidebar ======= -->
+    <aside id="sidebar" class="sidebar">
+        <%- include('../../partials/asideBar') %>
+    </aside><!-- End Sidebar-->
+
+    <main id="main" class="main">
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Assistant Directors</h5>
+                <!-- Table with stripped rows -->
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">User ID</th>
+                            <th scope="col">First Name</th>
+                            <th scope="col">Last Name</th>
+                            <th scope="col">Phone Number</th>
+                            <th scope="col">Email ID</th>
+                            <th scope="col">IsAdmin</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for(var i=0; i < userData.length;i++) { %>
+                            <tr>
+                                <td>
+                                    <%=userData[i].userId %>
+                                </td>
+                                <td>
+                                    <%=userData[i].firstName %>
+                                </td>
+                                <td>
+                                    <%=userData[i].lastName %>
+                                </td>
+                                <td>
+                                    <%=userData[i].phoneNo %>
+                                </td>
+                                <td>
+                                    <%=userData[i].email %>
+                                </td>
+                                <td>
+                                    <%=userData[i].isAdmin==1 ? 'YES' : 'NO' %>
+                                </td>
+                                <td>
+                                    <a class="border-none" href="/sh/admin/editad/<%=userData[i].id %>">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button class="no-border-button" onclick="deleteuser('<%=userData[i].id %>')">
+                                        <i class="fas fa-trash" style="color: red;"></i>
+                                    </button>
+
+                                </td>
+                            </tr>
+                            <%} %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main><!-- End #main -->
+
+    <!-- ======= Footer ======= -->
+    <footer id="footer" class="footer">
+        <%- include ('../../partials/footer') %>
+    </footer><!-- End Footer -->
+
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+            class="bi bi-arrow-up-short"></i></a>
+
+    <!-- Vendor JS Files -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="/assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/vendor/chart.js/chart.umd.js"></script>
+    <script src="/assets/vendor/echarts/echarts.min.js"></script>
+    <script src="/assets/vendor/quill/quill.js"></script>
+    <script src="/assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="/assets/vendor/tinymce/tinymce.min.js"></script>
+    <script src="/assets/vendor/php-email-form/validate.js"></script>
+    <!-- Template Main JS File -->
+    <script src="/assets/js/main.js"></script>
+
+    <script>
+        function deleteuser(id) {
+
+            if(confirm('Are your sure to delete user')){
+                const requestOptions = {
+                method: "DELETE",
+                redirect: "follow"
+            };
+
+            let request = fetch(`http://localhost:4000/api/user/${id}`, requestOptions)
+            request.then(async (response) => {
+                if (response.status == 200) {
+                    location.reload()
+                } else {
+                    alert(await response.text())
+                }
+            });
+            }
+        }        
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../../partials/head') %>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+        <style>
+            .mt-n1 {
+                margin-top: 5.25rem !important;
+            }
+
+            .px-2 {
+                margin: 1.25rem !important;
+            }
+
+            .border-none {
+                list-style-type: none;
+                padding-left: 0;
+            }
+            .btn {
+                border: transparent;
+            }
+
+            input[type="checkbox"] {
+                height: 30px;
+                width: 30px;
+            }
+
+            .hidden-input {
+                display: none;
+            }
+
+            .custom-alert .modal-content {
+                border-radius: 10px;
+                background: linear-gradient(135deg, #f0f8ff, #e6e6fa);
+                box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
+            }
+
+            .custom-alert .modal-header {
+                background-color: #6c757d;
+                color: white;
+                border-bottom: 2px solid #e6e6fa;
+            }
+
+            .custom-alert .modal-footer {
+                justify-content: center;
+            }
+
+            .custom-alert .btn-close {
+                color: white;
+            }
+        </style>
+</head>
+
+<body>
+
+    <!-- ======= Header ======= -->
+    <header id="header" class="header fixed-top d-flex align-items-center">
+        <%- include('../../partials/header') %>
+    </header><!-- End Header -->
+
+    <!-- ======= Sidebar ======= -->
+    <aside id="sidebar" class="sidebar">
+        <%- include('../../partials/asideBar') %>
+    </aside><!-- End Sidebar-->
+
+    <main id="main" class="main">
+        <div id="alart">
+        </div>
+        <div class="container-main container">
+            <div class="container-fluid">
+                <div class="w-100 p-3 d-flex justify-content-center">
+                    <input type="date" name="todayDate" id="todayDate" class="btn">
+                </div>
+                <div class="w-100 p-3 d-flex justify-content-center">
+                    <li class="border-none" value="<%=user.id %>" id="warden">Attendance taken by <%=user.firstName %>
+                    </li>
+                </div>
+                <div class="d-flex flex-column mb-3">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Account No</th>
+                                <th scope="col">Name </th>
+                                <th scope="col">Present</th>
+                                <th scope="col">Absent</th>
+                                <th scope="col">Leave</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if( data.length==0 ) { %>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>
+                                        <p>No students in the Room</p>
+                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <% }else { %>
+                                    <% for(var i=0; i < data.length;i++) { %>
+                                        <tr>
+                                            <td scope="row">
+                                                <%= data[i].accNo %>
+                                            </td>
+                                            <td>
+                                                <input type="text" class="hidden-input" value="<%=data[i].blockId %>"
+                                                    name="block">
+                                                <input type="text" class="hidden-input" value="<%=data[i].roomId %>"
+                                                    name="room">
+                                                <li class="border-none" value="<%=data[i].id %>" name="student">
+                                                    <%=data[i].sfirstName %>
+                                                </li>
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" name="options" value="p">
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" name="options" value="a">
+
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" name="options" value="l"><br>
+                                                <input type="text" class="form-control" name="reason">
+
+                                            </td>
+                                            <td>
+                                                <button class="btn" onclick="showAlert('<%=data[i].id %>')"><span
+                                                        class="fa fa-info-circle"></span></button>
+                                            </td>
+                                        </tr>
+                                        <% } %>
+                                            <% } %>
+
+                        </tbody>
+                    </table>
+                    <div class="w-100 p-3 d-flex justify-content-center">
+                        <button onclick="attendance()" class="btn btn-success">Submit</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main><!-- End #main -->
+
+    <!-- ======= Footer ======= -->
+    <footer id="footer" class="footer">
+        <%- include('../../partials/footer') %>
+    </footer><!-- End Footer -->
+
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+            class="bi bi-arrow-up-short"></i></a>
+
+    <!-- Vendor JS Files -->
+    <script src="/assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/vendor/chart.js/chart.umd.js"></script>
+    <script src="/assets/vendor/echarts/echarts.min.js"></script>
+    <script src="/assets/vendor/quill/quill.js"></script>
+    <script src="/assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="/assets/vendor/tinymce/tinymce.min.js"></script>
+    <script src="/assets/vendor/php-email-form/validate.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <!-- Template Main JS File -->
+    <script src="/assets/js/main.js"></script>
+
+    <script>
+
+        async function showAlert(id) {
+            const response = await fetch(`http://localhost:4000/api/student/${id}`)
+            const studData = await response.json()
+            var studInfo = ` 
+        <div class="modal fade custom-alert" id="customAlertModal" tabindex="-1" aria-labelledby="customAlertLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="customAlertLabel">student information</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                         Account No : ${studData.accNo} <br> <hr>
+                        First Name  : ${studData.sfirstName} <br> <hr>
+                        Last Name : ${studData.lastName} <br> <hr>
+                        Email : ${studData.email} <br> <hr>
+                        Phone Number : ${studData.phoneNo} <br> <hr>
+                        Native : ${studData.native} <br> <hr>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>`
+            console.log(studInfo)
+            document.getElementById('alart').innerHTML = studInfo
+            const alertModal = new bootstrap.Modal(document.getElementById('customAlertModal'));
+            alertModal.show();
+
+        }
+
+        const today = new Date().toISOString().split('T')[0];
+        const todayDateDom = document.getElementById('todayDate')
+        todayDateDom.value = today
+        function attendance() {
+            const wardenDom = document.getElementById('warden').value;
+            const appearance = [];
+            const students = [];
+            const reason = [];
+            const blocks = [];
+            const rooms = [];
+            const checkboxs = document.querySelectorAll('input[name = "options"]:checked');
+            checkboxs.forEach((checkboxInput) => {
+                appearance.push(checkboxInput.value);
+            });
+            const roomStud = document.querySelectorAll('li[name="student"]');
+            roomStud.forEach((stud) => {
+                students.push(stud.value);
+            });
+            const studBlock = document.querySelectorAll('input[name="block"]');
+            studBlock.forEach((block) => {
+                blocks.push(block.value);
+            })
+            const studRoom = document.querySelectorAll('input[name="room"]');
+            studRoom.forEach((room) => {
+                rooms.push(room.value);
+            })
+            const reasonArr = document.querySelectorAll('input[name = "reason"]');
+            reasonArr.forEach((key) => {
+                reason.push(key.value)
+            })
+            for (let i = 0; i < students.length; i++) {
+                const myHeaders = new Headers();
+                myHeaders.append("Content-Type", "application/json");
+                myHeaders.append("Cookie", "connect.sid=s%3A0FBGyvDQt12m2t3TO-XjJI6gJ8xNdBFn.xp64Qp7hK3iQAjYNPj7I1L97j1MVY6yhLK5FJ3JjAhw");
+
+                const raw = JSON.stringify({
+                    "studentId": students[i],
+                    "wardenId": wardenDom,
+                    "appearance": appearance[i],
+                    "date": todayDateDom.value,
+                    "reason": reason[i],
+                    "blockId": blocks[i],
+                    "roomId": rooms[i]
+                });
+
+                const requestOptions = {
+                    method: "POST",
+                    headers: myHeaders,
+                    body: raw,
+                    redirect: "follow"
+                };
+
+                var request = fetch("http://localhost:4000/api/attendance", requestOptions)
+            }
+            request.then(async (response) => {
+                if (response.status == 200) {
+                    alert("Done ")
+                    btnClickCount = btnClickCount + 1
+
+                } else {
+                    alert(await response.text())
+                }
+            })
+
+        }
+    </script>
+
+</body>
+
+</html>

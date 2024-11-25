@@ -42,6 +42,11 @@ async function postOrPutAttendance(req, res) {
             roomId,
             blockId
         ]
+        const checkTodayAtt = await execQuery(/*sql*/`SELECT 
+                                * FROM
+                                dayattendance 
+                                WHERE date = ? AND roomId = ? AND blockId = ?`,[date, roomId, blockId])
+        console.log(checkTodayAtt)
         const postAttendance = await execQuery(/*sql*/`INSERT 
                                 INTO dayattendance 
                                 (studentId, 
@@ -60,7 +65,7 @@ async function postOrPutAttendance(req, res) {
             res.status(200).send("INSERTED")
 
         } else {
-            res.status(304).send('Not Modified')
+            res.status(400).send('Not Modified')
             return
         }
 

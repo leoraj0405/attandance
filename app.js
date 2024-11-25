@@ -18,9 +18,8 @@ const attendanceRouter = require('./router/api/dayAttendance')
 const departmentApiRouter = require('./router/api/department')
 
 const userUiRouter = require('./router/ui/csUser');
-const blockUiRouter = require('./router/ui/csBlock');
-const roomuiRouter = require('./router/ui/csRoom');
-const studentUiRouter = require('./router/ui/csStudent');
+const adminUiRouter = require('./router/ui/csAdmin');
+const attendanceUiRouter = require('./router/ui/csAttendance');
 
 var fileStoreOptions = {};
 
@@ -33,6 +32,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'uploads')));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
     store: new FileStore(fileStoreOptions),
@@ -52,9 +52,9 @@ app.use('/api/attendance', attendanceRouter);
 app.use('/api/department', departmentApiRouter)
 
 app.use('/sh', userUiRouter);
-app.use('/sh/attendance', blockUiRouter);
-app.use('/sh/attendance/room', roomuiRouter);
-app.use('/sh/attendance/stud', studentUiRouter);
+app.use('/sh/admin/', adminUiRouter);
+app.use('/sh/attendance', attendanceUiRouter);
+
 
 app.use(function (req, res, next) {
     next(createError(404));

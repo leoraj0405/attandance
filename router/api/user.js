@@ -4,6 +4,9 @@ const router = express.Router();
 const otpGenerator = require('otp-generator');
 const sendMail = require('../../utils/email');
 const execQuery = require('../../utils/query');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 const LENGTH_OF_OTP = 6;
 const PATTERN_OF_OTP = {
@@ -11,6 +14,18 @@ const PATTERN_OF_OTP = {
     specialChars: false,
     lowerCaseAlphabets: false
 }
+
+// Configure multer storage
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, 'public/uploads/'); // save files in the uploads folder
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+  });
+  const upload = multer({ storage: storage });
 
 async function getUser(req, res) {
     try {
@@ -22,7 +37,7 @@ async function getUser(req, res) {
 
         if (getUser.length !== 0) {
             res.status(200).send(getUser)
-        }else {
+        } else {
             return res.status(404).send('Not Founded')
         }
     } catch (error) {
@@ -30,6 +45,8 @@ async function getUser(req, res) {
     }
 }
 async function insertorUpdateUser(req, res) {
+
+    const profileImage = req.file.filename
     const {
         firstName,
         lastName,
@@ -39,6 +56,7 @@ async function insertorUpdateUser(req, res) {
         password,
         isAdmin
     } = req.body;
+
     try {
         const userInput = [
             firstName,
@@ -47,9 +65,10 @@ async function insertorUpdateUser(req, res) {
             email,
             userId,
             password,
-            isAdmin
+            isAdmin,
+            profileImage
         ]
-        if (firstName.length > 0 && lastName.length > 0 && phoneNo.length > 0 && email.length > 0 && userId.length > 0 && password.length > 0 && isAdmin.length > 0) {
+            if (firstName.length > 0 && lastName.length > 0 && phoneNo.length > 0 && email.length > 0 && userId.length > 0 && password.length > 0 && isAdmin.length > 0) {
             const postUser = await execQuery(/*sql*/` INSERT INTO 
                 user 
                 ( firstName, 
@@ -58,23 +77,25 @@ async function insertorUpdateUser(req, res) {
                 email, 
                 userId, 
                 password, 
-                isAdmin, otpAttempt) 
-                VALUES (?,?,?,?,?,?,?,1) 
+                isAdmin, otpAttempt,profileImage) 
+                VALUES (?,?,?,?,?,?,?,1,?) 
                 ON DUPLICATE KEY UPDATE 
                 firstName = VALUES(firstName),
                 lastName = VALUES(lastName),
                 phoneNo = VALUES(phoneNo),
                 email = VALUES(email),
-                password = VALUES(password),
-                isAdmin = VALUES (isAdmin)`, userInput)
+                isAdmin = VALUES (isAdmin),
+                profileImage = VALUES(profileImage)`,
+                userInput)
 
             if (postUser.affectedRows != 0) {
                 res.status(200).send("User Inserted")
             }
         } else {
-            return res.status(304).send('Not modified')
+            return res.status(400).send('Not modified')
         }
     } catch (error) {
+        console.log(error)
         return res.status(500).send(error.message)
     }
 }
@@ -88,8 +109,8 @@ async function deleteUser(req, res) {
 
         if (deleteUser.affectedRows != 0) {
             res.status(200).send('User Deleted')
-        }else {
-            return res.status(304).send('Not modified')
+        } else {
+            return res.status(400).send('Not modified')
         }
     } catch (error) {
         console.error(error)
@@ -100,75 +121,26 @@ async function deleteUser(req, res) {
 async function getSingleUser(req, res) {
     const id = req.params.id;
     try {
-       const singleUser = await execQuery(/*sql*/`SELECT 
+        const singleUser = await execQuery(/*sql*/`SELECT 
             * 
             FROM user 
             WHERE id = ?`,
-             [id])
-            if(singleUser.length) {
-                res.status(200).send(singleUser[0])
-            }else {
-                return res.status(404).send('Not founded')
-            }
+            [id])
+        if (singleUser.length) {
+            res.status(200).send(singleUser[0])
+        } else {
+            return res.status(404).send('Not founded')
+        }
     } catch (error) {
         console.error(error)
-       return res.status(500).send(error.message)
+        return res.status(500).send(error.message)
 
     }
 }
-// function restPassword(req, res) {
-//     try {
-//         const {
-//             email,
-//         } = req.body;
-
-//         const randomString = randomstring.generate({
-//             length: 6
-//         });
-//         console.log(randomString)
-
-//         con.query(/*sql*/`SELECT email FROM user WHERE email = ?`, [email], (err1, result1) => {
-//             if (result1 == 0) {
-//                 res.status(409).send('Invalid Email Id')
-//                 return
-//             }
-//             con.query(/*sql*/`UPDATE user SET password = ? WHERE email = ?`,
-//                 [randomString, email],
-//                 async (err, result) => {
-//                     if (err) {
-//                         res.status(409).send(err.sqlMessage)
-//                         return
-//                     }
-//                     console.log(result)
-//                     if (result.affectedRows == 0) {
-//                         console.log(result)
-//                         res.status(409).send('API Error : Reset Password Unsccessfull')
-//                         return
-//                     }
-//                     const mailOptions = {
-//                         to: email,
-//                         subject: 'Send By SH Team',
-//                         text: `Your new password is ${randomString}`
-//                     }
-
-//                     try {
-//                         const emailResult = await sendMail(mailOptions)
-//                     } catch (error) {
-//                         console.log(error)
-//                     }
-//                 })
-
-
-//         })
-
-//     } catch (error) {
-//         console.log(error)
-//     }
-// }
 async function login(req, res) {
     const { userId, password } = req.body;
     try {
-        const userLogin = await execQuery(/*sql*/` SELECT id,firstName,isAdmin FROM user WHERE userId = ? AND password = ? `, [userId, password]) 
+        const userLogin = await execQuery(/*sql*/` SELECT * FROM user WHERE userId = ? AND password = ? `, [userId, password])
         if (userLogin.length > 0) {
             req.session.isLogged = true;
             req.session.data = userLogin[0];
@@ -181,14 +153,29 @@ async function login(req, res) {
         }
     } catch (error) {
         console.error(error)
-       return res.status(500).send(error.message)
+        return res.status(500).send(error.message)
     }
 }
 function home(req, res) {
     try {
         if (req.session.isLogged) {
-            const userData = req.session.data
-            res.status(200).send("Welcome " + userData.firstName)
+            const imagePath = req.session.data.profileImage
+            const filePath = path.join(__dirname, '../../public/uploads', imagePath)
+            
+            const invalidUserProfile = `demoProfile.jpg`
+            const invalidUserProfilePath = path.join(__dirname, '../../public/uploads', invalidUserProfile)
+
+            fs.access(filePath, fs.constants.F_OK, (err) => {
+              if (err) {
+                return res.status(200).sendFile(invalidUserProfilePath)
+              }
+          
+              res.status(200).sendFile(filePath, (error) => {
+                if (error) {
+                  res.status(500).send(invalidUserProfilePath)
+                }
+              })
+            })
         }
         else {
             res.status(401).send("Please Login again")
@@ -196,7 +183,7 @@ function home(req, res) {
         }
     } catch (error) {
         console.error(error)
-       return res.status(500).send(error.message)
+        return res.status(500).send(error.message)
     }
 }
 function logout(req, res) {
@@ -210,7 +197,7 @@ function logout(req, res) {
         });
 
     } catch (error) {
-       return res.status(500).send(error.message)
+        return res.status(500).send(error.message)
     }
 }
 async function processOtp(req, res) {
@@ -239,7 +226,9 @@ async function processOtp(req, res) {
             return
         }
         const unBlockTime = new Date(userResult[0].unBlockTime).getTime();
-        console.log(unBlockTime+ ' '+ currentTime)
+        
+        console.log('cur '+currentTime + ' unB ' + unBlockTime)
+        
         if (currentTime >= unBlockTime) {
             const otp = otpGenerator.generate(LENGTH_OF_OTP, PATTERN_OF_OTP);
             const otpUpdateRes = await execQuery(/*sql*/`UPDATE user 
@@ -263,11 +252,11 @@ async function processOtp(req, res) {
             res.status(200).send('OTP sent ')
 
         } else {
-           return res.status(401).send('user blocked')
+            return res.status(401).send('user blocked')
         }
     } catch (error) {
         console.error(error)
-       return res.status(500).send(error.message)
+        return res.status(500).send(error.message)
     }
 }
 async function restPassword(req, res) {
@@ -341,8 +330,8 @@ async function restPassword(req, res) {
 
         if (updatePassword.affectedRows > 0) {
             res.status(200).send('Password Updated')
-        }else {
-            return res.status(304).send('Not Modified')
+        } else {
+            return res.status(400).send('Not Modified')
         }
 
     } catch (error) {
@@ -352,15 +341,15 @@ async function restPassword(req, res) {
 }
 
 router.get('/', getUser)
-router.post('/', insertorUpdateUser)
+router.post('/', upload.single('profile'), insertorUpdateUser)
 router.delete('/:id', deleteUser)
 router.get('/:id', getSingleUser)
 router.post('/login', login)
 router.get('/user/home', home)
 router.get('/user/logout', logout)
-// router.put('/restPassword', restPassword)  method 1
 router.post('/processotp', processOtp)
 router.put('/restpassword', restPassword)
 
 
 module.exports = router;
+    

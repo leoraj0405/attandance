@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../../partials/head') %>
+        <style>
+            .no-border-button {
+                border: none;
+                background: none;
+                padding: 10px 20px;
+                cursor: pointer;
+                font-size: 16px;
+                color: #333;
+            }
+
+            .border-none {
+                border: none;
+                background: none;
+                text-decoration: none;
+                color: inherit;
+            }
+        </style>
+</head>
+
+<body>
+    <!-- ======= Header ======= -->
+    <header id="header" class="header fixed-top d-flex align-items-center">
+        <%- include('../../partials/header') %>
+    </header><!-- End Header -->
+
+    <!-- ======= Sidebar ======= -->
+    <aside id="sidebar" class="sidebar">
+        <%- include('../../partials/asideBar') %>
+    </aside><!-- End Sidebar-->
+
+    <main id="main" class="main">
+        <div class="card-body">
+            <h5 class="card-title">Students</h5>
+
+            <!-- Table with stripped rows -->
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Account No</th>
+                        <th scope="col">Full Name</th>
+                        <th scope="col">Warden </th>
+                        <th scope="col">Block </th>
+                        <th scope="col">Room No</th>
+                        <th scope="col">Department</th>
+                        <th scope="col">Phone Number</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Native</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% for(var i=0; i < studentInfo.length;i++) { %>
+                        <tr>
+                            <td>
+                                <%= studentInfo[i].accNo %>
+                            </td>
+                            <td>
+                                <%= studentInfo[i].sfirstName + ' ' + studentInfo[i].lastName %>
+                            </td>
+                            <td>
+                                <%= studentInfo[i].firstName %>
+                            </td>
+                            <td>
+                                <%= studentInfo[i].name %>
+                            </td>
+                            <td>
+                                <%= studentInfo[i].roomId %>
+                            </td>
+                            <td>
+                                <%= studentInfo[i].deptName %>
+                            </td>
+                            <td>
+                                <%= studentInfo[i].phoneNo %>
+                            </td>
+                            <td>
+                                <%= studentInfo[i].email %>
+                            </td>
+                            <td>
+                                <%= studentInfo[i].native %>
+                            </td>
+                            <td>
+                                <a class="border-none" href="/sh/admin/editad/<%=studentInfo[i].id %>">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button class="no-border-button" onclick="deleteuser('<%=studentInfo[i].id %>')">
+                                    <i class="fas fa-trash" style="color: red;"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <% } %>
+                </tbody>
+            </table>
+            <!-- End Table with stripped rows -->
+
+            <div class="card">
+                <div class="card-body">
+
+                    <!-- Disabled and active states -->
+                    <nav aria-label="...">
+                        <div class="h-25 d-inline-block" ></div>
+                        <ul class="pagination d-flex justify-content-center">
+                            <li class="page-item <% if(currentPage == 1) { %> disabled <% } %>">
+                                <a class="page-link" href="/sh/admin/student?page=<%=currentPage - 1  %>" tabindex="-1" aria-disabled="true">Previous</a>
+                            </li>
+                            <% for(var i=1;i <=pagesTotal;i++) { %>
+                                <li class="page-item  <% if(currentPage == i ) { %> active <% } %>"><a class="page-link" href="/sh/admin/student?page=<%=i %>"><%=i %></a></li>
+
+                            <%} %>
+                            <li class="page-item <% if(currentPage == pagesTotal ) { %> disabled <% } %>">
+                                <a class="page-link" href="/sh/admin/student?page=<%= currentPage + 1 %>">Next</a>
+                            </li>
+                        </ul>
+                    </nav><!-- End Disabled and active states -->
+
+                </div>
+            </div>
+
+        </div>
+    </main><!-- End #main -->
+
+    <!-- ======= Footer ======= -->
+    <footer id="footer" class="footer">
+        <%- include('../../partials/footer') %>
+    </footer><!-- End Footer -->
+
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+            class="bi bi-arrow-up-short"></i></a>
+
+    <!-- Vendor JS Files -->
+    <script src="/assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/vendor/chart.js/chart.umd.js"></script>
+    <script src="/assets/vendor/echarts/echarts.min.js"></script>
+    <script src="/assets/vendor/quill/quill.js"></script>
+    <script src="/assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="/assets/vendor/tinymce/tinymce.min.js"></script>
+    <script src="/assets/vendor/php-email-form/validate.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="/assets/js/main.js"></script>
+
+</body>
+
+</html>

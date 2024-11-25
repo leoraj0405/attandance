@@ -1,19 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 
 </head>
-
 <body>
-
+    <div id="sideBar" style="display: none;">
+        <ul>
+            <li>Profile</li>
+            <li>Contact</li>
+            <li>Others</li>
+        </ul>
+        <button onclick="closeSideBar()">close</button>
+    </div>
+    <button onclick="showSideBar()">Click Me</button>
     <script>
-
-
+        function showSideBar() {
+            document.getElementById('sideBar').style.display = 'block'
+        }
+        function closeSideBar() {
+             document.getElementById('sideBar').style.display = 'none'
+        }
     </script>
 </body>
-
 </html>

@@ -14,8 +14,7 @@ async function getBlockRoom(req, res) {
                     *, DATE_FORMAT(createdAt, "%D %M %Y") 
                     AS createdAt
                     FROM room 
-                    WHERE blockId = ? AND deletedAt IS NULL`,
-            [id])
+                    WHERE blockId = ? AND deletedAt IS NULL`,[id])
 
         if (getBlockRoom.length !== 0) {
             res.status(200).send(getBlockRoom)
@@ -63,7 +62,7 @@ async function insertRoom(req, res) {
         if (postOrPutroom.affectedRows !== 0) {
             res.status(200).send("Data Inserted")
         } else {
-            return res.status(304).send('Not modified')
+            return res.status(400).send('Not modified')
         }
     } catch (error) {
         return res.status(500).send(error.messege)
@@ -92,7 +91,7 @@ async function updateRoom(req, res) {
                 res.status(200).send(getUpdatedRoom[0])
             }
         } else {
-            return res.status(304).send('Not Modified')
+            return res.status(400).send('Not Modified')
         }
 
     } catch (error) {
@@ -109,7 +108,7 @@ async function deleteRoom(req, res) {
         if (deleRoom.affectedRows > 0) {
             res.status(200).send("DELETED")
         } else {
-            return res.status(304).send('Not Modified')
+            return res.status(400).send('Not Modified')
         }
     } catch (error) {
         return res.status(500).send(error.messege)

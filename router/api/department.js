@@ -38,7 +38,7 @@ async function insertDepartment(req, res) {
         if (insertDepartment.affectedRows !== 0) {
             res.status(200).send("INSERTED")
         } else {
-            return res.status(304).send('Not Modified')
+            return res.status(400).send('Not Modified')
         }
     } catch (error) {
         console.error(error)
@@ -64,7 +64,7 @@ async function updateDepartment(req, res) {
                 return res.status(404).send('Not Founded')
             }
         } else {
-            return res.status(304).send('Not Modifed')
+            return res.status(400).send('Not Modifed')
         }
 
     } catch (error) {
@@ -81,7 +81,7 @@ async function deleteDepartment(req, res) {
             res.status(200).send("DELETED")
         }
         else {
-            res.status(304).send('Not modified')
+            res.status(400).send('Not modified')
             return
         }
     } catch (error) {

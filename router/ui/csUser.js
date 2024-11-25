@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const fetch = require('node-fetch');
+const path = require('path');
+
 
 router.get('/login', (req, res) => {
     try {
@@ -8,15 +10,16 @@ router.get('/login', (req, res) => {
     } catch (error) {
         console.error(error)
     }
-
 })
-
 router.get('/home', (req, res) => {
     try {
         if (req.session.isLogged == true) {
             const user = req.session.data
             const admin = req.session.data.isAdmin;
-            res.render('pages/home.ejs', { user, admin })
+            const profile = req.session.data.profileImage
+
+                res.render('pages/home.ejs', { user, admin, profile })
+            console.log(profile)
         }
 
     } catch (error) {
@@ -46,26 +49,23 @@ router.get('/signup', (req, res) => {
     res.render('pages/signup.ejs')
 })
 
-// router.get('/warden/restPassword', async (req, res) => {
-//     try {
-//         res.render('pages/restPassword.ejs')
+router.get('/user/profile',(req, res) => {
+    try {
+            if (req.session.isLogged == true) {
+                const userInfo = req.session.data
+                const user = req.session.data
+                const admin = req.session.data.isAdmin;
+                const profile = req.session.data.profileImage;
+                res.render('pages/users/userProfile.ejs', {userInfo, user, admin, profile})
+            } else {
+                    res.redirect('http://localhost:4000/sh/login')
+            }
+    } catch (error) {
+            console.error(error)  
+    }
+})
 
-//     } catch (error) {
-//         console.error(error)
-//     }
-// })
-
-// router.get('/warden/:id',async (req, res) => {
-//     try {
-//         const id = req.params.id;
-//         const response = await fetch(`http://localhost:4000/api/user/${id}`)
-//         const data = await response.json();
-//         res.render('pages/profile.ejs',{data})
-//     } catch (error) {
-//         console.error(error)
-//     }
-// })
-router.get('/warden/restPassword',(req, res) => {
+router.get('/user/restPassword',(req, res) => {
     res.render('pages/restPassword.ejs')
 })
 
