@@ -8,7 +8,7 @@ const mysqlClient = mysql.createConnection({
 })
 
 module.exports = (queryText, options) => {
-    return new Promise((resolve,reject) => {
+    return new Promise((resolve, reject) => {
         mysqlClient.query(queryText, options, (err, result) => {
             if (err) {
                 reject(err)

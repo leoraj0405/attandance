@@ -74,18 +74,52 @@
                                     <%=userData[i].isAdmin==1 ? 'YES' : 'NO' %>
                                 </td>
                                 <td>
-                                    <a class="border-none" href="/sh/admin/editad/<%=userData[i].id %>">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <button class="no-border-button" onclick="deleteuser('<%=userData[i].id %>')">
-                                        <i class="fas fa-trash" style="color: red;"></i>
-                                    </button>
-
+                                    <table>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <a class="border-none" href="/sh/admin/editad/<%=userData[i].id %>">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <button class="no-border-button" onclick="deleteuser('<%=userData[i].id %>')">
+                                                        <i class="fas fa-trash" style="color: red;"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </td>
                             </tr>
                             <%} %>
                     </tbody>
                 </table>
+                <div class="card">
+                    <div class="card-body">
+                        <!-- Disabled and active states -->
+                        <nav aria-label="...">
+                            <div class="h-25 d-inline-block"></div>
+                            <ul class="pagination d-flex justify-content-center">
+                                <li class="page-item <% if(currentPage == 1) { %> disabled <% } %>">
+                                    <a class="page-link" href="/sh/admin/asstdir?page=<%=currentPage - 1  %>"
+                                        tabindex="-1" aria-disabled="true">Previous</a>
+                                </li>
+                                <% for(var i=1;i <=pagesTotal;i++) { %>
+                                    <li class="page-item  <% if(currentPage == i ) { %> active <% } %>"><a
+                                            class="page-link" href="/sh/admin/asstdir?page=<%=i %>">
+                                            <%=i %>
+                                        </a></li>
+
+                                    <%} %>
+                                        <li class="page-item <% if(currentPage == pagesTotal ) { %> disabled <% } %>">
+                                            <a class="page-link"
+                                                href="/sh/admin/asstdir?page=<%= currentPage + 1 %>">Next</a>
+                                        </li>
+                            </ul>
+                        </nav><!-- End Disabled and active states -->
+                    </div>
+                </div>
             </div>
         </div>
     </main><!-- End #main -->
@@ -114,20 +148,20 @@
     <script>
         function deleteuser(id) {
 
-            if(confirm('Are your sure to delete user')){
+            if (confirm('Are your sure to delete user')) {
                 const requestOptions = {
-                method: "DELETE",
-                redirect: "follow"
-            };
+                    method: "DELETE",
+                    redirect: "follow"
+                };
 
-            let request = fetch(`http://localhost:4000/api/user/${id}`, requestOptions)
-            request.then(async (response) => {
-                if (response.status == 200) {
-                    location.reload()
-                } else {
-                    alert(await response.text())
-                }
-            });
+                let request = fetch(`http://localhost:4000/api/user/${id}`, requestOptions)
+                request.then(async (response) => {
+                    if (response.status == 200) {
+                        location.reload()
+                    } else {
+                        alert(await response.text())
+                    }
+                });
             }
         }        
     </script>

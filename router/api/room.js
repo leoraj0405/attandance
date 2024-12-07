@@ -31,8 +31,9 @@ async function getRoom(req, res) {
     try {
         const getAllRoom = await execQuery(/*sql*/`SELECT *, 
             DATE_FORMAT(createdAt, "%D %M %Y") 
-            AS
-            createdAt FROM room WHERE deletedAt IS NULL`, [id])
+            AS createdAt 
+            FROM room 
+            WHERE deletedAt IS NULL`, [id])
         if (getAllRoom.length > 0) {
             res.status(200).send(getAllRoom)
         } else {

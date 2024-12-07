@@ -54,66 +54,87 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% for(var i=0; i < studentInfo.length;i++) { %>
+                    <% if(studentInfo.length===0) { %>
                         <tr>
-                            <td>
-                                <%= studentInfo[i].accNo %>
-                            </td>
-                            <td>
-                                <%= studentInfo[i].sfirstName + ' ' + studentInfo[i].lastName %>
-                            </td>
-                            <td>
-                                <%= studentInfo[i].firstName %>
-                            </td>
-                            <td>
-                                <%= studentInfo[i].name %>
-                            </td>
-                            <td>
-                                <%= studentInfo[i].roomId %>
-                            </td>
-                            <td>
-                                <%= studentInfo[i].deptName %>
-                            </td>
-                            <td>
-                                <%= studentInfo[i].phoneNo %>
-                            </td>
-                            <td>
-                                <%= studentInfo[i].email %>
-                            </td>
-                            <td>
-                                <%= studentInfo[i].native %>
-                            </td>
-                            <td>
-                                <a class="border-none" href="/sh/admin/editad/<%=studentInfo[i].id %>">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <button class="no-border-button" onclick="deleteuser('<%=studentInfo[i].id %>')">
-                                    <i class="fas fa-trash" style="color: red;"></i>
-                                </button>
-                            </td>
+                            <td>No students</td>
                         </tr>
-                        <% } %>
+                        <% }else { %>
+                            <% for(var i=0; i < studentInfo.length;i++) { %>
+                                <tr>
+                                    <td>
+                                        <%= studentInfo[i].accNo %>
+                                    </td>
+                                    <td>
+                                        <%= studentInfo[i].sfirstName + ' ' + studentInfo[i].lastName %>
+                                    </td>
+                                    <td>
+                                        <%= studentInfo[i].firstName %>
+                                    </td>
+                                    <td>
+                                        <%= studentInfo[i].name %>
+                                    </td>
+                                    <td>
+                                        <%= studentInfo[i].roomNo %>
+                                    </td>
+                                    <td>
+                                        <%= studentInfo[i].deptName %>
+                                    </td>
+                                    <td>
+                                        <%= studentInfo[i].phoneNo %>
+                                    </td>
+                                    <td>
+                                        <%= studentInfo[i].email %>
+                                    </td>
+                                    <td>
+                                        <%= studentInfo[i].native %>
+                                    </td>
+                                    <td>
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <a class="border-none" href="/sh/admin/editstudent/<%=studentInfo[i].id %>">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <button class="no-border-button"
+                                                            onclick="deleteStudent('<%=studentInfo[i].id %>')">
+                                                            <i class="fas fa-trash" style="color: red;"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                    </td>
+                                </tr>
+                                <% } %>
+                                    <% } %>
                 </tbody>
             </table>
             <!-- End Table with stripped rows -->
-
             <div class="card">
                 <div class="card-body">
-
                     <!-- Disabled and active states -->
                     <nav aria-label="...">
-                        <div class="h-25 d-inline-block" ></div>
+                        <div class="h-25 d-inline-block"></div>
                         <ul class="pagination d-flex justify-content-center">
                             <li class="page-item <% if(currentPage == 1) { %> disabled <% } %>">
-                                <a class="page-link" href="/sh/admin/student?page=<%=currentPage - 1  %>" tabindex="-1" aria-disabled="true">Previous</a>
+                                <a class="page-link" href="/sh/admin/student?page=<%=currentPage - 1  %>" tabindex="-1"
+                                    aria-disabled="true">Previous</a>
                             </li>
                             <% for(var i=1;i <=pagesTotal;i++) { %>
-                                <li class="page-item  <% if(currentPage == i ) { %> active <% } %>"><a class="page-link" href="/sh/admin/student?page=<%=i %>"><%=i %></a></li>
+                                <li class="page-item  <% if(currentPage == i ) { %> active <% } %>"><a class="page-link"
+                                        href="/sh/admin/student?page=<%=i %>">
+                                        <%=i %>
+                                    </a></li>
 
-                            <%} %>
-                            <li class="page-item <% if(currentPage == pagesTotal ) { %> disabled <% } %>">
-                                <a class="page-link" href="/sh/admin/student?page=<%= currentPage + 1 %>">Next</a>
-                            </li>
+                                <%} %>
+                                    <li class="page-item <% if(currentPage == pagesTotal ) { %> disabled <% } %>">
+                                        <a class="page-link"
+                                            href="/sh/admin/student?page=<%= currentPage + 1 %>">Next</a>
+                                    </li>
                         </ul>
                     </nav><!-- End Disabled and active states -->
 
@@ -144,6 +165,28 @@
     <!-- Template Main JS File -->
     <script src="/assets/js/main.js"></script>
 
+    <script>
+        async function deleteStudent(id) {
+            if (confirm('Are You sure to delete the student ?')) {
+                const myHeaders = new Headers();
+
+                const requestOptions = {
+                    method: "DELETE",
+                    headers: myHeaders,
+                    redirect: "follow"
+                };
+
+                fetch("http://localhost:4000/api/student/" + id, requestOptions)
+                    .then(async (response) => {
+                        if (response.status == 200) {
+                            window.location.reload();
+                        } else {
+                            alert(await response.text())
+                        }
+                    })
+            }
+        } 
+    </script>
 </body>
 
 </html>

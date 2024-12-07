@@ -55,7 +55,6 @@ app.use('/sh', userUiRouter);
 app.use('/sh/admin/', adminUiRouter);
 app.use('/sh/attendance', attendanceUiRouter);
 
-
 app.use(function (req, res, next) {
     next(createError(404));
 });

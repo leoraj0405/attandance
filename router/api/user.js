@@ -18,26 +18,55 @@ const PATTERN_OF_OTP = {
 // Configure multer storage
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, 'public/uploads/'); // save files in the uploads folder
+        cb(null, 'public/uploads/'); // save files in the uploads folder
     },
     filename: (req, file, cb) => {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
     }
-  });
-  const upload = multer({ storage: storage });
+});
+const upload = multer({ storage: storage });
 
 async function getUser(req, res) {
+    const {
+        page = 1,
+        limit = 5
+    } = req.query
+
+    const userResponse = {
+        total: 0,
+        page: 0,
+        limit: 0,
+        userData: []
+    }
+
+    const condtionArr = []
+
     try {
+        const pageNo = isNaN(Number(page)) ? 1 : Number(page)
+        const limitNo = isNaN(Number(limit)) ? 5 : Number(limit)
+
+        const userCount = await execQuery(/*sql*/`SELECT COUNT(id) AS total FROM user WHERE deletedAt IS NULL `)
+
+        if (!userCount.length) {
+            console.log(userCount)
+            return res.status(404).send('not founded')
+        }
+        userResponse.total = userCount[0].total
+
         const getUser = await execQuery( /*sql*/ `SELECT *,
             DATE_FORMAT(createdAt, "%D %M %Y")
             AS createdAt 
             FROM user
-            WHERE deletedAt IS NULL`)
-
+            WHERE deletedAt IS NULL
+            LIMIT ? OFFSET ? `, [limitNo, (pageNo - 1) * limitNo])
         if (getUser.length !== 0) {
-            res.status(200).send(getUser)
+            userResponse.page = pageNo;
+            userResponse.limit = limitNo
+            userResponse.userData = getUser
+            res.status(200).send(userResponse)
         } else {
+            
             return res.status(404).send('Not Founded')
         }
     } catch (error) {
@@ -68,7 +97,7 @@ async function insertorUpdateUser(req, res) {
             isAdmin,
             profileImage
         ]
-            if (firstName.length > 0 && lastName.length > 0 && phoneNo.length > 0 && email.length > 0 && userId.length > 0 && password.length > 0 && isAdmin.length > 0) {
+        if (firstName.length > 0 && lastName.length > 0 && phoneNo.length > 0 && email.length > 0 && userId.length > 0 && password.length > 0 && isAdmin.length > 0) {
             const postUser = await execQuery(/*sql*/` INSERT INTO 
                 user 
                 ( firstName, 
@@ -161,20 +190,20 @@ function home(req, res) {
         if (req.session.isLogged) {
             const imagePath = req.session.data.profileImage
             const filePath = path.join(__dirname, '../../public/uploads', imagePath)
-            
+
             const invalidUserProfile = `demoProfile.jpg`
             const invalidUserProfilePath = path.join(__dirname, '../../public/uploads', invalidUserProfile)
 
             fs.access(filePath, fs.constants.F_OK, (err) => {
-              if (err) {
-                return res.status(200).sendFile(invalidUserProfilePath)
-              }
-          
-              res.status(200).sendFile(filePath, (error) => {
-                if (error) {
-                  res.status(500).send(invalidUserProfilePath)
+                if (err) {
+                    return res.status(200).sendFile(invalidUserProfilePath)
                 }
-              })
+
+                res.status(200).sendFile(filePath, (error) => {
+                    if (error) {
+                        res.status(500).send(invalidUserProfilePath)
+                    }
+                })
             })
         }
         else {
@@ -206,7 +235,6 @@ async function processOtp(req, res) {
     const {
         emailId
     } = req.body
-
     try {
         // Validate userInputmail length
         if (emailId.length == 0) {
@@ -226,9 +254,9 @@ async function processOtp(req, res) {
             return
         }
         const unBlockTime = new Date(userResult[0].unBlockTime).getTime();
-        
-        console.log('cur '+currentTime + ' unB ' + unBlockTime)
-        
+
+        console.log('cur ' + currentTime + ' unB ' + unBlockTime)
+
         if (currentTime >= unBlockTime) {
             const otp = otpGenerator.generate(LENGTH_OF_OTP, PATTERN_OF_OTP);
             const otpUpdateRes = await execQuery(/*sql*/`UPDATE user 
@@ -340,6 +368,19 @@ async function restPassword(req, res) {
     }
 }
 
+async function getWarden( req, res) {
+    
+    try {
+        const getWarden = await execQuery(/*sql*/`SELECT * FROM user WHERE deletedAt IS NULL`)
+        if( getWarden.length == 0){
+           return res.status(404).send('Not Founded')
+        }
+        res.status(200).send(getWarden)
+    } catch (error) {
+        res.status(500).send(error)
+    }
+}
+
 router.get('/', getUser)
 router.post('/', upload.single('profile'), insertorUpdateUser)
 router.delete('/:id', deleteUser)
@@ -349,7 +390,7 @@ router.get('/user/home', home)
 router.get('/user/logout', logout)
 router.post('/processotp', processOtp)
 router.put('/restpassword', restPassword)
+router.get('/admin/getwarden', getWarden)
 
 
 module.exports = router;
-    

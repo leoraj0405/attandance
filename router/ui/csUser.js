@@ -18,7 +18,7 @@ router.get('/home', (req, res) => {
             const admin = req.session.data.isAdmin;
             const profile = req.session.data.profileImage
 
-                res.render('pages/home.ejs', { user, admin, profile })
+            res.render('pages/home.ejs', { user, admin, profile })
             console.log(profile)
         }
 
@@ -49,23 +49,23 @@ router.get('/signup', (req, res) => {
     res.render('pages/signup.ejs')
 })
 
-router.get('/user/profile',(req, res) => {
+router.get('/user/profile', (req, res) => {
     try {
-            if (req.session.isLogged == true) {
-                const userInfo = req.session.data
-                const user = req.session.data
-                const admin = req.session.data.isAdmin;
-                const profile = req.session.data.profileImage;
-                res.render('pages/users/userProfile.ejs', {userInfo, user, admin, profile})
-            } else {
-                    res.redirect('http://localhost:4000/sh/login')
-            }
+        if (req.session.isLogged == true) {
+            const userInfo = req.session.data
+            const user = req.session.data
+            const admin = req.session.data.isAdmin;
+            const profile = req.session.data.profileImage;
+            res.render('pages/users/userProfile.ejs', { userInfo, user, admin, profile })
+        } else {
+            res.redirect('http://localhost:4000/sh/login')
+        }
     } catch (error) {
-            console.error(error)  
+        console.error(error)
     }
 })
 
-router.get('/user/restPassword',(req, res) => {
+router.get('/user/restPassword', (req, res) => {
     res.render('pages/restPassword.ejs')
 })
 

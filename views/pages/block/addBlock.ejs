@@ -103,14 +103,6 @@
                                                     <label class="form-check-label" for="inlineRadio2">No</label>
                                                 </div>
                                             </div>
-
-                                        </div>
-                                        <div class="col-12">
-                                            <img src="/uploads/<%= profile%>" alt="Profile"
-                                            class="w-50 p-3">
-                                            <input type="file" name="profile" class="form-control" id="profile"
-                                                required>                                    
-                                            <div class="invalid-feedback">Choose your Profile Picture</div>
                                         </div>
                                         <div class="col-12 d-flex justify-content-evenly">
                                             <a href="/sh/home" class="btn btn-secondary ">Back</a>
@@ -153,56 +145,6 @@
 
     <!-- Template Main JS File -->
     <script src="assets/js/main.js"></script>
-
-    <script>
-
-        const fnameDom = document.getElementById('yourFirstName');
-        const lnameDom = document.getElementById('yourLastName');
-        const phoneNoDom = document.getElementById('yourPhoneNo');
-        const emailIdDom = document.getElementById('yourEmail');
-        const userIdDom = document.getElementById('yourUsername');
-        const passDom = document.getElementById('yourPassword');
-        const confirmPassDom = document.getElementById('yourConfirmPassword');
-        const profileDom = document.getElementById('profile')
-
-        function addOrEdituser() {
-            const isAdminDom = document.querySelector('input[name="isAdmin"]:checked');
-            const myHeaders = new Headers();
-
-            if (passDom.value != confirmPassDom.value) {
-                return alert('Password not match')
-            }
-            const formdata = new FormData();
-            formdata.append("profile", profileDom.files[0], profileDom.value);
-            formdata.append("firstName", fnameDom.value);
-            formdata.append("lastName", lnameDom.value);
-            formdata.append("phoneNo", phoneNoDom.value);
-            formdata.append("email", emailIdDom.value);
-            formdata.append("userId", userIdDom.value);
-            formdata.append("password", passDom.value);
-            formdata.append("isAdmin", isAdminDom.value);
-
-            console.log(profileDom.value, fnameDom.value, lnameDom.value, phoneNoDom.value, emailIdDom.value, userIdDom.value, passDom.value, isAdminDom.value)
-
-            const requestOptions = {
-                method: "POST",
-                headers: myHeaders,
-                body: formdata,
-                redirect: "follow"
-            };
-
-            fetch("http://localhost:4000/api/user", requestOptions)
-                .then(async (response) => {
-                    if (response.status == 200) {
-                        alert('User Added')
-                    } else {
-                        alert(await response.text())
-                        return
-                    }
-                });
-        }
-    </script>
-
 </body>
 
 </html>

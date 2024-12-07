@@ -20,7 +20,7 @@
                                 <a href="index.html" class="logo d-flex align-items-center w-auto">
                                     <img src="assets/img/logo.png" alt="">
                                     <span class="d-none d-lg-block">
-                                        <%=pageName %> Assistant Director
+                                        <%=pageName %> Student
                                     </span>
                                 </a>
                             </div><!-- End Logo -->
@@ -35,86 +35,96 @@
                                     </div>
 
                                     <form class="row g-3 needs-validation" novalidate>
+
+                                        <div class="col-12">
+                                            <label for="yourAccNo" class="form-label">Account No</label>
+                                            <input type="text" name="firstName" class="form-control" value="<%=data.accNo %>" id="yourAccNo"
+                                                required>
+                                            <div class="invalid-feedback">Please, enter your Account No!</div>
+                                        </div>
+
                                         <div class="col-12">
                                             <label for="yourFirstName" class="form-label">Your first Name</label>
-                                            <input type="text" name="firstName" class="form-control" id="yourFirstName"
-                                                value="<%=data.firstName %>" required>
+                                            <input type="text" value="<%=data.sfirstName %>" name="firstName" class="form-control" id="yourFirstName"
+                                                required>
                                             <div class="invalid-feedback">Please, enter your first name!</div>
                                         </div>
 
                                         <div class="col-12">
                                             <label for="yourLastName" class="form-label">Your Last Name</label>
-                                            <input type="text" name="lastName" class="form-control" id="yourLastName"
-                                                value="<%=data.lastName %>" required>
+                                            <input type="text" value="<%=data.lastName %>" name="lastName" class="form-control" id="yourLastName"
+                                                required>
                                             <div class="invalid-feedback">Please, enter your last name!</div>
                                         </div>
 
                                         <div class="col-12">
                                             <label for="yourEmail" class="form-label">Your Email</label>
-                                            <input type="email" name="email" class="form-control" id="yourEmail"
-                                                value="<%=data.email %>" required>
+                                            <input type="email" value="<%=data.email %>" name="email" class="form-control" id="yourEmail"
+                                                required>
                                             <div class="invalid-feedback">Please enter a valid Email adddress!</div>
                                         </div>
 
                                         <div class="col-12">
                                             <label for="yourPhoneNo" class="form-label">Your Phone Number</label>
-                                            <input type="text" name="phoneNo" class="form-control" id="yourPhoneNo"
-                                                value="<%=data.phoneNo %>" required>
+                                            <input type="text" value="<%=data.phoneNo %>" name="phoneNo" class="form-control" id="yourPhoneNo"
+                                                required>
                                             <div class="invalid-feedback">Please, enter your phone number!</div>
                                         </div>
 
                                         <div class="col-12">
-                                            <label for="yourUsername" class="form-label">Username</label>
-                                            <div class="input-group has-validation">
-                                                <span class="input-group-text" id="inputGroupPrepend">@</span>
-                                                <input type="text" name="username" class="form-control"
-                                                    value="<%=data.userId %>" id="yourUsername" required <%=inputType
-                                                    %>>
-                                                <div class="invalid-feedback">Please choose a username.</div>
-                                            </div>
+                                            <label for="yourWarden" class="form-label">Warden</label>
+                                            <select class="form-select" id="yourWarden" aria-label="Default select example">
+                                                <option selected></option>
+                                                <% for(var i=0; i< wardenList.length; i++) { %>
+                                                    <option value="<%=wardenList[i].id %>"><%= wardenList[i].firstName %></option>
+                                                    
+                                                <% } %>
+                                              </select>
+                                        </div>
+                                        
+                                        <div class="col-12">
+                                            <label for="yourblock"  class="form-label">block</label>
+                                            <select class="form-select" onchange="updateSecondDropdown()" id="yourblock" aria-label="Default select example">
+                                                <option selected></option>
+                                                <% for(var i=0; i< blockList.length; i++) { %>
+                                                <option value="<%=blockList[i].id %>"><%= blockList[i].name %></option>
+                                                <% } %>
+                                               
+                                              </select>
                                         </div>
 
                                         <div class="col-12">
-                                            <label for="yourPassword" class="form-label">Password</label>
-                                            <input type="password" name="password" class="form-control"
-                                                value="<%=data.password %>" id="yourPassword" required <%=inputType %>>
-                                            <div class="invalid-feedback">Please enter your password!</div>
+                                            <label for="yourRoom" class="form-label">Room</label>
+                                            <select class="form-select" id="yourRoom" aria-label="Default select example">
+                                                
+                                              </select>
                                         </div>
-
+                                      
                                         <div class="col-12">
-                                            <label for="yourConfirmPassword" class="form-label">Confirm Password</label>
-                                            <input type="password" name="ConfirmPassword" class="form-control"
-                                                value="<%=data.password %>" id="yourConfirmPassword" required
-                                                <%=inputType %>>
-                                            <div class="invalid-feedback">Please re-enter your password!</div>
-                                        </div>
-
-                                        <div class="col-12">
-                                            <div class="form-group">
-                                                <label for="isAdmin">Is Admin ?</label>
-                                                <div class="form-check form-check-inline">
-                                                    <input class="form-check-input" type="radio" name="isAdmin"
-                                                        id="inlineRadio1" value="1" <% if(data.isAdmin == 1){ %> checked <% } %> >
-                                                    <label class="form-check-label" for="inlineRadio1">Yes</label>
-                                                </div>
-                                                <div class="form-check form-check-inline">
-                                                    <input class="form-check-input" type="radio" name="isAdmin"
-                                                        id="inlineRadio2" value="0" <% if(data.isAdmin == 0){ %> checked <% } %> >
-                                                    <label class="form-check-label" for="inlineRadio2">No</label>
-                                                </div>
-                                            </div>
-
+                                            <label for="yourDepartment" class="form-label">Department</label>
+                                            <select class="form-select" id="yourDepartment" aria-label="Default select example">
+                                                <option></option>
+                                                <% for(var i=0; i< deptList.length; i++) { %>
+                                                <option value="<%=deptList[i].id %>"><%=deptList[i].deptName %></option>
+                                                
+                                                <% } %>
+                                              </select>
                                         </div>
                                         <div class="col-12">
-                                            <img src="/uploads/<%= profile%>" alt="Profile"
+                                            <label for="yourNative" class="form-label">Native</label>
+                                            <input type="text" value="<%=data.native %>" name="native" class="form-control" id="yourNative"
+                                                required>
+                                        </div>
+                                        <div class="col-12">
+                                            <img src="/uploads/<%= data.studProfile%>" style="border-radius: 50%;" alt="Profile"
                                             class="w-50 p-3">
-                                            <input type="file" name="profile" class="form-control" id="profile"
+                                            <input type="file" value="<%=data.studProfile %>" name="profile" class="form-control" id="studPicture"
                                                 required>                                    
                                             <div class="invalid-feedback">Choose your Profile Picture</div>
                                         </div>
                                         <div class="col-12 d-flex justify-content-evenly">
-                                            <a href="/sh/home" class="btn btn-secondary ">Back</a>
-                                            <button class="btn btn-primary" onclick="addOrEdituser()"
+
+                                            <button class="btn btn-primary" onclick="addOrEditStudent()"
                                                 type="button">Save</button>
                                         </div>
                                     </form>
@@ -155,34 +165,49 @@
     <script src="assets/js/main.js"></script>
 
     <script>
-
+        const accDom = document.getElementById('yourAccNo');
         const fnameDom = document.getElementById('yourFirstName');
         const lnameDom = document.getElementById('yourLastName');
-        const phoneNoDom = document.getElementById('yourPhoneNo');
         const emailIdDom = document.getElementById('yourEmail');
-        const userIdDom = document.getElementById('yourUsername');
-        const passDom = document.getElementById('yourPassword');
-        const confirmPassDom = document.getElementById('yourConfirmPassword');
-        const profileDom = document.getElementById('profile')
+        const profileDom = document.getElementById('studPicture');
+        const roomDom = document.getElementById('yourRoom');
+        const blockDom = document.getElementById('yourblock');
+        const phoneNoDom = document.getElementById('yourPhoneNo');
+        const nativeDom = document.getElementById('yourNative')
+        const wardenDom = document.getElementById('yourWarden')
+        const deptDom = document.getElementById('yourDepartment')
+      
+        async function updateSecondDropdown() {
+            
+            const roomRes = await fetch(`http://localhost:4000/api/room/block/${blockDom.value}`)
+            const roomList = await roomRes.json();
 
-        function addOrEdituser() {
-            const isAdminDom = document.querySelector('input[name="isAdmin"]:checked');
+            var roomCode = ''
+            for(var i=0; i < roomList.length; i++) {
+                roomCode = roomCode + `
+                     
+                    <option value="${roomList[i].id}">${roomList[i].roomNo}</option>`
+                
+            }
+            roomDom.innerHTML = roomCode;
+        }
+
+        function addOrEditStudent() {
             const myHeaders = new Headers();
 
-            if (passDom.value != confirmPassDom.value) {
-                return alert('Password not match')
-            }
             const formdata = new FormData();
-            formdata.append("profile", profileDom.files[0], profileDom.value);
+            formdata.append("accNo", accDom.value);
+            formdata.append("studProfile", profileDom.files[0], profileDom.value);
             formdata.append("firstName", fnameDom.value);
             formdata.append("lastName", lnameDom.value);
+            formdata.append("wardenId", wardenDom.value);
+            formdata.append("blockId", blockDom.value);
+            formdata.append("roomId", roomDom.value);
+            formdata.append("departmentId", deptDom.value);
             formdata.append("phoneNo", phoneNoDom.value);
             formdata.append("email", emailIdDom.value);
-            formdata.append("userId", userIdDom.value);
-            formdata.append("password", passDom.value);
-            formdata.append("isAdmin", isAdminDom.value);
-
-            console.log(profileDom.value, fnameDom.value, lnameDom.value, phoneNoDom.value, emailIdDom.value, userIdDom.value, passDom.value, isAdminDom.value)
+            formdata.append("native", nativeDom.value);
+            
 
             const requestOptions = {
                 method: "POST",
@@ -191,13 +216,12 @@
                 redirect: "follow"
             };
 
-            fetch("http://localhost:4000/api/user", requestOptions)
+            fetch("http://localhost:4000/api/student", requestOptions)
                 .then(async (response) => {
-                    if (response.status == 200) {
-                        alert('User Added')
-                    } else {
+                    if(response.status == 200) {
+                        alert('done')
+                    }else{
                         alert(await response.text())
-                        return
                     }
                 });
         }

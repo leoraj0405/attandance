@@ -1,28 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Check Value and Run Function</title>
 </head>
 <body>
-    <div id="sideBar" style="display: none;">
-        <ul>
-            <li>Profile</li>
-            <li>Contact</li>
-            <li>Others</li>
-        </ul>
-        <button onclick="closeSideBar()">close</button>
-    </div>
-    <button onclick="showSideBar()">Click Me</button>
-    <script>
-        function showSideBar() {
-            document.getElementById('sideBar').style.display = 'block'
-        }
-        function closeSideBar() {
-             document.getElementById('sideBar').style.display = 'none'
-        }
-    </script>
+  <input type="text" id="inputField" placeholder="Enter a value" />
+  <button id="actionButton">Submit</button>
+
+  <script>
+    // Define the save function
+    function saveFunction() {
+      alert("Save function executed!");
+    }
+
+    // Define the edit function
+    function editFunction() {
+      alert("Edit function executed!");
+    }
+
+    // Attach event listener to the button
+    document.getElementById("actionButton").addEventListener("click", function () {
+      const inputValue = document.getElementById("inputField").value;
+
+      if (inputValue) {
+        // If value exists, run the edit function
+        editFunction();
+      } else {
+        // If no value, run the save function
+        saveFunction();
+      }
+    });
+  </script>
 </body>
 </html>

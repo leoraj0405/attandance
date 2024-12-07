@@ -18,6 +18,7 @@
                 list-style-type: none;
                 padding-left: 0;
             }
+
             .btn {
                 border: transparent;
             }
@@ -70,7 +71,7 @@
         </div>
         <div class="container-main container">
             <div class="container-fluid">
-                
+
                 <div class="w-100 p-3 d-flex justify-content-center">
                     <li class="border-none" value="<%=user.id %>" id="warden">Attendance taken by <%=user.firstName %>
                     </li>
@@ -176,13 +177,16 @@
             var studInfo = ` 
         <div class="modal fade custom-alert" id="customAlertModal" tabindex="-1" aria-labelledby="customAlertLabel" aria-hidden="true">
             <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="customAlertLabel">student information</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                         Account No : ${studData.accNo} <br> <hr>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="customAlertLabel">student information</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                        <div class="d-flex justify-content-center">
+                            <img src="/uploads/${studData.studProfile}" style="height: 150px; width: 150px;" alt="Profile" class="rounded-circle">
+                         </div><br> <hr>
+                        Account No : ${studData.accNo} <br> <hr>
                         First Name  : ${studData.sfirstName} <br> <hr>
                         Last Name : ${studData.lastName} <br> <hr>
                         Email : ${studData.email} <br> <hr>
