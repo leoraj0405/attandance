@@ -51,9 +51,10 @@ app.use('/api/room/', roomApiRouter);
 app.use('/api/attendance', attendanceRouter);
 app.use('/api/department', departmentApiRouter)
 
-app.use('/sh', userUiRouter);
-app.use('/sh/admin/', adminUiRouter);
-app.use('/sh/attendance', attendanceUiRouter);
+app.use('/', userUiRouter);
+app.use('/admin/', adminUiRouter);
+app.use('/attendance', attendanceUiRouter);
+
 
 app.use(function (req, res, next) {
     next(createError(404));
