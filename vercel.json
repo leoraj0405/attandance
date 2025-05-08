@@ -14,7 +14,7 @@
   ],
   "functions": {
     "app.js": {
-      "includeFiles": [],
+      "includeFiles": "",
       "excludeFiles": "Dump20241224 (3)/**"
     }
   }
