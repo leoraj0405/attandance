@@ -12,15 +12,16 @@ router.get('/asstdir', async (req, res) => {
                         const user = req.session.data
                         const admin = req.session.data.isAdmin;
                         const profile = req.session.data.profileImage
-                        const mainUrl = new URL(`http://localhost:4000/api/user`)
-                        pageInput && mainUrl.searchParams.append('page', pageInput);
-                        const userResponse = await fetch(mainUrl.href)
+                        const fetchUrl = new URL(`${process.env.MAIN_URL}/api/user`)
+                        pageInput && fetchUrl.searchParams.append('page', pageInput);
+                        const userResponse = await fetch(fetchUrl.href)
                         const userData = await userResponse.json()
                         const currentPage = userData.page
                         const pagesTotal = Math.ceil(userData.total / userData.limit)
-                        res.render('pages/users/userList.ejs', { ...userData, profile, user, admin, currentPage, pagesTotal })
+                        const mainUrl = process.env.MAIN_URL
+                        res.render('pages/users/userList.ejs', { ...userData, profile, user, admin, currentPage, pagesTotal, mainUrl })
                 } else {
-                        res.redirect('http://localhost:4000/sh/login')
+                        res.redirect(`${process.env.MAIN_URL}/sh/login`)
                 }
         } catch (error) {
                 console.error(error)
@@ -33,9 +34,10 @@ router.get('/addad', (req, res) => {
                         const user = req.session.data
                         const admin = req.session.data.isAdmin;
                         const pageName = 'Add'
-                        res.render('pages/users/userAdd.ejs', { pageName, profile: '', data: {}, user, admin, inputType: {} })
+                        const mainUrl = process.env.MAIN_URL
+                        res.render('pages/users/userAdd.ejs', { pageName, profile: '', data: {}, user, admin, inputType: {}, mainUrl })
                 } else {
-                        res.redirect('http://localhost:4000/sh/login')
+                        res.redirect(`${process.env.MAIN_URL}/sh/login`)
                 }
 
         } catch (error) {
@@ -51,13 +53,13 @@ router.get('/editad/:id', async (req, res) => {
                         const admin = req.session.data.isAdmin;
                         const profile = req.session.data.profileImage
                         const pageName = 'Edit'
-                        const response = await fetch(`http://localhost:4000/api/user/${id}`)
+                        const response = await fetch(`${process.env.MAIN_URL}/api/user/${id}`)
                         const data = await response.json()
-                        console.log(data)
                         const inputType = 'disabled'
-                        res.render('pages/users/userAdd.ejs', { pageName, profile, data, inputType, user, admin })
+                        const mainUrl = process.env.MAIN_URL
+                        res.render('pages/users/userAdd.ejs', { pageName, profile, data, inputType, user, admin, mainUrl })
                 } else {
-                        res.redirect('http://localhost:4000/sh/login')
+                        res.redirect(`${process.env.MAIN_URL}/sh/login`)
                 }
 
         } catch (error) {
@@ -75,18 +77,19 @@ router.get('/student', async (req, res) => {
                         const admin = req.session.data.isAdmin;
                         const profile = req.session.data.profileImage;
                         const currentWarden = req.session.data.id
-                        const mainUrl = new URL(`http://localhost:4000/api/student`)
-                        pageInput && mainUrl.searchParams.append('page', pageInput);
-                        currentWarden && mainUrl.searchParams.append('warden', currentWarden);
+                        const fetchUrl = new URL(`${process.env.MAIN_URL}/api/student`)
+                        pageInput && fetchUrl.searchParams.append('page', pageInput);
+                        currentWarden && fetchUrl.searchParams.append('warden', currentWarden);
 
-                        const response = await fetch(mainUrl.href)
+                        const response = await fetch(fetchUrl.href)
                         const studentInfo = await response.json()
                         const studentList = 'No students'
                         const currentPage = studentInfo.page
                         var pagesTotal = Math.ceil(studentInfo.total / studentInfo.limit)
-                        res.render('pages/student/studentList.ejs', { user, profile, admin, ...studentInfo, pagesTotal, currentPage, studentList })
+                        const mainUrl = process.env.MAIN_URL
+                        res.render('pages/student/studentList.ejs', { user, profile, admin, ...studentInfo, pagesTotal, currentPage, studentList, mainUrl })
                 } else {
-                        res.redirect('http://localhost:4000/sh/login')
+                        res.redirect(`${process.env.MAIN_URL}/sh/login`)
                 }
         } catch (error) {
                 console.error(error)
@@ -104,15 +107,15 @@ router.get('/addstudent', async (req, res) => {
                         const pageName = 'Add'
                         const inputType = 'disabled'
 
-                        const wardenResponse = await fetch(`http://localhost:4000/api/user/admin/getwarden`)
+                        const wardenResponse = await fetch(`${process.env.MAIN_URL}/api/user/admin/getwarden`)
                         const wardenList = await wardenResponse.json()
 
-                        const blockRes = await fetch(`http://localhost:4000/api/block`)
+                        const blockRes = await fetch(`${process.env.MAIN_URL}/api/block`)
                         const blockList = await blockRes.json()
 
-                        const deptRes = await fetch(`http://localhost:4000/api/department`)
+                        const deptRes = await fetch(`${process.env.MAIN_URL}/api/department`)
                         const deptList = await deptRes.json()
-
+                        const mainUrl = process.env.MAIN_URL
 
                         res.render('pages/student/addStudent.ejs', {
                                 pageName,
@@ -123,10 +126,11 @@ router.get('/addstudent', async (req, res) => {
                                 admin,
                                 wardenList,
                                 blockList,
-                                deptList
+                                deptList,
+                                mainUrl
                         })
                 } else {
-                        res.redirect('http://localhost:4000/sh/login')
+                        res.redirect(`${process.env.MAIN_URL}/sh/login`)
                 }
 
         } catch (error) {
@@ -145,19 +149,18 @@ router.get('/editstudent/:id', async (req, res) => {
                         const studentProfile = ''
                         const pageName = 'Edit'
 
-                        const wardenResponse = await fetch(`http://localhost:4000/api/user/admin/getwarden`)
+                        const wardenResponse = await fetch(`${process.env.MAIN_URL}/api/user/admin/getwarden`)
                         const wardenList = await wardenResponse.json();
 
-                        const blockRes = await fetch(`http://localhost:4000/api/block`)
+                        const blockRes = await fetch(`${process.env.MAIN_URL}/api/block`)
                         const blockList = await blockRes.json();
 
-                        const deptRes = await fetch(`http://localhost:4000/api/department`)
+                        const deptRes = await fetch(`${process.env.MAIN_URL}/api/department`)
                         const deptList = await deptRes.json();
 
-                        const response = await fetch(`http://localhost:4000/api/student/${id}`)
+                        const response = await fetch(`${process.env.MAIN_URL}/api/student/${id}`)
                         const data = await response.json()
-
-                        console.log(data)
+                        const mainUrl = process.env.MAIN_URL
 
                         res.render('pages/student/addStudent.ejs', {
                                 pageName,
@@ -167,10 +170,11 @@ router.get('/editstudent/:id', async (req, res) => {
                                 admin,
                                 wardenList,
                                 blockList,
-                                deptList
+                                deptList,
+                                mainUrl
                         })
                 } else {
-                        res.redirect('http://localhost:4000/sh/login')
+                        res.redirect(`${process.env.MAIN_URL}/sh/login`)
                 }
 
         } catch (error) {
@@ -184,11 +188,12 @@ router.get('/blocklist', async (req, res) => {
                         const user = req.session.data
                         const admin = req.session.data.isAdmin;
                         const profile = req.session.data.profileImage;
-                        const blockResponse = await fetch(`http://localhost:4000/api/block`)
+                        const blockResponse = await fetch(`${process.env.MAIN_URL}/api/block`)
                         const blockData = await blockResponse.json()
-                        res.render('pages/block/blockList', { user, admin, profile, blockData })
+                        const mainUrl = process.env.MAIN_URL
+                        res.render('pages/block/blockList', { user, admin, profile, blockData, mainUrl })
                 } else {
-                        res.redirect('http://localhost:4000/sh/login')
+                        res.redirect(`${process.env.MAIN_URL}/sh/login`)
                 }
         } catch (error) {
                 console.log(error)
@@ -202,26 +207,19 @@ router.get('/roomlist', async (req, res) => {
                         const admin = req.session.data.isAdmin;
                         const profile = req.session.data.profileImage;
 
-                        const roomResponse = await fetch(`http://localhost:4000/api/room`)
+                        const roomResponse = await fetch(`${process.env.MAIN_URL}/api/room`)
                         const roomData = await roomResponse.json()
-                        console.log(roomData)
-                        res.render('pages/room/roomList', {user, admin, profile, blockData : {}})
-                }else{
-                        res.redirect('http://localhost:4000/sh/login')
+
+                        const blockResponse = await fetch(`${process.env.MAIN_URL}/api/block`)
+                        const blockData = await blockResponse.json()
+                        const mainUrl = process.env.MAIN_URL
+                        res.render('pages/room/roomList', { user, admin, profile, roomData, blockData, mainUrl })
+                } else {
+                        res.redirect(`${process.env.MAIN_URL}/sh/login`)
                 }
         } catch (error) {
                 console.log(error)
         }
 })
 
-
-
-// router.get('/demo', (req, res) =>{
-//         const data = [
-//                 { name: "Alice", age: 25 },
-//                 { name: "Bob", age: 30 },
-//                 { name: "Charlie", age: 22 },
-//               ];
-//         res.render('pages/demo2', {data})
-// })
 module.exports = router;

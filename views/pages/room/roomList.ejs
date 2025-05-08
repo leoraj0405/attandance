@@ -38,7 +38,52 @@
             <div class="d-flex flex-row-reverse bd-highlight">
                 <button class="btn btn-primary" onclick="openForm()">Add block</button>
             </div>
-            <h5 class="card-title">Students</h5>
+            <div class="mt-5"></div>
+            <div class="card" id="form" style="display: none;">
+                <div class="card-body">
+                    <h5 class="card-title" id="formName">Add Block </h5>
+
+                    <!-- General Form Elements -->
+                    <form class="w-75 p-3">
+
+                        <div class="row mb-3">
+                            <label for="inputText" class="col-sm-2 col-form-label ">Block Name :</label>
+                            <select class="form-select" id="blockId" aria-label="Default select example">
+                                <option>Open this select block</option>
+                                <% for(var i=0; i < blockData.length; i++) { %>
+                                    <option value="<%= blockData[i].id %>">
+                                        <%= blockData[i].name %>
+                                    </option>
+                                    <% } %>
+                            </select>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="inputText" class="col-sm-2 col-form-label ">Room Active status</label>
+                            <select class="form-select" id="isActive" aria-label="Default select example">
+                                <option value="0">NO</option>
+                                <option value="1">YES</option>
+                            </select>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="inputText" class="col-sm-2 col-form-label ">Room Number :</label>
+                            <div class="col-sm-10 w-100 p-3">
+                                <input type="text" id="roomNo" class="form-control">
+                                <input type="hidden" id="roomId" class="form-control">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+
+                            <div class="col-sm-10  d-flex justify-content-center">
+                                <button type="button" class="btn btn-primary" onclick="saveBlock()">Save</button>
+                            </div>
+
+                        </div>
+                    </form><!-- End General Form Elements -->
+                </div>
+            </div>
+            <h5 class="card-title">Rooms</h5>
 
             <!-- Table with stripped rows -->
             <table class="table table-striped" id="table">
@@ -46,32 +91,41 @@
                     <tr>
                         <th scope="col">S. No</th>
                         <th scope="col">Block Name</th>
+                        <th scope="col">Room Number</th>
+                        <th scope="col">Status</th>
                         <th scope="col">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <% let serialNumber=1; %>
-                        <% for(var i=0; i< blockData.length; i++) { %>
+                        <% for(var i=0; i< roomData.length; i++) { %>
                             <tr>
                                 <td>
                                     <%=serialNumber++ %>
                                 </td>
                                 <td>
-                                    <%=blockData[i].name %>
+                                    <%=roomData[i].roomNo %>
                                 </td>
+                                <td>
+                                    <%=roomData[i].blockName %>
+                                </td>
+                                <td>
+                                    <%=roomData[i].isActive===0 ? 'NO' : 'YES' %>
+                                </td>
+
                                 <td>
                                     <table>
                                         <tbody>
                                             <tr>
                                                 <td>
                                                     <button class="no-border-button"
-                                                        onclick="editBlock('<%=blockData[i].id %>')">
+                                                        onclick="editRoom('<%=roomData[i].id %>')">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
                                                 </td>
                                                 <td>
                                                     <button class="no-border-button"
-                                                        onclick="deleteBlock('<%=blockData[i].id %>')">
+                                                        onclick="deleteRoom('<%=roomData[i].id %>')">
                                                         <i class="fas fa-trash" style="color: red;"></i>
                                                     </button>
                                                 </td>
@@ -85,31 +139,6 @@
 
             </table>
             <!-- End Table with stripped rows -->
-            <div class="card" id="form" style="display: none;">
-                <div class="card-body">
-                    <h5 class="card-title" id="formName">Add  Block </h5>
-
-                    <!-- General Form Elements -->
-                    <form class="w-75 p-3">
-
-                        <input type="hidden" id="blockId" class="form-control">
-
-                        <div class="row mb-3">
-                            <label for="inputText" class="col-sm-2 col-form-label ">Block Name :</label>
-                            <div class="col-sm-10 w-100 p-3">
-                                <input type="text" id="block" class="form-control">
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-
-                            <div class="col-sm-10  d-flex justify-content-center">
-                                <button type="button" class="btn btn-primary" onclick="saveBlock()">Save</button>
-                            </div>
-
-                        </div>
-                    </form><!-- End General Form Elements -->
-                </div>
-            </div>
         </div>
     </main><!-- End #main -->
 
@@ -137,13 +166,14 @@
 
     <script>
         const blockBoxDom = document.getElementById('form')
-        const blockDom = document.getElementById('block')
-        const blockIdDom = document.getElementById('blockId')
+        const blockDom = document.getElementById('blockId')
+        const roomNoDom = document.getElementById('roomNo')
         const formDom = document.getElementById('formName')
+        const roomIdDom = document.getElementById('roomId')
+        const isActiveDom = document.getElementById('isActive')
+        const mainUrl = '<%=mainUrl %>'
 
-
-
-        async function deleteBlock(id) {
+        async function deleteRoom(id) {
             if (confirm('Are you sure to delete block')) {
                 const myHeaders = new Headers();
 
@@ -153,7 +183,7 @@
                     redirect: "follow"
                 };
 
-                fetch("http://localhost:4000/api/block/" + id, requestOptions)
+                fetch(`${mainUrl}/api/room/${id}`, requestOptions)
                     .then(async (response) => {
                         if (response.status == 200) {
                             window.location.reload()
@@ -167,14 +197,17 @@
         function openForm() {
             blockBoxDom.style.display = 'block'
         }
-        
+
         function saveBlock() {
             const myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
 
             const raw = JSON.stringify({
-                "name": blockDom.value
+                "roomNo": roomNoDom.value,
+                "blockId": blockDom.value,
+                "isActive": isActiveDom.value
             });
+
 
             const requestOptions = {
                 headers: myHeaders,
@@ -183,10 +216,10 @@
             };
 
             let request
-            if (blockIdDom.value == '') {
-                request = fetch("http://localhost:4000/api/block", { ...requestOptions, method: "POST" })
+            if (roomIdDom.value == '') {
+                request = fetch(`${mainUrl}/api/room`, { ...requestOptions, method: "POST" })
             } else {
-                request = fetch("http://localhost:4000/api/block/"+blockIdDom.value, { ...requestOptions, method: "PUT" })
+                request = fetch(`${mainUrl}/api/room/${roomNoDom.value}`, { ...requestOptions, method: "PUT" })
             }
 
             request.then(async (response) => {
@@ -194,18 +227,19 @@
                     alert('Done')
                     window.location.reload()
                 } else {
-                    alert(await response.text())
+                    const error = await response.text()
+                    alert(error)
                 }
             });
         }
 
-        async function editBlock(id) {
+        async function editRoom(id) {
             blockBoxDom.style.display = 'block'
-            formDom.innerHTML = 'Edit Block '
-            const blockRes = await fetch(`http://localhost:4000/api/block/${id}`)
-            const blockResult = await blockRes.json()
-            blockIdDom.value = blockResult.id
-            blockDom.value = blockResult.name
+            formDom.innerHTML = 'Edit Room '
+            const roomRes = await fetch(`${mainUrl}/api/room/${id}`)
+            const roomData = await roomRes.json()
+            roomIdDom.value = roomData.id
+            roomNoDom.value = roomData.roomNo
 
         }
     </script>

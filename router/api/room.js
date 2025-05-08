@@ -14,7 +14,7 @@ async function getBlockRoom(req, res) {
                     *, DATE_FORMAT(createdAt, "%D %M %Y") 
                     AS createdAt
                     FROM room 
-                    WHERE blockId = ? AND deletedAt IS NULL`,[id])
+                    WHERE blockId = ? AND deletedAt IS NULL`, [id])
 
         if (getBlockRoom.length !== 0) {
             res.status(200).send(getBlockRoom)
@@ -29,11 +29,13 @@ async function getBlockRoom(req, res) {
 async function getRoom(req, res) {
     const id = req.params.id;
     try {
-        const getAllRoom = await execQuery(/*sql*/`SELECT *, 
-            DATE_FORMAT(createdAt, "%D %M %Y") 
-            AS createdAt 
-            FROM room 
-            WHERE deletedAt IS NULL`, [id])
+        const getAllRoom = await execQuery(/*sql*/`SELECT 
+            r.*, 
+            DATE_FORMAT('2025-07-07', "%D %M %Y") AS createdAt , 
+            b.name as blockName  
+            FROM room as r
+             JOIN blocks AS b ON b.id = r.blockId WHERE r.deletedAt IS NULL
+            `, [id])
         if (getAllRoom.length > 0) {
             res.status(200).send(getAllRoom)
         } else {
@@ -120,7 +122,7 @@ async function getSingleRoom(req, res) {
     try {
         const getSingleRoom = await execQuery(/*sql*/`SELECT * FROM room WHERE id = ?`, [id])
         if (getSingleRoom.length !== 0) {
-            res.status(200).send(result[0])
+            res.status(200).send(getSingleRoom[0])
         } else {
             return res.status(404).send('Not Founded')
         }

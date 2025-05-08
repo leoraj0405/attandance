@@ -166,6 +166,9 @@
     <script src="/assets/js/main.js"></script>
 
     <script>
+
+        const mainUrl = '<%= mainUrl %>'
+
         async function deleteStudent(id) {
             if (confirm('Are You sure to delete the student ?')) {
                 const myHeaders = new Headers();
@@ -176,7 +179,7 @@
                     redirect: "follow"
                 };
 
-                fetch("http://localhost:4000/api/student/" + id, requestOptions)
+                fetch(`${mainUrl}/api/student/${id}`, requestOptions)
                     .then(async (response) => {
                         if (response.status == 200) {
                             window.location.reload();

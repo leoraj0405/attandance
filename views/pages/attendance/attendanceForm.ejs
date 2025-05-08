@@ -170,9 +170,9 @@
     <script src="/assets/js/main.js"></script>
 
     <script>
-
+        const mainUrl = '<%= mainUrl %>'
         async function showAlert(id) {
-            const response = await fetch(`http://localhost:4000/api/student/${id}`)
+            const response = await fetch(`${mainUrl}/api/student/${id}`)
             const studData = await response.json()
             var studInfo = ` 
         <div class="modal fade custom-alert" id="customAlertModal" tabindex="-1" aria-labelledby="customAlertLabel" aria-hidden="true">
@@ -232,7 +232,6 @@
             for (let i = 0; i < students.length; i++) {
                 const myHeaders = new Headers();
                 myHeaders.append("Content-Type", "application/json");
-                myHeaders.append("Cookie", "connect.sid=s%3A0FBGyvDQt12m2t3TO-XjJI6gJ8xNdBFn.xp64Qp7hK3iQAjYNPj7I1L97j1MVY6yhLK5FJ3JjAhw");
 
                 const raw = JSON.stringify({
                     "studentId": students[i],
@@ -251,7 +250,7 @@
                     redirect: "follow"
                 };
 
-                var request = fetch("http://localhost:4000/api/attendance", requestOptions)
+                var request = fetch(`${mainUrl}/api/attendance`, requestOptions)
             }
             request.then(async (response) => {
                 if (response.status == 200) {

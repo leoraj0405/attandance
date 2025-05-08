@@ -6,6 +6,8 @@ var logger = require('morgan');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var FileStore = require('session-file-store')(session);
+require('dotenv').config();
+
 
 const http = require('http');
 const app = express()
@@ -49,11 +51,11 @@ app.use('/api/student/', studentApiRouter);
 app.use('/api/block', blockApiRouter);
 app.use('/api/room/', roomApiRouter);
 app.use('/api/attendance', attendanceRouter);
-app.use('/api/department', departmentApiRouter)
+app.use('/api/department', departmentApiRouter);
 
-app.use('/', userUiRouter);
-app.use('/admin/', adminUiRouter);
-app.use('/attendance', attendanceUiRouter);
+app.use('/sh/', userUiRouter)
+app.use('/sh/admin/', adminUiRouter);
+app.use('/sh/attendance/', attendanceUiRouter);
 
 
 app.use(function (req, res, next) {
@@ -69,7 +71,7 @@ app.use(function (err, req, res, next) {
 });
 
 var server = http.createServer(app);
-var port = 4000;
+var port = process.env.SERVER_PORT;
 
 
 server.listen(port, () => {

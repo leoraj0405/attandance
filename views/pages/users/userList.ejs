@@ -146,6 +146,7 @@
     <script src="/assets/js/main.js"></script>
 
     <script>
+        const mainUrl = '<%= mainUrl %>'
         function deleteuser(id) {
 
             if (confirm('Are your sure to delete user')) {
@@ -154,7 +155,7 @@
                     redirect: "follow"
                 };
 
-                let request = fetch(`http://localhost:4000/api/user/${id}`, requestOptions)
+                let request = fetch(`${mainUrl}/api/user/${id}`, requestOptions)
                 request.then(async (response) => {
                     if (response.status == 200) {
                         location.reload()

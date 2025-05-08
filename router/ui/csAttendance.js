@@ -13,12 +13,12 @@ router.get('/blocks', async (req, res) => {
                         const user = req.session.data
                         const admin = req.session.data.isAdmin;
                         const profile = req.session.data.profileImage;
-                        const response = await fetch(`http://localhost:4000/api/block`)
+                        const response = await fetch(`${process.env.MAIN_URL}/api/block`)
                         const data = await response.json();
-                        console.log(data)
-                        res.render('pages/attendance/block.ejs', { data, user, admin, profile})
+                        const mainUrl = process.env.MAIN_URL
+                        res.render('pages/attendance/block.ejs', { data, user, admin, profile, mainUrl})
                 } else {
-                        res.redirect('http://localhost:4000/sh/login')
+                        res.redirect(`${process.env.MAIN_URL}/sh/login`)
                 }
         } catch (error) {
                 console.error(error)
@@ -33,12 +33,13 @@ router.get('/rooms/:id', async(req, res) => {
                         const user = req.session.data
                         const admin = req.session.data.isAdmin;
                         const profile = req.session.data.profileImage;
-                        const response = await fetch(`http://localhost:4000/api/room/block/${id}`)
+                        const response = await fetch(`${process.env.MAIN_URL}/api/room/block/${id}`)
                         const data = await response.json()
                         currentPage.block = id
-                        res.render('pages/attendance/room',{user, admin, profile, data})
+                        const mainUrl = process.env.MAIN_URL
+                        res.render('pages/attendance/room',{user, admin, profile, data, mainUrl})
                 }else {
-                        res.redirect('http://localhost:4000/sh/login')
+                        res.redirect(`${process.env.MAIN_URL}/sh/login`)
                 } 
         } catch (error) {
                 console.error(error)
@@ -53,11 +54,12 @@ router.get('/students/:id', async (req, res) => {
                         const user = req.session.data
                         const admin = req.session.data.isAdmin;
                         const profile = req.session.data.profileImage;  
-                        const response = await fetch(`http://localhost:4000/api/student/room?room=${room}&block=${block}`)
+                        const response = await fetch(`${process.env.MAIN_URL}/api/student/room?room=${room}&block=${block}`)
                         const data = await response.json()
-                        res.render('pages/attendance/attendanceForm', {user, admin, profile, data}) 
+                        const mainUrl = process.env.MAIN_URL
+                        res.render('pages/attendance/attendanceForm', {user, admin, profile, data, mainUrl}) 
                 }else{
-                        res.redirect('http://localhost:4000/sh/login')
+                        res.redirect(`${process.env.MAIN_URL}/sh/login`)
                 }
         } catch (error) {
              console.log(error)   

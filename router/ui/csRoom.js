@@ -8,23 +8,12 @@ router.get('/', async (req, res) => {
             const user = req.session.data
             const blockId = req.query.block;
 
-            console.log(blockId)
-            var response = await fetch(`http://localhost:4000/api/room/block/${blockId}`)
+            var response = await fetch(`${process.env.MAIN_URL}/api/room/block/${blockId}`)
             var data = await response.json();
 
-            // console.log(data)
-
-            // const total = data2.studTotalCountInRoom
-            // const stud = data2.todayPutAttStudCountInRoom
-
-            // const percentage = (stud / total) * 100
-
-            // const roundedUp = Math.ceil(percentage);
-
-            // console.log(roundedUp)
             res.render('pages/room.ejs', { data, user })
         } else {
-            res.redirect('http://localhost:4000/sh/login')
+            res.redirect(`${process.env.MAIN_URL}/sh/login`)
         }
     } catch (error) {
 

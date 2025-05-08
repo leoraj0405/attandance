@@ -88,12 +88,13 @@
     </main><!-- End #main -->
     <script>
 
+        const mainUrl = '<%= mainUrl %>' 
+
         const userIdDom = document.getElementById('yourUsername')
         const passDom = document.getElementById('yourPassword')
 
         function loginUser() {
 
-            console.log(userIdDom.value, passDom.value)
             const myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
 
@@ -108,10 +109,10 @@
                 redirect: "follow"
             };
 
-            fetch("http://localhost:4000/api/user/login", requestOptions)
+            fetch(`${mainUrl}/api/user/login`, requestOptions)
                 .then((response) => {
                     if (response.status === 200) {
-                        window.location.replace("http://localhost:4000/sh/home");
+                        window.location.replace(`${mainUrl}/sh/home`);
                     } else {
                         alert('Login Failed try again !')
                     }

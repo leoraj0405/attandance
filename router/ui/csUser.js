@@ -1,12 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const fetch = require('node-fetch');
-const path = require('path');
 
 
 router.get('/login', (req, res) => {
     try {
-        res.render('pages/login.ejs')
+        const mainUrl = process.env.MAIN_URL
+        res.render('pages/login.ejs', {mainUrl})
     } catch (error) {
         console.error(error)
     }
@@ -17,9 +16,9 @@ router.get('/home', (req, res) => {
             const user = req.session.data
             const admin = req.session.data.isAdmin;
             const profile = req.session.data.profileImage
+            const mainUrl = process.env.MAIN_URL
 
-            res.render('pages/home.ejs', { user, admin, profile })
-            console.log(profile)
+            res.render('pages/home.ejs', { user, admin, profile, mainUrl })
         }
 
     } catch (error) {
@@ -35,10 +34,10 @@ router.get('/logout', (req, res) => {
                     console.error(err)
                     return
                 }
-                res.redirect('http://localhost:4000/sh/login')
+                res.redirect(`${process.env.MAIN_URL}/sh/login`)
             })
         } else {
-            res.redirect("http://localhost:4000/sh/login")
+            res.redirect(`${process.env.MAIN_URL}/sh/login`)
         }
     } catch (error) {
         console.error(error)
@@ -56,9 +55,10 @@ router.get('/user/profile', (req, res) => {
             const user = req.session.data
             const admin = req.session.data.isAdmin;
             const profile = req.session.data.profileImage;
-            res.render('pages/users/userProfile.ejs', { userInfo, user, admin, profile })
+            const mainUrl = '<%= mainUrl %>'
+            res.render('pages/users/userProfile.ejs', { userInfo, user, admin, profile, mainUrl })
         } else {
-            res.redirect('http://localhost:4000/sh/login')
+            res.redirect(`${process.env.MAIN_URL}sh/login`)
         }
     } catch (error) {
         console.error(error)
@@ -66,7 +66,8 @@ router.get('/user/profile', (req, res) => {
 })
 
 router.get('/user/restPassword', (req, res) => {
-    res.render('pages/restPassword.ejs')
+    const mainUrl = process.env.MAIN_URL
+    res.render('pages/restPassword.ejs', {mainUrl})
 })
 
 

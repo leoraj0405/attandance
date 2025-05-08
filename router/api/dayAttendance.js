@@ -46,7 +46,6 @@ async function postOrPutAttendance(req, res) {
                                 * FROM
                                 dayattendance 
                                 WHERE date = ? AND roomId = ? AND blockId = ?`,[date, roomId, blockId])
-        console.log(checkTodayAtt)
         const postAttendance = await execQuery(/*sql*/`INSERT 
                                 INTO dayattendance 
                                 (studentId, 
@@ -60,7 +59,6 @@ async function postOrPutAttendance(req, res) {
                                 ON DUPLICATE KEY UPDATE
                                 appearance = VALUES(appearance), 
                                 reason = VALUES(reason)`, insertColumns)
-        console.log(postAttendance)
         if (postAttendance.affectedRows !== 0) {
             res.status(200).send("INSERTED")
 

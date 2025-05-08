@@ -49,7 +49,6 @@ async function getUser(req, res) {
         const userCount = await execQuery(/*sql*/`SELECT COUNT(id) AS total FROM user WHERE deletedAt IS NULL `)
 
         if (!userCount.length) {
-            console.log(userCount)
             return res.status(404).send('not founded')
         }
         userResponse.total = userCount[0].total
@@ -254,8 +253,6 @@ async function processOtp(req, res) {
             return
         }
         const unBlockTime = new Date(userResult[0].unBlockTime).getTime();
-
-        console.log('cur ' + currentTime + ' unB ' + unBlockTime)
 
         if (currentTime >= unBlockTime) {
             const otp = otpGenerator.generate(LENGTH_OF_OTP, PATTERN_OF_OTP);

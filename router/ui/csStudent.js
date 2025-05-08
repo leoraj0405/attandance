@@ -8,12 +8,12 @@ router.get('/:id',async (req,res) =>{
             const warden = req.session.data;
             const user = req.session.data
             const id = req.params.id;
-            const response = await fetch(`http://localhost:4000/api/student/room/${id}`)
+            const response = await fetch(`${process.env.MAIN_URL}/api/student/room/${id}`)
             const data = await response.json();
             const studCount = data.length
             res.render('pages/student',{data, ...warden, user, studCount})
         }else {
-            res.redirect('http://localhost:4000/sh/login')
+            res.redirect(`${process.env.MAIN_URL}/sh/login`)
         }
         
     } catch (error) {
