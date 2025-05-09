@@ -68,8 +68,7 @@
                                             <div class="input-group has-validation">
                                                 <span class="input-group-text" id="inputGroupPrepend">@</span>
                                                 <input type="text" name="username" class="form-control"
-                                                    value="<%=data.userId %>" id="yourUsername" required <%=inputType
-                                                    %>>
+                                                    value="<%=data.userId %>" id="yourUsername" required <%=inputType%>>
                                                 <div class="invalid-feedback">Please choose a username.</div>
                                             </div>
                                         </div>
@@ -94,22 +93,23 @@
                                                 <label for="isAdmin">Is Admin ?</label>
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="isAdmin"
-                                                        id="inlineRadio1" value="1" <% if(data.isAdmin == 1){ %> checked <% } %> >
-                                                    <label class="form-check-label" for="inlineRadio1">Yes</label>
+                                                        id="inlineRadio1" value="1" <% if(data.isAdmin==1){ %> checked
+                                                    <% } %> >
+                                                        <label class="form-check-label" for="inlineRadio1">Yes</label>
                                                 </div>
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="isAdmin"
-                                                        id="inlineRadio2" value="0" <% if(data.isAdmin == 0){ %> checked <% } %> >
-                                                    <label class="form-check-label" for="inlineRadio2">No</label>
+                                                        id="inlineRadio2" value="0" <% if(data.isAdmin==0){ %> checked
+                                                    <% } %> >
+                                                        <label class="form-check-label" for="inlineRadio2">No</label>
                                                 </div>
                                             </div>
 
                                         </div>
                                         <div class="col-12">
-                                            <img src="/uploads/<%= profile%>" alt="Profile"
-                                            class="w-50 p-3">
+                                            <img src="/uploads/<%= profile%>" alt="Profile" class="w-50 p-3">
                                             <input type="file" name="profile" class="form-control" id="profile"
-                                                required>                                    
+                                                required>
                                             <div class="invalid-feedback">Choose your Profile Picture</div>
                                         </div>
                                         <div class="col-12 d-flex justify-content-evenly">

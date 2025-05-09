@@ -40,8 +40,6 @@ async function getUser(req, res) {
         userData: []
     }
 
-    const condtionArr = []
-
     try {
         const pageNo = isNaN(Number(page)) ? 1 : Number(page)
         const limitNo = isNaN(Number(limit)) ? 5 : Number(limit)

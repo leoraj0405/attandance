@@ -19,6 +19,10 @@
                 text-decoration: none;
                 color: inherit;
             }
+
+            .bc {
+                font-size: larger;
+            }
         </style>
 </head>
 
@@ -34,9 +38,18 @@
     </aside><!-- End Sidebar-->
 
     <main id="main" class="main">
+        <div class="container py-3">
+            <h5 class="mb-2 fw-bold text-primary">Students</h5>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb" id="breadcrumbOl">
+                </ol>
+            </nav>
+        </div>
         <div class="card-body">
-            <h5 class="card-title">Students</h5>
-
+            <div class="d-flex justify-content-between p-2">
+                <h5 class="card-title">Students</h5>
+                <a class="btn btn-primary" style="align-content: center;" href="/sh/admin/addstudent">Add students</a>
+            </div>
             <!-- Table with stripped rows -->
             <table class="table table-striped">
                 <thead>
@@ -54,63 +67,64 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% if(studentInfo.length===0) { %>
-                        <tr>
-                            <td>No students</td>
-                        </tr>
-                        <% }else { %>
-                            <% for(var i=0; i < studentInfo.length;i++) { %>
-                                <tr>
-                                    <td>
-                                        <%= studentInfo[i].accNo %>
-                                    </td>
-                                    <td>
-                                        <%= studentInfo[i].sfirstName + ' ' + studentInfo[i].lastName %>
-                                    </td>
-                                    <td>
-                                        <%= studentInfo[i].firstName %>
-                                    </td>
-                                    <td>
-                                        <%= studentInfo[i].name %>
-                                    </td>
-                                    <td>
-                                        <%= studentInfo[i].roomNo %>
-                                    </td>
-                                    <td>
-                                        <%= studentInfo[i].deptName %>
-                                    </td>
-                                    <td>
-                                        <%= studentInfo[i].phoneNo %>
-                                    </td>
-                                    <td>
-                                        <%= studentInfo[i].email %>
-                                    </td>
-                                    <td>
-                                        <%= studentInfo[i].native %>
-                                    </td>
-                                    <td>
-                                        <table>
-                                            <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <a class="border-none" href="/sh/admin/editstudent/<%=studentInfo[i].id %>">
-                                                            <i class="fas fa-edit"></i>
-                                                        </a>
-                                                    </td>
-                                                    <td>
-                                                        <button class="no-border-button"
-                                                            onclick="deleteStudent('<%=studentInfo[i].id %>')">
-                                                            <i class="fas fa-trash" style="color: red;"></i>
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                    <% if(studentInfo.length > 0) { %>
+                        <% for(var i=0; i < studentInfo.length;i++) { %>
+                            <tr>
+                                <td>
+                                    <%= studentInfo[i].accNo %>
+                                </td>
+                                <td>
+                                    <%= studentInfo[i].sfirstName + ' ' + studentInfo[i].lastName %>
+                                </td>
+                                <td>
+                                    <%= studentInfo[i].firstName %>
+                                </td>
+                                <td>
+                                    <%= studentInfo[i].name %>
+                                </td>
+                                <td>
+                                    <%= studentInfo[i].roomNo %>
+                                </td>
+                                <td>
+                                    <%= studentInfo[i].deptName %>
+                                </td>
+                                <td>
+                                    <%= studentInfo[i].phoneNo %>
+                                </td>
+                                <td>
+                                    <%= studentInfo[i].email %>
+                                </td>
+                                <td>
+                                    <%= studentInfo[i].native %>
+                                </td>
+                                <td>
+                                    <table>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <a class="border-none"
+                                                        href="/sh/admin/editstudent/<%=studentInfo[i].id %>">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <button class="no-border-button"
+                                                        onclick="deleteStudent('<%=studentInfo[i].id %>')">
+                                                        <i class="fas fa-trash" style="color: red;"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <% } %>
 
-                                    </td>
-                                </tr>
-                                <% } %>
-                                    <% } %>
+                        <% }else { %>
+                            <tr>
+                                <td colspan="10" class="text-center text-secondary">No students</td>
+                            </tr>
+                        <% } %>
                 </tbody>
             </table>
             <!-- End Table with stripped rows -->
@@ -167,7 +181,21 @@
 
     <script>
 
+        const path = window.location.pathname;
         const mainUrl = '<%= mainUrl %>'
+        const breadcrumbItems = path.split('/').slice(2)
+        var blockCode = ``
+        let itemName
+        breadcrumbItems.forEach((item) => {
+            if (item === 'admin') {
+                item = 'home'
+                blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href=/sh/${item}>${item}</a></li> `
+            } else {
+                item === 'asstdir' ? itemName = 'Assitant Directors' : itemName = item
+                blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href=/sh/admin/${item}>${itemName}</a></li> `
+            }
+        })
+        document.getElementById('breadcrumbOl').innerHTML = blockCode
 
         async function deleteStudent(id) {
             if (confirm('Are You sure to delete the student ?')) {

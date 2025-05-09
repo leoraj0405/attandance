@@ -3,6 +3,11 @@
 
 <head>
   <%- include('../../partials/head') %>
+    <style>
+      .bc {
+        font-size: larger;
+      }
+    </style>
 </head>
 
 <body>
@@ -19,6 +24,13 @@
 
   <main id="main" class="main">
 
+    <div class="container py-3">
+      <h5 class="mb-2 fw-bold text-primary">User Profile</h5>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb" id="breadcrumbOl">
+        </ol>
+      </nav>
+    </div>
     <div class="pagetitle">
       <h1>Profile</h1>
     </div><!-- End Page Title -->
@@ -31,7 +43,8 @@
             <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
 
               <img src="/uploads/<%= profile%>" alt="Profile" class="rounded-circle">
-              <h2>Mr. <%= userInfo.firstName.toUpperCase() %></h2>
+              <h2>Mr. <%= userInfo.firstName.toUpperCase() %>
+              </h2>
               <h3>Assistant Director</h3>
             </div>
           </div>
@@ -49,45 +62,52 @@
                   <button class="nav-link active" data-bs-toggle="tab"
                     data-bs-target="#profile-overview">Overview</button>
                 </li>
-                <li class="nav-item">
-                  <a class="nav-link active" href="/sh/admin/editad/<%=userInfo.id %>">Edit Profile</a>
-                </li>
               </ul>
               <div class="tab-content pt-2">
 
                 <div class="tab-pane fade show active profile-overview" id="profile-overview">
-                  
+
 
                   <h5 class="card-title">Profile Details</h5>
 
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label ">Full Name</div>
-                    <div class="col-lg-9 col-md-8"><%=userInfo.firstName + ' ' + userInfo.lastName %></div>
+                    <div class="col-lg-9 col-md-8">
+                      <%=userInfo.firstName + ' ' + userInfo.lastName %>
+                    </div>
                   </div>
 
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label">Email Address</div>
-                    <div class="col-lg-9 col-md-8"><%=userInfo.email %></div>
+                    <div class="col-lg-9 col-md-8">
+                      <%=userInfo.email %>
+                    </div>
                   </div>
 
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label">Phone Number</div>
-                    <div class="col-lg-9 col-md-8"><%= userInfo.phoneNo %></div>
+                    <div class="col-lg-9 col-md-8">
+                      <%= userInfo.phoneNo %>
+                    </div>
                   </div>
 
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label">Is Admin</div>
-                    <div class="col-lg-9 col-md-8"><%= userInfo.isAdmin == 1 ? 'YES' : 'NO'%></div>
+                    <div class="col-lg-9 col-md-8">
+                      <%= userInfo.isAdmin==1 ? 'YES' : 'NO' %>
+                    </div>
                   </div>
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label">User Id</div>
-                    <div class="col-lg-9 col-md-8"><%= userInfo.userId %></div>
+                    <div class="col-lg-9 col-md-8">
+                      <%= userInfo.userId %>
+                    </div>
                   </div>
                 </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
     </section>
 
   </main><!-- End #main -->
@@ -112,6 +132,23 @@
 
   <!-- Template Main JS File -->
   <script src="/assets/js/main.js"></script>
+
+  <script>
+    const path = window.location.pathname;
+    const mainUrl = '<%= mainUrl %>'
+    const breadcrumbItems = path.split('/').slice(2)
+    var blockCode = ``
+    let itemName
+    breadcrumbItems.forEach((item) => {
+      if (item === 'user') {
+        item = 'home'
+        blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href=/sh/${item}>${item}</a></li> `
+      } else {
+        blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href=/sh/user/${item}>${item}</a></li> `
+      }
+    })
+    document.getElementById('breadcrumbOl').innerHTML = blockCode
+  </script>
 
 </body>
 

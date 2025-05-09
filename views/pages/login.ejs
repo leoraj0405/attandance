@@ -3,13 +3,34 @@
 
 <head>
     <%- include('../partials/head') %>
+        <style>
+            .spinner-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 1050;
+                display: none;
+            }
+        </style>
 </head>
 
 <body>
 
     <main>
         <div class="container">
+            <!-- Spinner Overlay -->
+            <div id="spinner">
+                <!-- Spinner Overlay -->
+                <div class="spinner-overlay d-flex justify-content-center align-items-center">
+                    <div class="spinner-border text-light" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
 
+            </div>
             <section
                 class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
                 <div class="container">
@@ -59,7 +80,8 @@
                                             </div>
                                         </div>
                                         <div class="col-12">
-                                            <button class="btn btn-primary w-100" onclick="loginUser()" type="button">Login</button>
+                                            <button class="btn btn-primary w-100" onclick="loginUser()"
+                                                type="button">Login</button>
                                         </div>
                                         <div class="col-12">
                                             <p class="small mb-0"> Forget Password ? <a
@@ -88,7 +110,8 @@
     </main><!-- End #main -->
     <script>
 
-        const mainUrl = '<%= mainUrl %>' 
+        const mainUrl = '<%= mainUrl %>'
+        document.getElementById('spinner').style.display = 'none';
 
         const userIdDom = document.getElementById('yourUsername')
         const passDom = document.getElementById('yourPassword')
@@ -108,9 +131,11 @@
                 body: raw,
                 redirect: "follow"
             };
+            document.getElementById('spinner').style.display = 'block';
 
             fetch(`${mainUrl}/api/user/login`, requestOptions)
                 .then((response) => {
+                    document.getElementById('spinner').style.display = 'none';
                     if (response.status === 200) {
                         window.location.replace(`${mainUrl}/sh/home`);
                     } else {

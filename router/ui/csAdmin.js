@@ -19,7 +19,15 @@ router.get('/asstdir', async (req, res) => {
                         const currentPage = userData.page
                         const pagesTotal = Math.ceil(userData.total / userData.limit)
                         const mainUrl = process.env.MAIN_URL
-                        res.render('pages/users/userList.ejs', { ...userData, profile, user, admin, currentPage, pagesTotal, mainUrl })
+                        res.render('pages/users/userList.ejs', {
+                                ...userData,
+                                profile,
+                                user,
+                                admin,
+                                currentPage,
+                                pagesTotal,
+                                mainUrl
+                        })
                 } else {
                         res.redirect(`${process.env.MAIN_URL}/sh/login`)
                 }
@@ -82,12 +90,13 @@ router.get('/student', async (req, res) => {
                         currentWarden && fetchUrl.searchParams.append('warden', currentWarden);
 
                         const response = await fetch(fetchUrl.href)
-                        const studentInfo = await response.json()
+                        const studentInfoRes = await response.json()
                         const studentList = 'No students'
-                        const currentPage = studentInfo.page
-                        var pagesTotal = Math.ceil(studentInfo.total / studentInfo.limit)
+                        const currentPage = studentInfoRes.page
+                        const studentInfo = studentInfoRes.studentInfo
+                        var pagesTotal = Math.ceil(studentInfoRes.total / studentInfoRes.limit)
                         const mainUrl = process.env.MAIN_URL
-                        res.render('pages/student/studentList.ejs', { user, profile, admin, ...studentInfo, pagesTotal, currentPage, studentList, mainUrl })
+                        res.render('pages/student/studentList.ejs', { user, profile, admin, studentInfo, pagesTotal, currentPage, studentList, mainUrl })
                 } else {
                         res.redirect(`${process.env.MAIN_URL}/sh/login`)
                 }
@@ -139,13 +148,12 @@ router.get('/addstudent', async (req, res) => {
 })
 
 router.get('/editstudent/:id', async (req, res) => {
-        try {
-                const id = req.params.id
+        const id = req.params.id
 
+        try {
                 if (req.session.isLogged == true) {
                         const user = req.session.data
                         const admin = req.session.data.isAdmin;
-                        const profile = req.session.data.profileImage;
                         const studentProfile = ''
                         const pageName = 'Edit'
 
@@ -153,7 +161,8 @@ router.get('/editstudent/:id', async (req, res) => {
                         const wardenList = await wardenResponse.json();
 
                         const blockRes = await fetch(`${process.env.MAIN_URL}/api/block`)
-                        const blockList = await blockRes.json();
+                        const blockListRes = await blockRes.json();
+                        const blockList = blockListRes.data
 
                         const deptRes = await fetch(`${process.env.MAIN_URL}/api/department`)
                         const deptList = await deptRes.json();
@@ -183,15 +192,31 @@ router.get('/editstudent/:id', async (req, res) => {
 })
 
 router.get('/blocklist', async (req, res) => {
+        const {
+                page: pageInput,
+        } = req.query
         try {
                 if (req.session.isLogged == true) {
+                        const mainUrl = process.env.MAIN_URL
                         const user = req.session.data
                         const admin = req.session.data.isAdmin;
                         const profile = req.session.data.profileImage;
-                        const blockResponse = await fetch(`${process.env.MAIN_URL}/api/block`)
-                        const blockData = await blockResponse.json()
-                        const mainUrl = process.env.MAIN_URL
-                        res.render('pages/block/blockList', { user, admin, profile, blockData, mainUrl })
+                        const response = await fetch(`${mainUrl}/api/block?page=${pageInput}`)
+                        const blockDataRes = await response.json()
+                        const currentPage = blockDataRes.page
+                        const blockData = blockDataRes.data
+                        const pagesTotal = Math.ceil(blockDataRes.total / blockDataRes.limit)
+
+                        res.render('pages/block/blockList', {
+                                user,
+                                admin,
+                                profile,
+                                blockData,
+                                mainUrl,
+                                currentPage,
+                                pagesTotal
+                        })
+
                 } else {
                         res.redirect(`${process.env.MAIN_URL}/sh/login`)
                 }
@@ -201,19 +226,36 @@ router.get('/blocklist', async (req, res) => {
 })
 
 router.get('/roomlist', async (req, res) => {
+        const {
+                page: pageInput,
+        } = req.query
+
         try {
                 if (req.session.isLogged == true) {
                         const user = req.session.data
                         const admin = req.session.data.isAdmin;
                         const profile = req.session.data.profileImage;
+                        const mainUrl = process.env.MAIN_URL
 
-                        const roomResponse = await fetch(`${process.env.MAIN_URL}/api/room`)
-                        const roomData = await roomResponse.json()
+                        const response = await fetch(`${mainUrl}/api/room?page=${pageInput}`)
+                        const result = await response.json()
+
+                        const roomData = result.data
+                        const currentPage = result.page
+                        const pagesTotal = Math.ceil(result.total / result.limit)
 
                         const blockResponse = await fetch(`${process.env.MAIN_URL}/api/block`)
                         const blockData = await blockResponse.json()
-                        const mainUrl = process.env.MAIN_URL
-                        res.render('pages/room/roomList', { user, admin, profile, roomData, blockData, mainUrl })
+                        res.render('pages/room/roomList', {
+                                user,
+                                admin,
+                                profile,
+                                roomData,
+                                currentPage,
+                                pagesTotal,
+                                blockData: blockData.data,
+                                mainUrl
+                        })
                 } else {
                         res.redirect(`${process.env.MAIN_URL}/sh/login`)
                 }

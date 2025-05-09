@@ -19,6 +19,10 @@
                 text-decoration: none;
                 color: inherit;
             }
+
+            .bc {
+                font-size: larger;
+            }
         </style>
 </head>
 
@@ -34,11 +38,22 @@
     </aside><!-- End Sidebar-->
 
     <main id="main" class="main">
+
+        <div class="container py-3">
+            <h5 class="mb-2 fw-bold text-primary">Rooms</h5>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb" id="breadcrumbOl">
+                </ol>
+            </nav>
+        </div>
+
+        
         <div class="card-body">
-            <div class="d-flex flex-row-reverse bd-highlight">
-                <button class="btn btn-primary" onclick="openForm()">Add block</button>
+            <div class="d-flex justify-content-between pb-2">
+                <h5 class="card-title">Rooms</h5>
+
+                <button class="btn btn-primary" onclick="openForm()">Add Room</button>
             </div>
-            <div class="mt-5"></div>
             <div class="card" id="form" style="display: none;">
                 <div class="card-body">
                     <h5 class="card-title" id="formName">Add Block </h5>
@@ -83,7 +98,6 @@
                     </form><!-- End General Form Elements -->
                 </div>
             </div>
-            <h5 class="card-title">Rooms</h5>
 
             <!-- Table with stripped rows -->
             <table class="table table-striped" id="table">
@@ -136,8 +150,32 @@
                             </tr>
                             <% } %>
                 </tbody>
-
             </table>
+            <div class="card">
+                <div class="card-body">
+                    <!-- Disabled and active states -->
+                    <nav aria-label="...">
+                        <div class="h-25 d-inline-block"></div>
+                        <ul class="pagination d-flex justify-content-center">
+                            <li class="page-item <% if(currentPage == 1) { %> disabled <% } %>">
+                                <a class="page-link" href="/sh/admin/roomlist?page=<%=currentPage - 1  %>" tabindex="-1"
+                                    aria-disabled="true">Previous</a>
+                            </li>
+                            <% for(var i=1;i <=pagesTotal;i++) { %>
+                                <li class="page-item  <% if(currentPage == i ) { %> active <% } %>"><a class="page-link"
+                                        href="/sh/admin/roomlist?page=<%=i %>">
+                                        <%=i %>
+                                    </a></li>
+
+                                <%} %>
+                                    <li class="page-item <% if(currentPage == pagesTotal ) { %> disabled <% } %>">
+                                        <a class="page-link"
+                                            href="/sh/admin/roomlist?page=<%= currentPage + 1 %>">Next</a>
+                                    </li>
+                        </ul>
+                    </nav><!-- End Disabled and active states -->
+                </div>
+            </div>
             <!-- End Table with stripped rows -->
         </div>
     </main><!-- End #main -->
@@ -165,6 +203,7 @@
     <script src="/assets/js/main.js"></script>
 
     <script>
+
         const blockBoxDom = document.getElementById('form')
         const blockDom = document.getElementById('blockId')
         const roomNoDom = document.getElementById('roomNo')
@@ -172,6 +211,20 @@
         const roomIdDom = document.getElementById('roomId')
         const isActiveDom = document.getElementById('isActive')
         const mainUrl = '<%=mainUrl %>'
+        const path = window.location.pathname;
+        const breadcrumbItems = path.split('/').slice(2)
+        var blockCode = ``
+        let itemName
+        breadcrumbItems.forEach((item) => {
+            if (item === 'admin') {
+                item = 'home'
+                blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href=/sh/${item}>${item}</a></li> `
+            } else {
+                item === 'roomlist' ? itemName = 'rooms' : itemName = item
+                blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href=/sh/admin/${item}>${itemName}</a></li> `
+            }
+        })
+        document.getElementById('breadcrumbOl').innerHTML = blockCode
 
         async function deleteRoom(id) {
             if (confirm('Are you sure to delete block')) {
@@ -195,7 +248,11 @@
         }
 
         function openForm() {
-            blockBoxDom.style.display = 'block'
+            if(blockBoxDom.style.display === 'none') {
+                blockBoxDom.style.display = 'block'
+            }else{
+                blockBoxDom.style.display = 'none'
+            }
         }
 
         function saveBlock() {
@@ -240,6 +297,8 @@
             const roomData = await roomRes.json()
             roomIdDom.value = roomData.id
             roomNoDom.value = roomData.roomNo
+            isActiveDom.value = roomData.isActive
+            blockDom.value = roomData.blockId  
 
         }
     </script>

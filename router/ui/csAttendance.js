@@ -14,8 +14,9 @@ router.get('/blocks', async (req, res) => {
                         const admin = req.session.data.isAdmin;
                         const profile = req.session.data.profileImage;
                         const response = await fetch(`${process.env.MAIN_URL}/api/block`)
-                        const data = await response.json();
+                        const blockData = await response.json();
                         const mainUrl = process.env.MAIN_URL
+                        const data = blockData.data
                         res.render('pages/attendance/block.ejs', { data, user, admin, profile, mainUrl})
                 } else {
                         res.redirect(`${process.env.MAIN_URL}/sh/login`)
@@ -34,9 +35,10 @@ router.get('/rooms/:id', async(req, res) => {
                         const admin = req.session.data.isAdmin;
                         const profile = req.session.data.profileImage;
                         const response = await fetch(`${process.env.MAIN_URL}/api/room/block/${id}`)
-                        const data = await response.json()
+                        const roomData = await response.json()
                         currentPage.block = id
                         const mainUrl = process.env.MAIN_URL
+                        const data = roomData.data
                         res.render('pages/attendance/room',{user, admin, profile, data, mainUrl})
                 }else {
                         res.redirect(`${process.env.MAIN_URL}/sh/login`)

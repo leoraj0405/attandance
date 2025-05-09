@@ -9,15 +9,34 @@ const DELETE_QUERY = /*sql*/` UPDATE blocks SET
                                  WHERE id = ?`
 
 async function getBlock(req, res) {
+    const {
+        page = 1,
+        limit = 5
+    } = req.query
+
+    const response = {
+        total: 0,
+        page: 0,
+        limit: 0,
+        data: []
+    }
     try {
 
+        const pageNo = isNaN(Number(page)) ? 1 : Number(page)
+        const limitNo = isNaN(Number(limit)) ? 5 : Number(limit)
+
+        const blockCount = await execQuery(/*sql*/`SELECT COUNT(id) AS total FROM blocks WHERE deletedAt IS NULL `)
+        response.total = blockCount[0].total
         const getBlock = await execQuery(/*sql*/`SELECT 
                 *, DATE_FORMAT(createdAt, "%D %M %Y") 
                 AS createdAt 
                 FROM blocks 
-                WHERE deletedAt IS NULL`)
+                WHERE deletedAt IS NULL LIMIT ? OFFSET ? `, [limitNo, (pageNo - 1) * limitNo])
         if (getBlock.length !== 0) {
-            res.status(200).send(getBlock)
+            response.data = getBlock
+            response.limit = limitNo
+            response.page = pageNo
+            res.status(200).send(response)
         } else {
             return res.status(404).send('Not Founded')
         }

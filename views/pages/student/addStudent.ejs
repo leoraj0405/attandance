@@ -38,88 +38,92 @@
 
                                         <div class="col-12">
                                             <label for="yourAccNo" class="form-label">Account No</label>
-                                            <input type="text" name="firstName" class="form-control" value="<%=data.accNo %>" id="yourAccNo"
-                                                required>
+                                            <input type="text" name="firstName" class="form-control"
+                                                value="<%=data.accNo %>" id="yourAccNo" required>
                                             <div class="invalid-feedback">Please, enter your Account No!</div>
                                         </div>
 
                                         <div class="col-12">
                                             <label for="yourFirstName" class="form-label">Your first Name</label>
-                                            <input type="text" value="<%=data.sfirstName %>" name="firstName" class="form-control" id="yourFirstName"
-                                                required>
+                                            <input type="text" value="<%=data.sfirstName %>" name="firstName"
+                                                class="form-control" id="yourFirstName" required>
                                             <div class="invalid-feedback">Please, enter your first name!</div>
                                         </div>
 
                                         <div class="col-12">
                                             <label for="yourLastName" class="form-label">Your Last Name</label>
-                                            <input type="text" value="<%=data.lastName %>" name="lastName" class="form-control" id="yourLastName"
-                                                required>
+                                            <input type="text" value="<%=data.lastName %>" name="lastName"
+                                                class="form-control" id="yourLastName" required>
                                             <div class="invalid-feedback">Please, enter your last name!</div>
                                         </div>
 
                                         <div class="col-12">
                                             <label for="yourEmail" class="form-label">Your Email</label>
-                                            <input type="email" value="<%=data.email %>" name="email" class="form-control" id="yourEmail"
-                                                required>
+                                            <input type="email" value="<%=data.email %>" name="email"
+                                                class="form-control" id="yourEmail" required>
                                             <div class="invalid-feedback">Please enter a valid Email adddress!</div>
                                         </div>
 
                                         <div class="col-12">
                                             <label for="yourPhoneNo" class="form-label">Your Phone Number</label>
-                                            <input type="text" value="<%=data.phoneNo %>" name="phoneNo" class="form-control" id="yourPhoneNo"
-                                                required>
+                                            <input type="text" value="<%=data.phoneNo %>" name="phoneNo"
+                                                class="form-control" id="yourPhoneNo" required>
                                             <div class="invalid-feedback">Please, enter your phone number!</div>
                                         </div>
 
                                         <div class="col-12">
                                             <label for="yourWarden" class="form-label">Warden</label>
-                                            <select class="form-select" id="yourWarden" aria-label="Default select example">
-                                                <option selected></option>
+                                            <select class="form-select" id="yourWarden" value="<%=data.wardenId %>">
                                                 <% for(var i=0; i< wardenList.length; i++) { %>
-                                                    <option value="<%=wardenList[i].id %>"><%= wardenList[i].firstName %></option>
-                                                    
-                                                <% } %>
-                                              </select>
+                                                    <option value="<%=wardenList[i].id %>">
+                                                        <%= wardenList[i].firstName %>
+                                                    </option>
+
+                                                    <% } %>
+                                            </select>
                                         </div>
-                                        
+
                                         <div class="col-12">
-                                            <label for="yourblock"  class="form-label">block</label>
-                                            <select class="form-select" onchange="updateSecondDropdown()" id="yourblock" aria-label="Default select example">
-                                                <option selected></option>
+                                            <label for="yourblock" class="form-label">block</label>
+                                            <select class="form-select" onchange="updateSecondDropdown()" id="yourblock"
+                                                value="<%=data.blockId %>">
                                                 <% for(var i=0; i< blockList.length; i++) { %>
-                                                <option value="<%=blockList[i].id %>"><%= blockList[i].name %></option>
-                                                <% } %>
-                                               
-                                              </select>
+                                                    <option value="<%=blockList[i].id %>">
+                                                        <%= blockList[i].name %>
+                                                    </option>
+                                                    <% } %>
+
+                                            </select>
                                         </div>
 
                                         <div class="col-12">
                                             <label for="yourRoom" class="form-label">Room</label>
-                                            <select class="form-select" id="yourRoom" aria-label="Default select example">
-                                                
-                                              </select>
+                                            <select class="form-select" value="<%=data.roomId %>" id="yourRoom">
+                                            </select>
                                         </div>
-                                      
+
                                         <div class="col-12">
                                             <label for="yourDepartment" class="form-label">Department</label>
-                                            <select class="form-select" id="yourDepartment" aria-label="Default select example">
-                                                <option></option>
+                                            <select class="form-select" id="yourDepartment"
+                                                value="<%=data.departmentId %>">
                                                 <% for(var i=0; i< deptList.length; i++) { %>
-                                                <option value="<%=deptList[i].id %>"><%=deptList[i].deptName %></option>
-                                                
-                                                <% } %>
-                                              </select>
+                                                    <option value="<%=deptList[i].id %>">
+                                                        <%=deptList[i].deptName %>
+                                                    </option>
+
+                                                    <% } %>
+                                            </select>
                                         </div>
                                         <div class="col-12">
                                             <label for="yourNative" class="form-label">Native</label>
-                                            <input type="text" value="<%=data.native %>" name="native" class="form-control" id="yourNative"
-                                                required>
+                                            <input type="text" value="<%=data.native %>" name="native"
+                                                class="form-control" id="yourNative" required>
                                         </div>
                                         <div class="col-12">
-                                            <img src="/uploads/<%= data.studProfile%>" style="border-radius: 50%;" alt="Profile"
-                                            class="w-50 p-3">
-                                            <input type="file" value="<%=data.studProfile %>" name="profile" class="form-control" id="studPicture"
-                                                required>                                    
+                                            <img src="/uploads/<%= data.studProfile%>" style="border-radius: 50%;"
+                                                alt="Profile" class="w-50 p-3">
+                                            <input type="file" value="<%=data.studProfile %>" name="profile"
+                                                class="form-control" id="studPicture" required>
                                             <div class="invalid-feedback">Choose your Profile Picture</div>
                                         </div>
                                         <div class="col-12 d-flex justify-content-evenly">
@@ -137,6 +141,7 @@
                                 <!-- Licensing information: https://bootstrapmade.com/license/ -->
                                 <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
                                 Designed by <a href="https://bootstrapmade.com/">Leo</a>
+
                             </div>
 
                         </div>
@@ -165,6 +170,8 @@
     <script src="assets/js/main.js"></script>
 
     <script>
+
+        const editStudentRoom = '<%=data.roomId %>'
         const accDom = document.getElementById('yourAccNo');
         const fnameDom = document.getElementById('yourFirstName');
         const lnameDom = document.getElementById('yourLastName');
@@ -178,18 +185,15 @@
         const deptDom = document.getElementById('yourDepartment')
 
         const mainUrl = '<%= mainUrl %>'
-      
+
         async function updateSecondDropdown() {
-            
+
             const roomRes = await fetch(`${mainUrl}/api/room/block/${blockDom.value}`)
             const roomList = await roomRes.json();
 
             var roomCode = ''
-            for(var i=0; i < roomList.length; i++) {
-                roomCode = roomCode + `
-                     
-                    <option value="${roomList[i].id}">${roomList[i].roomNo}</option>`
-                
+            for (var i = 0; i < roomList.length; i++) {
+                roomCode = roomCode + `<option value="${roomList[i].id}">${roomList[i].roomNo}</option>`
             }
             roomDom.innerHTML = roomCode;
         }
@@ -209,7 +213,7 @@
             formdata.append("phoneNo", phoneNoDom.value);
             formdata.append("email", emailIdDom.value);
             formdata.append("native", nativeDom.value);
-            
+
 
             const requestOptions = {
                 method: "POST",
@@ -220,10 +224,10 @@
 
             fetch(`${mainUrl}/api/student`, requestOptions)
                 .then(async (response) => {
-                    if(response.status == 200) {
+                    if (response.status == 200) {
                         alert('done')
                         window.location.href = `${mainUrl}/sh/admin/student`
-                    }else{
+                    } else {
                         alert(await response.text())
                     }
                 });
