@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../../partials/head') %>
+        <style>
+            p {
+                text-align: justify;
+            }
+
+            .bc {
+                font-size: larger;
+            }
+        </style>
+</head>
+
+<body>
+
+    <!-- ======= Header ======= -->
+    <header>
+        <%- include('../../partials/header') %>
+    </header>
+    <!-- End Header -->
+
+    <!-- ======= Sidebar ======= -->
+    <aside id="sidebar" class="sidebar">
+        <%- include('../../partials/asideBar') %>
+    </aside>
+    <!-- End Sidebar-->
+
+    <main id="main" class="main">
+        <div class="container py-3">
+            <h5 class="mb-2 fw-bold text-primary">Students Report</h5>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb" id="breadcrumbOl">
+                </ol>
+            </nav>
+        </div>
+
+        <section class="section dashboard">
+
+            <div class="modal fade" id="attendanceModal" tabindex="-1" aria-labelledby="attendanceModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="attendanceModalLabel">Enter Total Days</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Form inside the modal -->
+                            <div>
+                                <div class="mb-3">
+                                    <label for="totalDays" class="form-label">Enter Total Days</label>
+                                    <input type="number" class="form-control" id="totalDays" name="totalDays" min="1"
+                                        required>
+                                </div>
+                                <button onclick="generateReport()" class="btn btn-primary">Generate Report</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">S. No</th>
+                            <th scope="col">Student Name</th>
+                            <th scope="col">Block</th>
+                            <th scope="col">Room</th>
+                            <th scope="col">Appearance</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="6" class="text-center text-secondary">First you need to enter the total days to
+                                calculate percentage</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main><!-- End #main -->
+
+    <!-- ======= Footer ======= -->
+    <footer id="footer" class="footer">
+        <%- include('../../partials/footer') %>
+    </footer><!-- End Footer -->
+
+    <!-- Vendor JS Files -->
+    <script src="/assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/vendor/chart.js/chart.umd.js"></script>
+    <script src="/assets/vendor/echarts/echarts.min.js"></script>
+    <script src="/assets/vendor/quill/quill.js"></script>
+    <script src="/assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="/assets/vendor/tinymce/tinymce.min.js"></script>
+    <script src="/assets/vendor/php-email-form/validate.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="/assets/js/main.js"></script>
+
+    <script>
+
+        window.onload = function () {
+            var myModal = new bootstrap.Modal(document.getElementById('attendanceModal'), {
+                keyboard: false // Disable closing with keyboard
+            });
+            myModal.show();
+        };
+        const path = window.location.pathname;
+        const mainUrl = '<%= mainUrl %>'
+        const warden = '<%= warden %>'
+        const breadcrumbItems = path.split('/').slice(2)
+        var blockCode = ``
+        breadcrumbItems.forEach((item) => {
+            if (item === 'admin') {
+                blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href=/sh/home>Home</a></li> `
+
+            } else {
+                blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href=/sh/admin/${item}>Students Report</a></li> `
+
+            }
+        })
+        document.getElementById('breadcrumbOl').innerHTML = blockCode
+        const daysDom = document.getElementById('totalDays')
+
+        async function generateReport() {
+            var myModal = new bootstrap.Modal(document.getElementById('attendanceModal'), {
+                keyboard: false // Disable closing with keyboard
+            });
+            myModal.hide();
+            const response = await fetch(`${mainUrl}/api/attendance/report/${warden}/${daysDom.value}`)
+            const data = await response.json()
+            console.log(data)
+        }
+    </script>
+
+</body>
+
+</html>

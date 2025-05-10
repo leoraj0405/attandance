@@ -73,7 +73,8 @@
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label ">Full Name</div>
                     <div class="col-lg-9 col-md-8">
-                      <%=userInfo.firstName + ' ' + userInfo.lastName %>
+                      <%= userInfo.firstName.charAt(0).toUpperCase() +
+    userInfo.firstName.slice(1).toLowerCase()+ ' ' + userInfo.lastName %>
                     </div>
                   </div>
 

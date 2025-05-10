@@ -21,15 +21,12 @@
 
     <main>
         <div class="container">
-            <!-- Spinner Overlay -->
             <div id="spinner">
-                <!-- Spinner Overlay -->
                 <div class="spinner-overlay d-flex justify-content-center align-items-center">
                     <div class="spinner-border text-light" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
                 </div>
-
             </div>
             <section
                 class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
@@ -38,7 +35,7 @@
                         <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
 
                             <div class="d-flex justify-content-center py-4">
-                                <a href="index.html" class="logo d-flex align-items-center w-auto">
+                                <a class="logo d-flex align-items-center w-auto">
                                     <img src="/assets/img/logo.png" alt="">
                                     <span class="d-none d-lg-block">SH Hostel</span>
                                 </a>
@@ -47,6 +44,10 @@
                             <div class="card mb-3">
 
                                 <div class="card-body">
+                                    <div class="pt-5">
+                                        <div class="alert alert-danger" id="error">
+                                        </div>
+                                    </div>
 
                                     <div class="pt-4 pb-2">
                                         <h5 class="card-title text-center pb-0 fs-4">Login to Your Account</h5>
@@ -110,7 +111,11 @@
     </main><!-- End #main -->
     <script>
 
+        const error = document.getElementById('error')
+        error.style.display = 'none'
+
         const mainUrl = '<%= mainUrl %>'
+        
         document.getElementById('spinner').style.display = 'none';
 
         const userIdDom = document.getElementById('yourUsername')
@@ -134,12 +139,19 @@
             document.getElementById('spinner').style.display = 'block';
 
             fetch(`${mainUrl}/api/user/login`, requestOptions)
-                .then((response) => {
+                .then(async(response) => {
                     document.getElementById('spinner').style.display = 'none';
                     if (response.status === 200) {
                         window.location.replace(`${mainUrl}/sh/home`);
                     } else {
-                        alert('Login Failed try again !')
+                        error.style.display = 'block'
+                        if (response.status === 404 || response.status < 499) {
+                            error.innerHTML = 'Not founded or Client side error'
+                        } else if (response.status < 500) {
+                            error.innerHTML = 'Server error contact owner'
+                        } else {
+                            error.innerHTML = await response.text()
+                        }
                     }
                 })
         }

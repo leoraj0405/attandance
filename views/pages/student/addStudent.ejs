@@ -3,13 +3,31 @@
 
 <head>
     <%- include('../../partials/head') %>
+        <style>
+            .spinner-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 1050;
+                display: none;
+            }
+        </style>
 </head>
 
 <body>
 
     <main>
         <div class="container">
-
+            <div id="spinner">
+                <div class="spinner-overlay d-flex justify-content-center align-items-center">
+                    <div class="spinner-border text-light" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
             <section
                 class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
                 <div class="container">
@@ -78,7 +96,6 @@
                                                     <option value="<%=wardenList[i].id %>">
                                                         <%= wardenList[i].firstName %>
                                                     </option>
-
                                                     <% } %>
                                             </select>
                                         </div>
@@ -106,6 +123,7 @@
                                             <label for="yourDepartment" class="form-label">Department</label>
                                             <select class="form-select" id="yourDepartment"
                                                 value="<%=data.departmentId %>">
+                                                <option></option>
                                                 <% for(var i=0; i< deptList.length; i++) { %>
                                                     <option value="<%=deptList[i].id %>">
                                                         <%=deptList[i].deptName %>
@@ -125,6 +143,10 @@
                                             <input type="file" value="<%=data.studProfile %>" name="profile"
                                                 class="form-control" id="studPicture" required>
                                             <div class="invalid-feedback">Choose your Profile Picture</div>
+                                        </div>
+                                        <div class="pt-5">
+                                            <div class="alert alert-danger" id="error">
+                                            </div>
                                         </div>
                                         <div class="col-12 d-flex justify-content-evenly">
 
@@ -172,6 +194,11 @@
     <script>
 
         const editStudentRoom = '<%=data.roomId %>'
+
+        const error = document.getElementById('error')
+        error.style.display = 'none'
+
+
         const accDom = document.getElementById('yourAccNo');
         const fnameDom = document.getElementById('yourFirstName');
         const lnameDom = document.getElementById('yourLastName');
@@ -185,6 +212,8 @@
         const deptDom = document.getElementById('yourDepartment')
 
         const mainUrl = '<%= mainUrl %>'
+
+        document.getElementById('spinner').style.display = 'none';
 
         async function updateSecondDropdown() {
 
@@ -221,14 +250,22 @@
                 body: formdata,
                 redirect: "follow"
             };
-
+            document.getElementById('spinner').style.display = 'block';
             fetch(`${mainUrl}/api/student`, requestOptions)
                 .then(async (response) => {
                     if (response.status == 200) {
-                        alert('done')
+                        document.getElementById('spinner').style.display = 'none';
                         window.location.href = `${mainUrl}/sh/admin/student`
                     } else {
-                        alert(await response.text())
+                        document.getElementById('spinner').style.display = 'none';
+                        error.style.display = 'block'
+                        if (response.status === 404 || response.status < 499) {
+                            error.innerHTML = 'Not founded or Client side error'
+                        } else if (response.status < 500) {
+                            error.innerHTML = 'Server error contact owner'
+                        } else {
+                            error.innerHTML = await response.text()
+                        }
                     }
                 });
         }

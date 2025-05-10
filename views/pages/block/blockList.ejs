@@ -23,6 +23,17 @@
             .bc {
                 font-size: larger;
             }
+
+            .spinner-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 1050;
+                display: none;
+            }
         </style>
 </head>
 
@@ -38,12 +49,23 @@
     </aside><!-- End Sidebar-->
 
     <main id="main" class="main">
+        <div id="spinner">
+            <div class="spinner-overlay d-flex justify-content-center align-items-center">
+                <div class="spinner-border text-light" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
         <div class="container py-3">
             <h5 class="mb-2 fw-bold text-primary">Assitant Directors</h5>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb" id="breadcrumbOl">
                 </ol>
             </nav>
+        </div>
+        <div class="pt-5">
+            <div class="alert alert-danger" id="error">
+            </div>
         </div>
         <div class="card" id="form" style="display: none;">
             <div class="card-body">
@@ -73,53 +95,61 @@
         <div class="card-body">
             <div class="d-flex justify-content-between pb-2">
                 <h5 class="card-title">Students</h5>
-                    <button class="btn btn-primary" onclick="openForm()">Add block</button>
+                <button class="btn btn-primary" onclick="openForm()">Add block</button>
             </div>
 
             <!-- Table with stripped rows -->
-            <table class="table table-striped" id="table">
-                <thead>
-                    <tr>
-                        <th scope="col">S. No</th>
-                        <th scope="col">Block Name</th>
-                        <th scope="col">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% let serialNumber=1; %>
-                        <% for(var i=0; i< blockData.length; i++) { %>
-                            <tr>
-                                <td>
-                                    <%=serialNumber++ %>
-                                </td>
-                                <td>
-                                    <%=blockData[i].name %>
-                                </td>
-                                <td>
-                                    <table>
-                                        <tbody>
+            <div class="table-responsive">
+                <table class="table table-striped" id="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">S. No</th>
+                            <th scope="col">Block Name</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% let serialNumber=1; %>
+                            <% if(blockData.length> 0) { %>
+                                <% for(var i=0; i< blockData.length; i++) { %>
+                                    <tr>
+                                        <td>
+                                            <%=serialNumber++ %>
+                                        </td>
+                                        <td>
+                                            <%= blockData[i].name.charAt(0).toUpperCase() +
+                                                blockData[i].name.slice(1).toLowerCase() %>
+                                        </td>
+                                        <td>
+                                            <table>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <button class="no-border-button"
+                                                                onclick="editBlock('<%=blockData[i].id %>')">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                        </td>
+                                                        <td>
+                                                            <button class="no-border-button"
+                                                                onclick="deleteBlock('<%=blockData[i].id %>')">
+                                                                <i class="fas fa-trash" style="color: red;"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <% } %>
+                                        <% }else { %>
                                             <tr>
-                                                <td>
-                                                    <button class="no-border-button"
-                                                        onclick="editBlock('<%=blockData[i].id %>')">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                </td>
-                                                <td>
-                                                    <button class="no-border-button"
-                                                        onclick="deleteBlock('<%=blockData[i].id %>')">
-                                                        <i class="fas fa-trash" style="color: red;"></i>
-                                                    </button>
-                                                </td>
+                                                <td colspan="3">No Blocks</td>
                                             </tr>
-                                        </tbody>
-                                    </table>
-                                </td>
-                            </tr>
-                            <% } %>
-                </tbody>
-
-            </table>
+                                            <% } %>
+                    </tbody>
+                </table>
+            </div>
 
             <div class="card">
                 <div class="card-body">
@@ -132,8 +162,8 @@
                                     aria-disabled="true">Previous</a>
                             </li>
                             <% for(var i=1;i <=pagesTotal;i++) { %>
-                                <li class="page-item  <% if(currentPage == i ) { %> active <% } %>"><a
-                                        class="page-link" href="/sh/admin/blocklist?page=<%=i %>">
+                                <li class="page-item  <% if(currentPage == i ) { %> active <% } %>"><a class="page-link"
+                                        href="/sh/admin/blocklist?page=<%=i %>">
                                         <%=i %>
                                     </a></li>
 
@@ -177,11 +207,18 @@
         const blockDom = document.getElementById('block')
         const blockIdDom = document.getElementById('blockId')
         const formDom = document.getElementById('formName')
+
+        document.getElementById('spinner').style.display = 'none';
+
         const path = window.location.pathname;
         const mainUrl = '<%= mainUrl %>'
         const breadcrumbItems = path.split('/').slice(2)
         var blockCode = ``
         let itemName
+
+        const error = document.getElementById('error')
+        error.style.display = 'none'
+
         breadcrumbItems.forEach((item) => {
             if (item === 'admin') {
                 item = 'home'
@@ -195,6 +232,7 @@
 
         async function deleteBlock(id) {
             if (confirm('Are you sure to delete block')) {
+                document.getElementById('spinner').style.display = 'block';
                 const myHeaders = new Headers();
 
                 const requestOptions = {
@@ -206,18 +244,30 @@
                 fetch(`${mainUrl}/api/block/${id}`, requestOptions)
                     .then(async (response) => {
                         if (response.status == 200) {
+                            document.getElementById('spinner').style.display = 'none';
                             window.location.reload()
                         } else {
-                            alert(await response.text())
+                            document.getElementById('spinner').style.display = 'none';
+                            error.style.display = 'block'
+                            if (response.status === 404 || response.status < 499) {
+                                error.innerHTML = 'Not founded or Client side error'
+                            } else if (response.status < 500) {
+                                error.innerHTML = 'Server error contact owner'
+                            } else {
+                                error.innerHTML = await response.text()
+                            }
                         }
                     });
             }
         }
 
         function openForm() {
+            document.getElementById('spinner').style.display = 'block';
             if (blockBoxDom.style.display === 'none') {
+                document.getElementById('spinner').style.display = 'none';
                 blockBoxDom.style.display = 'block'
             } else {
+                document.getElementById('spinner').style.display = 'none';
                 blockBoxDom.style.display = 'none'
             }
         }
@@ -235,7 +285,7 @@
                 body: raw,
                 redirect: "follow"
             };
-
+            document.getElementById('spinner').style.display = 'block';
             let request
             if (blockIdDom.value == '') {
                 request = fetch(`${mainUrl}/api/block`, { ...requestOptions, method: "POST" })
@@ -245,10 +295,18 @@
 
             request.then(async (response) => {
                 if (response.status == 200) {
-                    alert('Done')
+                    document.getElementById('spinner').style.display = 'none';
                     window.location.reload()
                 } else {
-                    alert(await response.text())
+                    document.getElementById('spinner').style.display = 'none';
+                    error.style.display = 'block'
+                    if (response.status === 404 || response.status < 499) {
+                        error.innerHTML = 'Not founded or Client side error'
+                    } else if (response.status < 500) {
+                        error.innerHTML = 'Server error contact owner'
+                    } else {
+                        error.innerHTML = await response.text()
+                    }
                 }
             });
         }

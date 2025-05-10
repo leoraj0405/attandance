@@ -191,6 +191,32 @@ router.get('/editstudent/:id', async (req, res) => {
         }
 })
 
+router.get('/studentsreport', async (req, res) => {
+        const {totalDays} = req.query
+        try {
+                if (req.session.isLogged == true) {
+                        const mainUrl = process.env.MAIN_URL
+                        const user = req.session.data
+                        const admin = req.session.data.isAdmin;
+                        const profile = req.session.data.profileImage;
+                        const warden = req.session.data.id
+
+                        res.render('pages/student/report', {
+                                user,
+                                admin,
+                                profile,
+                                mainUrl,
+                                warden
+                        })
+
+                } else {
+                        res.redirect(`${process.env.MAIN_URL}/sh/login`)
+                }
+        } catch (error) {
+                console.log(error)
+        }
+})
+
 router.get('/blocklist', async (req, res) => {
         const {
                 page: pageInput,

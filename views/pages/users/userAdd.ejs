@@ -3,13 +3,31 @@
 
 <head>
     <%- include('../../partials/head') %>
+        <style>
+            .spinner-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 1050;
+                display: none;
+            }
+        </style>
 </head>
 
 <body>
 
     <main>
         <div class="container">
-
+            <div id="spinner">
+                <div class="spinner-overlay d-flex justify-content-center align-items-center">
+                    <div class="spinner-border text-light" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
             <section
                 class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
                 <div class="container">
@@ -28,8 +46,7 @@
                             <div class="card mb-3">
 
                                 <div class="card-body">
-
-                                    <div class="pt-4 pb-2">
+                                    <div class="pt-2 pb-2">
                                         <h5 class="card-title text-center pb-0 fs-4">Create an Account</h5>
                                         <p class="text-center small">Enter your personal details to create account</p>
                                     </div>
@@ -58,8 +75,8 @@
 
                                         <div class="col-12">
                                             <label for="yourPhoneNo" class="form-label">Your Phone Number</label>
-                                            <input type="text" name="phoneNo" class="form-control" id="yourPhoneNo"
-                                                value="<%=data.phoneNo %>" required>
+                                            <input type="text" maxlength="10" name="phoneNo" class="form-control"
+                                                id="yourPhoneNo" value="<%=data.phoneNo %>" required>
                                             <div class="invalid-feedback">Please, enter your phone number!</div>
                                         </div>
 
@@ -92,13 +109,13 @@
                                             <div class="form-group">
                                                 <label for="isAdmin">Is Admin ?</label>
                                                 <div class="form-check form-check-inline">
-                                                    <input class="form-check-input" type="radio" name="isAdmin"
+                                                    <input class="form-check-input" type="radio" name="isAdmin" required
                                                         id="inlineRadio1" value="1" <% if(data.isAdmin==1){ %> checked
                                                     <% } %> >
                                                         <label class="form-check-label" for="inlineRadio1">Yes</label>
                                                 </div>
                                                 <div class="form-check form-check-inline">
-                                                    <input class="form-check-input" type="radio" name="isAdmin"
+                                                    <input class="form-check-input" type="radio" name="isAdmin" required
                                                         id="inlineRadio2" value="0" <% if(data.isAdmin==0){ %> checked
                                                     <% } %> >
                                                         <label class="form-check-label" for="inlineRadio2">No</label>
@@ -112,6 +129,13 @@
                                                 required>
                                             <div class="invalid-feedback">Choose your Profile Picture</div>
                                         </div>
+                                        <div class="pt-5">
+                                            <div class="alert alert-success" id="success">
+                                                Successful
+                                            </div>
+                                            <div class="alert alert-danger" id="error">
+                                            </div>
+                                        </div>
                                         <div class="col-12 d-flex justify-content-evenly">
                                             <a href="/sh/home" class="btn btn-secondary ">Back</a>
                                             <button class="btn btn-primary" onclick="addOrEdituser()"
@@ -122,11 +146,7 @@
                             </div>
 
                             <div class="credits">
-                                <!-- All the links in the footer should remain intact. -->
-                                <!-- You can delete the links only if you purchased the pro version. -->
-                                <!-- Licensing information: https://bootstrapmade.com/license/ -->
-                                <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
-                                Designed by <a href="https://bootstrapmade.com/">Leo</a>
+                                Designed by Leo
                             </div>
 
                         </div>
@@ -165,9 +185,17 @@
         const confirmPassDom = document.getElementById('yourConfirmPassword');
         const profileDom = document.getElementById('profile')
 
+        const success = document.getElementById('success')
+        const error = document.getElementById('error')
+        success.style.display = 'none'
+        error.style.display = 'none'
+        
+        document.getElementById('spinner').style.display = 'none';
+
         const mainUrl = '<%= mainUrl %>'
 
         function addOrEdituser() {
+            document.getElementById('spinner').style.display = 'none';
             const isAdminDom = document.querySelector('input[name="isAdmin"]:checked');
             const myHeaders = new Headers();
 
@@ -191,14 +219,22 @@
                 body: formdata,
                 redirect: "follow"
             };
-
+            document.getElementById('spinner').style.display = 'block';
             fetch(`${mainUrl}/api/user`, requestOptions)
                 .then(async (response) => {
+                    document.getElementById('spinner').style.display = 'none';
                     if (response.status == 200) {
-                        alert('User Added')
+                        success.style.display = 'block'
+                        window.location.href = `${mainUrl}/sh/admin/asstdir`
                     } else {
-                        alert(await response.text())
-                        return
+                        error.style.display = 'block'
+                        if (response.status === 404 || response.status < 499) {
+                            error.innerHTML = 'Not founded or Client side error'
+                        } else if (response.status < 500) {
+                            error.innerHTML = 'Server error contact owner'
+                        } else {
+                            error.innerHTML = await response.text()
+                        }
                     }
                 });
         }

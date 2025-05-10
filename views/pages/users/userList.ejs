@@ -54,62 +54,77 @@
                     <a class="btn btn-primary" style="align-content: center;" href="/sh/admin/addad">Add AD`s</a>
                 </div>
                 <!-- Table with stripped rows -->
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th scope="col">User ID</th>
-                            <th scope="col">First Name</th>
-                            <th scope="col">Last Name</th>
-                            <th scope="col">Phone Number</th>
-                            <th scope="col">Email ID</th>
-                            <th scope="col">IsAdmin</th>
-                            <th scope="col">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% for(var i=0; i < userData.length;i++) { %>
+                <div class="pt-5">
+                    <div class="alert alert-danger" id="error">
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
                             <tr>
-                                <td>
-                                    <%=userData[i].userId %>
-                                </td>
-                                <td>
-                                    <%=userData[i].firstName %>
-                                </td>
-                                <td>
-                                    <%=userData[i].lastName %>
-                                </td>
-                                <td>
-                                    <%=userData[i].phoneNo %>
-                                </td>
-                                <td>
-                                    <%=userData[i].email %>
-                                </td>
-                                <td>
-                                    <%=userData[i].isAdmin==1 ? 'YES' : 'NO' %>
-                                </td>
-                                <td>
-                                    <table>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <a class="border-none" href="/sh/admin/editad/<%=userData[i].id %>">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                </td>
-                                                <td>
-                                                    <button class="no-border-button"
-                                                        onclick="deleteuser('<%=userData[i].id %>')">
-                                                        <i class="fas fa-trash" style="color: red;"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </td>
+                                <th scope="col">User ID</th>
+                                <th scope="col">First Name</th>
+                                <th scope="col">Last Name</th>
+                                <th scope="col">Phone Number</th>
+                                <th scope="col">Email ID</th>
+                                <th scope="col">IsAdmin</th>
+                                <th scope="col">Actions</th>
                             </tr>
-                            <%} %>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <% if(userData.length> 0) { %>
+                                <% for(var i=0; i < userData.length;i++) { %>
+                                    <tr>
+                                        <td>
+                                            <%=userData[i].userId %>
+                                        </td>
+                                        <td>
+                                            <%= userData[i].firstName.charAt(0).toUpperCase() +
+                                                userData[i].firstName.slice(1).toLowerCase() %>
+                                        </td>
+                                        <td>
+                                            <%= userData[i].lastName.charAt(0).toUpperCase() +
+                                                userData[i].lastName.slice(1).toLowerCase() %>
+                                        </td>
+                                        <td>
+                                            <%=userData[i].phoneNo %>
+                                        </td>
+                                        <td>
+                                            <%=userData[i].email %>
+                                        </td>
+                                        <td>
+                                            <%=userData[i].isAdmin==1 ? 'YES' : 'NO' %>
+                                        </td>
+                                        <td>
+                                            <table>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <a class="border-none"
+                                                                href="/sh/admin/editad/<%=userData[i].id %>">
+                                                                <i class="fas fa-edit"></i>
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <button class="no-border-button"
+                                                                onclick="deleteuser('<%=userData[i].id %>')">
+                                                                <i class="fas fa-trash" style="color: red;"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                    </tr>
+                                    <%} %>
+                                        <% }else { %>
+                                            <tr>
+                                                <td colspan="7" class="text-center text-secondary">No Assistant
+                                                    Directors</td>
+                                            </tr>
+                                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
                 <div class="card">
                     <div class="card-body">
                         <!-- Disabled and active states -->
@@ -164,8 +179,12 @@
         const path = window.location.pathname;
         const mainUrl = '<%= mainUrl %>'
         const breadcrumbItems = path.split('/').slice(2)
+
+        const error = document.getElementById('error')
+        error.style.display = 'none'
+
         var blockCode = ``
-        let itemName 
+        let itemName
         breadcrumbItems.forEach((item) => {
             if (item === 'admin') {
                 item = 'home'
@@ -189,7 +208,14 @@
                     if (response.status == 200) {
                         location.reload()
                     } else {
-                        alert(await response.text())
+                        error.style.display = 'block'
+                        if (response.status === 404 || response.status < 499) {
+                            error.innerHTML = 'Not founded or Client side error'
+                        } else if (response.status < 500) {
+                            error.innerHTML = 'Server error contact owner'
+                        } else {
+                            error.innerHTML = await response.text()
+                        }
                     }
                 });
             }

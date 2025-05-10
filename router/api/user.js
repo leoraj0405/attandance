@@ -67,7 +67,7 @@ async function getUser(req, res) {
             return res.status(404).send('Not Founded')
         }
     } catch (error) {
-        return res.status(500).send(error.message)
+        return res.status(500).send(error)
     }
 }
 async function insertorUpdateUser(req, res) {
