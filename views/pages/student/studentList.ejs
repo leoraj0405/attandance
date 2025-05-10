@@ -98,14 +98,17 @@
                                         <%= studentInfo[i].accNo %>
                                     </td>
                                     <td>
-                                        <%= studentInfo[i].sfirstName + ' ' + studentInfo[i].lastName %>
+                                         <%= studentInfo[i].sfirstName.charAt(0).toUpperCase() +
+                                                studentInfo[i].sfirstName.slice(1).toLowerCase() + ' ' + studentInfo[i].lastName %>
                                     </td>
                                     <td>
-                                        <%= studentInfo[i].firstName %>
+                                        
+                                        <%= studentInfo[i].firstName.charAt(0).toUpperCase() +
+                                                studentInfo[i].firstName.slice(1).toLowerCase() %>
                                     </td>
                                     <td>
-                                        <%= studentInfo[i].name %>
-                                    </td>
+                                        <%= studentInfo[i].name.charAt(0).toUpperCase() +
+                                                studentInfo[i].name.slice(1).toLowerCase() %>                                    </td>
                                     <td>
                                         <%= studentInfo[i].roomNo %>
                                     </td>

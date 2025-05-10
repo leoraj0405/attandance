@@ -217,6 +217,28 @@ router.get('/studentsreport', async (req, res) => {
         }
 })
 
+router.get('/studentprofile/:id', async (req, res) => {
+        const  id  = req.params.id
+        console.log(id)
+            try {
+        if (req.session.isLogged == true) {
+            const userInfo = req.session.data
+            const user = req.session.data
+            const admin = req.session.data.isAdmin;
+            const profile = req.session.data.profileImage;
+            const mainUrl = process.env.MAIN_URL
+            const response = await fetch(`${mainUrl}/api/student/${id}`)
+            const data = await response.json()
+            console.log(data)
+            res.render('pages/student/studentProfile.ejs', {  user, admin, profile, mainUrl, data })
+        } else {
+            res.redirect(`${process.env.MAIN_URL}sh/login`)
+        }
+    } catch (error) {
+        console.error(error)
+    }
+})
+
 router.get('/blocklist', async (req, res) => {
         const {
                 page: pageInput,

@@ -62,23 +62,22 @@
                 </div>
             </div>
             </div>
-            <div class="table-responsive">
+            <div class="table-responsive w-75">
+                <div class="card">
+                    <div class="card-body pt-2" id="text">
+                    </div>
+                </div>
                 <table class="table table-striped">
                     <thead>
                         <tr>
                             <th scope="col">S. No</th>
                             <th scope="col">Student Name</th>
-                            <th scope="col">Block</th>
-                            <th scope="col">Room</th>
-                            <th scope="col">Appearance</th>
-                            <th scope="col">Action</th>
+                            <th scope="col">Prsent days</th>
+                            <th scope="col">Percentage</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="6" class="text-center text-secondary">First you need to enter the total days to
-                                calculate percentage</td>
-                        </tr>
+                    <tbody id="tableContent">
+
                     </tbody>
                 </table>
             </div>
@@ -117,6 +116,9 @@
         const warden = '<%= warden %>'
         const breadcrumbItems = path.split('/').slice(2)
         var blockCode = ``
+
+        const tableContentDom = document.getElementById('tableContent')
+
         breadcrumbItems.forEach((item) => {
             if (item === 'admin') {
                 blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href=/sh/home>Home</a></li> `
@@ -130,13 +132,30 @@
         const daysDom = document.getElementById('totalDays')
 
         async function generateReport() {
-            var myModal = new bootstrap.Modal(document.getElementById('attendanceModal'), {
-                keyboard: false // Disable closing with keyboard
-            });
-            myModal.hide();
             const response = await fetch(`${mainUrl}/api/attendance/report/${warden}/${daysDom.value}`)
             const data = await response.json()
-            console.log(data)
+
+            var tableCode = ``
+
+            document.getElementById('text').innerHTML = `<b> Note </b> : These Reports generate for ${daysDom.value} days`
+
+            if (data.length > 0) {
+                let sno = 1
+                for (var i = 0; i < data.length; i++) {
+                    tableCode += `<tr>
+                                <td>${sno++}</td>
+                                <td><a class="btn btn-link" href="studentprofile/${data[i].studentId}">${data[i].name.charAt(0).toUpperCase() + data[i].name.slice(1).toLowerCase()}</a></td>
+                                <td>${data[i].presentDays}</td>
+                                <td>${data[i].percentage} %</td>
+                            </tr>`
+                }
+            } else {
+                tableCode = `<tr>
+                    <td colspan="4" class="text-center text-secondary">First you need to enter the total days to
+                        calculate percentage</td>
+                </tr>`
+            }
+            tableContentDom.innerHTML = tableCode
         }
     </script>
 

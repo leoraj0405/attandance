@@ -55,7 +55,7 @@ router.get('/user/profile', (req, res) => {
             const user = req.session.data
             const admin = req.session.data.isAdmin;
             const profile = req.session.data.profileImage;
-            const mainUrl = '<%= mainUrl %>'
+            const mainUrl = process.env.MAIN_URL
             res.render('pages/users/userProfile.ejs', { userInfo, user, admin, profile, mainUrl })
         } else {
             res.redirect(`${process.env.MAIN_URL}sh/login`)

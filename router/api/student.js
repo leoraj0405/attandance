@@ -163,7 +163,14 @@ async function deleteStudent(req, res) {
 async function getSingleStudent(req, res) {
     const id = req.params.id;
     try {
-        const singleStud = await execQuery(/*sql*/`SELECT * FROM  student WHERE id = ? AND deletedAt IS NULL`, [id])
+        const singleStud = await execQuery(/*sql*/`SELECT 
+                                s.*, d.deptName, b.name, u.firstName, r.roomNo 
+                                FROM student AS s 
+                                JOIN department AS d ON d.id = s.departmentId 
+                                JOIN blocks AS b ON b.id = s.blockId 
+                                JOIN user AS u ON u.id = s.wardenId 
+                                JOIN room AS r ON r.id = s.roomId
+                                WHERE s.deletedAt IS NULL AND s.id = ?`, [id])
         if (singleStud.length) {
             res.status(200).send(singleStud[0])
         } else {
