@@ -104,7 +104,7 @@
         const breadcrumbItems = path.split('/').slice(2)
         var blockCode = ``
         breadcrumbItems.forEach((item) => {
-            blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href=/sh/${item}>${item}</a></li> `
+            blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href="/sh/${item}">${item}</a></li> `
         })
         document.getElementById('breadcrumbOl').innerHTML = blockCode
   </script>

@@ -120,7 +120,8 @@ router.get('/addstudent', async (req, res) => {
                         const wardenList = await wardenResponse.json()
 
                         const blockRes = await fetch(`${process.env.MAIN_URL}/api/block`)
-                        const blockList = await blockRes.json()
+                        const blockData = await blockRes.json()
+                        const blockList = blockData.data
 
                         const deptRes = await fetch(`${process.env.MAIN_URL}/api/department`)
                         const deptList = await deptRes.json()

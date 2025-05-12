@@ -143,9 +143,9 @@
     breadcrumbItems.forEach((item) => {
       if (item === 'user') {
         item = 'home'
-        blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href=/sh/${item}>${item}</a></li> `
+        blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href="/sh/${item}">${item}</a></li> `
       } else {
-        blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href=/sh/user/${item}>${item}</a></li> `
+        blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href="/sh/user/${item}">${item}</a></li> `
       }
     })
     document.getElementById('breadcrumbOl').innerHTML = blockCode

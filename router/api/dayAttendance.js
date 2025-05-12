@@ -2,16 +2,24 @@ const express = require('express');
 const router = express.Router();
 const execQuery = require('../../utils/query');
 
-async function getdayattendance(req, res) {
-    const id = req.params.id;
+async function blockReport(req, res) {
+    const date = req.body.date
     try {
-        const getStudAttendance = await execQuery(/*sql*/`SELECT 
-                        *
-                        FROM dayattendance 
-                        WHERE studentId = ?`,
-            [id])
-        if (getStudAttendance.length !== 0) {
-            res.status(200).send(getStudAttendance)
+        const blockReport = await execQuery(/*sql*/`SELECT 
+                    s.blockId,
+                    COUNT(DISTINCT s.id) AS totalStudents,
+                    COUNT(DISTINCT a.studentId) AS attendanceCount
+                    FROM 
+                        student AS s
+                    LEFT JOIN 
+                        dayattendance AS a 
+                        ON s.id = a.studentId AND a.date = ?
+                    GROUP BY 
+                        s.blockId
+                    `,[date])
+
+        if (blockReport.length !== 0) {
+            res.status(200).send(blockReport)
         }
         else {
             return res.status(404).send('Not Founded')
@@ -22,11 +30,59 @@ async function getdayattendance(req, res) {
     }
 
 }
+async function getTodayAttendance(req, res) {
+    console.log('date')
+    const date = req.body.date
+    const {
+        room, block
+    } = req.query
+    try {
+        const result = await execQuery(/*sql*/`SELECT * FROM dayattendance WHERE date = ? AND roomId = ? AND blockId = ? `,[date, room, block])
 
+        if (result.length !== 0) {
+            res.status(200).send(result)
+        }
+        else {
+            return res.status(404).send(result)
+        }
+    } catch (error) {
+        console.error(error)
+        return res.status(500).send(error.messege)
+    }
 
+}
+async function roomReport(req, res) {
+    const id = req.params.id
+    const date = req.body.date
+    try {
+        const roomReport = await execQuery(/*sql*/`SELECT 
+                    s.roomId,
+                    COUNT(s.id) AS totalStudents,
+                    COUNT(a.roomId) AS attendanceCount
+                    FROM 
+                        student AS s
+                    LEFT JOIN 
+                        dayattendance AS a 
+                        ON s.id = a.studentId AND a.date = ?
+                    WHERE 
+                        s.blockId = ?
+                    GROUP BY 
+                        s.roomId`,[date, id])
+        if (roomReport.length !== 0) {
+            res.status(200).send(roomReport)
+        }
+        else {
+            return res.status(404).send('Not Founded')
+        }
+    } catch (error) {
+        console.error(error)
+        return res.status(500).send(error.messege)
+    }
+
+}
 async function report(req, res) {
     const id = req.params.id;
-    const totalDays =req.params.days
+    const totalDays = req.params.days
 
     try {
         if (!totalDays || totalDays <= 0) {
@@ -75,8 +131,6 @@ async function report(req, res) {
         return res.status(500).send(error)
     }
 }
-
-
 async function postOrPutAttendance(req, res) {
     const {
         studentId,
@@ -97,10 +151,7 @@ async function postOrPutAttendance(req, res) {
             roomId,
             blockId
         ]
-        const checkTodayAtt = await execQuery(/*sql*/`SELECT 
-                                * FROM
-                                dayattendance 
-                                WHERE date = ? AND roomId = ? AND blockId = ?`, [date, roomId, blockId])
+        
         const postAttendance = await execQuery(/*sql*/`INSERT 
                                 INTO dayattendance 
                                 (studentId, 
@@ -128,8 +179,12 @@ async function postOrPutAttendance(req, res) {
     }
 
 }
-router.get('/:id', getdayattendance)
-router.post('/', postOrPutAttendance)
+router.post('/roomreport/:id', roomReport)
 router.get('/report/:id/:days', report)
+
+router.post('/todayattendance', getTodayAttendance)
+router.post('/', postOrPutAttendance)
+router.post('/blockreport', blockReport)
+
 
 module.exports = router;

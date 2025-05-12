@@ -225,10 +225,10 @@
         breadcrumbItems.forEach((item) => {
             if (item === 'admin') {
                 item = 'home'
-                blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href=/sh/${item}>${item}</a></li> `
+                blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href="/sh/${item}">${item}</a></li> `
             } else {
                 item === 'asstdir' ? itemName = 'Assitant Directors' : itemName = item
-                blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href=/sh/admin/${item}>${itemName}</a></li> `
+                blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href="/sh/admin/${item}">${itemName}</a></li> `
             }
         })
         document.getElementById('breadcrumbOl').innerHTML = blockCode

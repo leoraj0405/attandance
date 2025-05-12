@@ -104,6 +104,7 @@
                                             <label for="yourblock" class="form-label">block</label>
                                             <select class="form-select" onchange="updateSecondDropdown()" id="yourblock"
                                                 value="<%=data.blockId %>">
+                                                <option>Select block</option>
                                                 <% for(var i=0; i< blockList.length; i++) { %>
                                                     <option value="<%=blockList[i].id %>">
                                                         <%= blockList[i].name %>
@@ -116,6 +117,7 @@
                                         <div class="col-12">
                                             <label for="yourRoom" class="form-label">Room</label>
                                             <select class="form-select" value="<%=data.roomId %>" id="yourRoom">
+                                                <option>First select block and then select</option>
                                             </select>
                                         </div>
 
@@ -123,7 +125,7 @@
                                             <label for="yourDepartment" class="form-label">Department</label>
                                             <select class="form-select" id="yourDepartment"
                                                 value="<%=data.departmentId %>">
-                                                <option></option>
+                                                <option>Select department</option>
                                                 <% for(var i=0; i< deptList.length; i++) { %>
                                                     <option value="<%=deptList[i].id %>">
                                                         <%=deptList[i].deptName %>
@@ -162,7 +164,7 @@
                                 <!-- You can delete the links only if you purchased the pro version. -->
                                 <!-- Licensing information: https://bootstrapmade.com/license/ -->
                                 <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
-                                Designed by <a href="https://bootstrapmade.com/">Leo</a>
+                                Designed by <a>Leo</a>
 
                             </div>
 
@@ -222,7 +224,9 @@
 
             var roomCode = ''
             for (var i = 0; i < roomList.length; i++) {
+                if(roomList[i].isActive === 1) {
                 roomCode = roomCode + `<option value="${roomList[i].id}">${roomList[i].roomNo}</option>`
+                }
             }
             roomDom.innerHTML = roomCode;
         }

@@ -2,11 +2,6 @@ const express = require('express');
 const router = express.Router();
 const fetch = require('node-fetch');
 
-const currentPage = {
-        block: 0,
-        room : 0
-}
-
 router.get('/blocks', async (req, res) => {
         try {
                 if (req.session.isLogged == true) {
@@ -35,10 +30,10 @@ router.get('/rooms/:id', async(req, res) => {
                         const admin = req.session.data.isAdmin;
                         const profile = req.session.data.profileImage;
                         const response = await fetch(`${process.env.MAIN_URL}/api/room/block/${id}`)
-                        const roomData = await response.json()
-                        currentPage.block = id
+                        const data = await response.json()
+                        req.session.block = id
                         const mainUrl = process.env.MAIN_URL
-                        const data = roomData.data
+                        
                         res.render('pages/attendance/room',{user, admin, profile, data, mainUrl})
                 }else {
                         res.redirect(`${process.env.MAIN_URL}/sh/login`)
@@ -52,14 +47,15 @@ router.get('/students/:id', async (req, res) => {
         try {
                 if (req.session.isLogged == true) {
                         const room = req.params.id
-                        const block = currentPage.block
+                        const block = req.session.block
                         const user = req.session.data
                         const admin = req.session.data.isAdmin;
                         const profile = req.session.data.profileImage;  
                         const response = await fetch(`${process.env.MAIN_URL}/api/student/room?room=${room}&block=${block}`)
                         const data = await response.json()
                         const mainUrl = process.env.MAIN_URL
-                        res.render('pages/attendance/attendanceForm', {user, admin, profile, data, mainUrl}) 
+                        const blockId = req.session.block
+                        res.render('pages/attendance/attendanceForm', {user, admin, profile, data, mainUrl, blockId}) 
                 }else{
                         res.redirect(`${process.env.MAIN_URL}/sh/login`)
                 }

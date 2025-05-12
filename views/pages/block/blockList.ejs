@@ -57,7 +57,7 @@
             </div>
         </div>
         <div class="container py-3">
-            <h5 class="mb-2 fw-bold text-primary">Assitant Directors</h5>
+            <h5 class="mb-2 fw-bold text-primary">Blocks</h5>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb" id="breadcrumbOl">
                 </ol>
@@ -94,7 +94,7 @@
         </div>
         <div class="card-body">
             <div class="d-flex justify-content-between pb-2">
-                <h5 class="card-title">Students</h5>
+                <h5 class="card-title">Block</h5>
                 <button class="btn btn-primary" onclick="openForm()">Add block</button>
             </div>
 
@@ -222,10 +222,10 @@
         breadcrumbItems.forEach((item) => {
             if (item === 'admin') {
                 item = 'home'
-                blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href=/sh/${item}>${item}</a></li> `
+                blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href="/sh/${item}">${item}</a></li> `
             } else {
                 item === 'blockList' ? itemName = 'Block' : itemName = item
-                blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href=/sh/admin/${item}>${itemName}</a></li> `
+                blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href="/sh/admin/${item}">${itemName}</a></li> `
             }
         })
         document.getElementById('breadcrumbOl').innerHTML = blockCode

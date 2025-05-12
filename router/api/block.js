@@ -38,7 +38,7 @@ async function getBlock(req, res) {
             response.page = pageNo
             res.status(200).send(response)
         } else {
-            return res.status(404).send('Not Founded')
+            return res.status(404).send(response)
         }
     } catch (error) {
         console.error(error)

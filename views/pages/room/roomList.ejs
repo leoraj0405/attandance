@@ -126,8 +126,8 @@
                     <thead>
                         <tr>
                             <th scope="col">S. No</th>
-                            <th scope="col">Block Name</th>
                             <th scope="col">Room Number</th>
+                            <th scope="col">Block Name</th>
                             <th scope="col">Status</th>
                             <th scope="col">Actions</th>
                         </tr>
@@ -255,10 +255,10 @@
         breadcrumbItems.forEach((item) => {
             if (item === 'admin') {
                 item = 'home'
-                blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href=/sh/${item}>${item}</a></li> `
+                blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href="/sh/${item}">${item}</a></li> `
             } else {
                 item === 'roomlist' ? itemName = 'rooms' : itemName = item
-                blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href=/sh/admin/${item}>${itemName}</a></li> `
+                blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href="/sh/admin/${item}">${itemName}</a></li> `
             }
         })
         document.getElementById('breadcrumbOl').innerHTML = blockCode

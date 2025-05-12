@@ -11,6 +11,37 @@
       .px-2 {
         margin: 1.25rem !important;
       }
+
+      .bc {
+        font-size: larger;
+      }
+
+      .blockTag {
+        color: white;
+      }
+
+      .colorBox {
+        width: 20px;
+        height: 20px;
+        background-color: aqua;
+      }
+
+      .note {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+      }
+
+      .spinner-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1050;
+        display: none;
+      }
     </style>
 </head>
 
@@ -19,11 +50,6 @@
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
     <%- include('../../partials/header') %>
-      <style>
-        .bc {
-          font-size: larger;
-        }
-      </style>
   </header><!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
@@ -32,6 +58,13 @@
   </aside><!-- End Sidebar-->
 
   <main id="main" class="main">
+    <div id="spinner">
+      <div class="spinner-overlay d-flex justify-content-center align-items-center">
+        <div class="spinner-border text-light" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    </div>
     <div class="container py-3">
       <h5 class="fw-bold text-primary">Attendance</h5>
       <nav aria-label="breadcrumb">
@@ -40,16 +73,50 @@
       </nav>
     </div>
     <div class="container">
-      <div class="container-fluid">
-        <h5>Blocks :</h5>
-        <div class="row">
-          <% for(var i=0; i < data.length;i++) { %>
-            <div class="col btn btn-light w-100 px-2" style="background-color: rgb(223, 240, 246);">
-              <a href="/sh/attendance/rooms/<%= data[i].id %>">
-                <%=data[i].name %>
-              </a>
+      <div class="pt-5">
+        <div class="alert alert-danger" id="error">
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <div class="container-fluid p-2">
+            <h5>Blocks :</h5>
+            <div class="row">
+              <% for(var i=0; i < data.length;i++) { %>
+                <div class="col btn btn-light px-2 blockBtn">
+                  <a href="/sh/attendance/rooms/<%= data[i].id %>" class="blockTag">
+                    <%=data[i].name %>
+                  </a>
+                </div>
+                <% } %>
             </div>
-            <% } %>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="card">
+        <div class="card-body">
+          <div class="pt-4">
+            <p><b>Note :</b></p>
+            <hr>
+            <div class="note">
+              <div class="colorBox" style="background-color: rgb(24 176 56);"></div>
+              <p> - 100% attendance compelete</p>
+            </div>
+            <div class="note">
+              <div class="colorBox" style="background-color: rgb(225 239 16);"></div>
+              <p> - 51% - 99% attendance compelete</p>
+            </div>
+            <div class="note">
+              <div class="colorBox" style="background-color: rgb(255 172 47);"></div>
+              <p> - 1% - 50% attendance compelete</p>
+            </div>
+            <div class="note">
+              <div class="colorBox" style="background-color: rgb(255 5 5);"></div>
+              <p> - 0% attendance compelete</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -78,11 +145,17 @@
   <script src="/assets/js/main.js"></script>
 
   <script>
+    document.getElementById('spinner').style.display = 'none';
+
     const path = window.location.pathname;
     const mainUrl = '<%= mainUrl %>'
     const breadcrumbItems = path.split('/').slice(2)
     var blockCode = ``
     let itemName
+    const error = document.getElementById('error')
+    error.style.display = 'none'
+
+
     breadcrumbItems.forEach((item) => {
       if (item === 'attendance') {
         blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href=/sh/home>${item}</a></li> `
@@ -91,6 +164,58 @@
       }
     })
     document.getElementById('breadcrumbOl').innerHTML = blockCode
+
+    function report() {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+
+      const raw = JSON.stringify({
+        "date": todayDateDom.value
+      });
+
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow"
+      };
+      document.getElementById('spinner').style.display = 'block';
+
+      fetch(`${mainUrl}/api/attendance/blockreport`, requestOptions)
+        .then(async (response) => {
+          document.getElementById('spinner').style.display = 'none';
+
+          if (response.status == 200) {
+            const data = await response.json()
+            document.querySelectorAll('.blockBtn').forEach((el, index) => {
+              el.id = `block-${data[index].blockId}`;
+            });
+            data.forEach((item) => {
+              const percentage = parseInt(item.attendanceCount) / parseInt(item.totalStudents) * 100
+
+              if (percentage === 100) {
+                document.getElementById(`block-${item.blockId}`).style.backgroundColor = 'rgb(24 176 56)'
+              } else if (percentage > 51 && percentage < 99) {
+                document.getElementById(`block-${item.blockId}`).style.backgroundColor = 'rgb(225 239 16)'
+              } else if (percentage > 0 && percentage < 50) {
+                document.getElementById(`block-${item.blockId}`).style.backgroundColor = 'rgb(255 172 47)'
+              } else {
+                document.getElementById(`block-${item.blockId}`).style.backgroundColor = 'rgb(255 5 5)'
+              }
+            })
+          } else {
+            error.style.display = 'block'
+            if (response.status === 404 || response.status < 499) {
+              error.innerHTML = 'Not founded or Client side error'
+            } else if (response.status < 500) {
+              error.innerHTML = 'Server error contact owner'
+            } else {
+              error.innerHTML = await response.text()
+            }
+          }
+        });
+    }
+    report()
   </script>
 
 </body>

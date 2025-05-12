@@ -19,7 +19,7 @@ async function getBlockRoom(req, res) {
         if (getBlockRoom.length !== 0) {
             res.status(200).send(getBlockRoom)
         } else {
-            return res.status(404).send('Not Founded')
+            return res.status(404).send(getBlockRoom)
         }
     } catch (error) {
         return res.status(500).send(error.messege)

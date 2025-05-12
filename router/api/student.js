@@ -79,7 +79,7 @@ async function getRoomStudent(req, res) {
         if (getStudRoomWise.length !== 0) {
             res.status(200).send(getStudRoomWise)
         } else {
-            return res.status(404).send('Invalid Room')
+            return res.status(404).send(getStudRoomWise)
         }
     } catch (error) {
         console.error(error)

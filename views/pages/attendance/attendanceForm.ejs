@@ -23,7 +23,7 @@
                 border: transparent;
             }
 
-            input[type="checkbox"] {
+            input[type="radio"] {
                 height: 30px;
                 width: 30px;
             }
@@ -32,24 +32,15 @@
                 display: none;
             }
 
-            .custom-alert .modal-content {
-                border-radius: 10px;
-                background: linear-gradient(135deg, #f0f8ff, #e6e6fa);
-                box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
-            }
-
-            .custom-alert .modal-header {
-                background-color: #6c757d;
-                color: white;
-                border-bottom: 2px solid #e6e6fa;
-            }
-
-            .custom-alert .modal-footer {
-                justify-content: center;
-            }
-
-            .custom-alert .btn-close {
-                color: white;
+            .spinner-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 1050;
+                display: none;
             }
         </style>
 </head>
@@ -67,80 +58,84 @@
     </aside><!-- End Sidebar-->
 
     <main id="main" class="main">
-        <div id="alart">
+        <div id="spinner">
+            <div class="spinner-overlay d-flex justify-content-center align-items-center">
+                <div class="spinner-border text-light" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
+        <div class="container py-3">
+            <h5 class="fw-bold text-primary">Attendance</h5>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb" id="breadcrumbOl">
+                </ol>
+            </nav>
+        </div>
+        <div class="pt-5">
+            <div class="alert alert-danger" id="error">
+            </div>
+            <div class="alert alert-success" id="success">
+                Successful
+            </div>
         </div>
         <div class="container-main container">
             <div class="container-fluid">
-
-                <div class="w-100 p-3 d-flex justify-content-center">
-                    <li class="border-none" value="<%=user.id %>" id="warden">Attendance taken by <%=user.firstName %>
-                    </li>
-                </div>
                 <div class="d-flex flex-column mb-3">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th scope="col">Account No</th>
-                                <th scope="col">Name </th>
-                                <th scope="col">Present</th>
-                                <th scope="col">Absent</th>
-                                <th scope="col">Leave</th>
-                                <th scope="col">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% if( data.length==0 ) { %>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead class="thead-light">
                                 <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td>
-                                        <p>No students in the Room</p>
-                                    </td>
-                                    <td></td>
-                                    <td></td>
+                                    <th scope="col">Account No</th>
+                                    <th scope="col">Name </th>
+                                    <th scope="col">Present</th>
+                                    <th scope="col">Absent</th>
+                                    <th scope="col">Leave</th>
+                                    <th scope="col">Actions</th>
                                 </tr>
-                                <% }else { %>
-                                    <% for(var i=0; i < data.length;i++) { %>
-                                        <tr>
-                                            <td scope="row">
-                                                <%= data[i].accNo %>
-                                            </td>
-                                            <td>
-                                                <input type="text" class="hidden-input" value="<%=data[i].blockId %>"
-                                                    name="block">
-                                                <input type="text" class="hidden-input" value="<%=data[i].roomId %>"
-                                                    name="room">
-                                                <li class="border-none" value="<%=data[i].id %>" name="student">
-                                                    <%=data[i].sfirstName %>
-                                                </li>
-                                            </td>
-                                            <td>
-                                                <input type="checkbox" name="options" value="p">
-                                            </td>
-                                            <td>
-                                                <input type="checkbox" name="options" value="a">
+                            </thead>
+                            <tbody>
+                                <% if( data.length==0 ) { %>
+                                    <tr>
+                                        <td colspan="6" class="text-center">No students in this Room</td>
+                                    </tr>
+                                    <% }else { %>
+                                        <% for(var i=0; i < data.length;i++) { %>
+                                            <tr>
+                                                <td scope="row">
+                                                    <%= data[i].accNo %>
+                                                </td>
+                                                <td>
+                                                    <li class="border-none student" value="<%=data[i].id %>">
+                                                        <%=data[i].sfirstName %>
+                                                    </li>
+                                                </td>
+                                                <td>
+                                                    <input type="radio" name="options-<%=data[i].id %>" value="p">
+                                                </td>
+                                                <td>
+                                                    <input type="radio" name="options-<%=data[i].id %>" value="a">
 
-                                            </td>
-                                            <td>
-                                                <input type="checkbox" name="options" value="l"><br>
-                                                <input type="text" class="form-control" name="reason">
+                                                </td>
+                                                <td>
+                                                    <input type="radio" name="options-<%=data[i].id %>" value="l"><br>
+                                                    <input type="text" class="form-control" name="reason">
 
-                                            </td>
-                                            <td>
-                                                <button class="btn" onclick="showAlert('<%=data[i].id %>')"><span
-                                                        class="fa fa-info-circle"></span></button>
-                                            </td>
-                                        </tr>
-                                        <% } %>
+                                                </td>
+                                                <td>
+                                                    <a class="btn"
+                                                        href="/sh/admin/studentprofile/<%=data[i].id %>"><span
+                                                            class="fa fa-info-circle"></span></a>
+                                                </td>
+                                            </tr>
                                             <% } %>
-
-                        </tbody>
-                    </table>
-                    <div class="w-100 p-3 d-flex justify-content-center">
-                        <button onclick="attendance()" class="btn btn-success">Submit</button>
+                                                <% } %>
+                            </tbody>
+                        </table>
                     </div>
-
+                    <div class="w-100 p-3 d-flex justify-content-center">
+                        <button onclick="save()" class="btn btn-success">Submit</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -169,100 +164,148 @@
     <!-- Template Main JS File -->
     <script src="/assets/js/main.js"></script>
 
+
     <script>
+        document.getElementById('spinner').style.display = 'none';
+        const path = window.location.pathname;
         const mainUrl = '<%= mainUrl %>'
-        async function showAlert(id) {
-            const response = await fetch(`${mainUrl}/api/student/${id}`)
-            const studData = await response.json()
-            var studInfo = ` 
-        <div class="modal fade custom-alert" id="customAlertModal" tabindex="-1" aria-labelledby="customAlertLabel" aria-hidden="true">
-            <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="customAlertLabel">student information</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                        <div class="d-flex justify-content-center">
-                            <img src="/uploads/${studData.studProfile}" style="height: 150px; width: 150px;" alt="Profile" class="rounded-circle">
-                         </div><br> <hr>
-                        Account No : ${studData.accNo} <br> <hr>
-                        First Name  : ${studData.sfirstName} <br> <hr>
-                        Last Name : ${studData.lastName} <br> <hr>
-                        Email : ${studData.email} <br> <hr>
-                        Phone Number : ${studData.phoneNo} <br> <hr>
-                        Native : ${studData.native} <br> <hr>
-                    </div>
-                    
-                </div>
-            </div>
-        </div>`
-            document.getElementById('alart').innerHTML = studInfo
-            const alertModal = new bootstrap.Modal(document.getElementById('customAlertModal'));
-            alertModal.show();
+        const breadcrumbItems = path.split('/').slice(2)
+        var blockCode = ``
+        let itemName
+        const error = document.getElementById('error')
+        error.style.display = 'none'
+        const success = document.getElementById('success')
+        success.style.display = 'none'
 
-        }
-        function attendance() {
-            const wardenDom = document.getElementById('warden').value;
-            const appearance = [];
-            const students = [];
-            const reason = [];
-            const blocks = [];
-            const rooms = [];
-            const checkboxs = document.querySelectorAll('input[name = "options"]:checked');
-            checkboxs.forEach((checkboxInput) => {
-                appearance.push(checkboxInput.value);
-            });
-            const roomStud = document.querySelectorAll('li[name="student"]');
-            roomStud.forEach((stud) => {
-                students.push(stud.value);
-            });
-            const studBlock = document.querySelectorAll('input[name="block"]');
-            studBlock.forEach((block) => {
-                blocks.push(block.value);
-            })
-            const studRoom = document.querySelectorAll('input[name="room"]');
-            studRoom.forEach((room) => {
-                rooms.push(room.value);
-            })
-            const reasonArr = document.querySelectorAll('input[name = "reason"]');
-            reasonArr.forEach((key) => {
-                reason.push(key.value)
-            })
-            for (let i = 0; i < students.length; i++) {
-                const myHeaders = new Headers();
-                myHeaders.append("Content-Type", "application/json");
+        const user = '<%=user.id %>'
+        const studentCount = '<%=data.length %>'
+        const blockId = '<%= blockId %>'
+        const roomId = breadcrumbItems[breadcrumbItems.length - 1];
 
-                const raw = JSON.stringify({
-                    "studentId": students[i],
-                    "wardenId": wardenDom,
-                    "appearance": appearance[i],
-                    "date": todayDateDom.value,
-                    "reason": reason[i],
-                    "blockId": blocks[i],
-                    "roomId": rooms[i]
-                });
 
-                const requestOptions = {
-                    method: "POST",
-                    headers: myHeaders,
-                    body: raw,
-                    redirect: "follow"
-                };
+        breadcrumbItems.forEach((item) => {
+            if (item === 'attendance') {
+                blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href="/sh/home">${item}</a></li> `
+            } else if (item === 'students') {
+                item = 'blocks'
+                blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href="/sh/attendance/${item}/">${item}</a></li> `
+            } else {
+                blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href="/sh/attendance/rooms/${blockId}">room</a></li> `
+                blockCode += `<li class="breadcrumb-item bc fw-bold d-flex"><a href="/sh/attendance/students/${item}">students</a></li> `
 
-                var request = fetch(`${mainUrl}/api/attendance`, requestOptions)
             }
-            request.then(async (response) => {
-                if (response.status == 200) {
-                    alert("Done ")
-                    btnClickCount = btnClickCount + 1
+        })
 
-                } else {
-                    alert(await response.text())
+        document.getElementById('breadcrumbOl').innerHTML = blockCode
+
+        function save() {
+                    document.getElementById('spinner').style.display = 'block';
+            const students = document.querySelectorAll('.student');
+
+            students.forEach((student) => {
+                const studentId = student.getAttribute('value');
+                const selected = document.querySelector(`input[name="options-${studentId}"]:checked`);
+
+                if (selected) {
+                    const appearance = selected.value;
+                    let reason = "";
+
+                    if (appearance === "l") {
+                        const reasonInput = student.closest('tr')?.querySelector('input[name="reason"]');
+                        if (reasonInput) reason = reasonInput.value.trim();
+                    }
+
+                    const myHeaders = new Headers();
+                    myHeaders.append("Content-Type", "application/json");
+
+                    const raw = JSON.stringify({
+                        "studentId": studentId,
+                        "wardenId": user,
+                        "appearance": appearance,
+                        "date": todayDateDom.value,
+                        "reason": reason,
+                        "roomId": roomId,
+                        "blockId": blockId
+                    });
+
+                    const requestOptions = {
+                        method: "POST",
+                        headers: myHeaders,
+                        body: raw,
+                        redirect: "follow"
+                    };
+
+                    fetch(`${mainUrl}/api/attendance`, requestOptions)
+                        .then(async (response) => {
+                                    document.getElementById('spinner').style.display = 'none';
+                            if (response.status === 200) {
+                                success.style.display = 'block'
+                            } else {
+                                error.style.display = 'block'
+                                if (response.status === 404 || response.status < 499) {
+                                    error.innerHTML = 'Not founded or Client side error'
+                                } else if (response.status < 500) {
+                                    error.innerHTML = 'Server error contact owner'
+                                } else {
+
+                                }
+                            }
+                        });
                 }
-            })
+            });
 
         }
+
+        function editAttendance() {
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+            const raw = JSON.stringify({
+                "date": todayDateDom.value
+            });
+
+            const requestOptions = {
+                method: "POST",
+                headers: myHeaders,
+                body: raw,
+                redirect: "follow"
+            };
+                    document.getElementById('spinner').style.display = 'block';
+            fetch(`${mainUrl}/api/attendance/todayattendance?room=${roomId}&block=${blockId}`, requestOptions)
+                .then(async (response) => {
+                            document.getElementById('spinner').style.display = 'none';
+                    if (response.status == 200) {
+                        const data = await response.json()
+                        data.forEach((item) => {
+                            const radioBtn = document.querySelector(`input[name="options-${item.studentId}"][value="${item.appearance}"]`)
+                            if (radioBtn) {
+                                radioBtn.checked = true
+                            }
+                            if (item.appearance === 'l') {
+                                const row = radioBtn.closest('tr');
+                                if (row) {
+                                    const reasonInput = row.querySelector('input[name="reason"]');
+                                    if (reasonInput) {
+                                        reasonInput.value = item.reason;
+                                    }
+                                }
+                            }
+                        })
+                    } else {
+                        error.style.display = 'block'
+                        if (response.status === 404 || response.status < 499) {
+                            error.innerHTML = 'Not founded or Client side error'
+                        } else if (response.status < 500) {
+                            error.innerHTML = 'Server error contact owner'
+                        } else {
+                            error.innerHTML = await response.text()
+                        }
+
+                    }
+                });
+        }
+
+        editAttendance()
     </script>
 
 </body>
