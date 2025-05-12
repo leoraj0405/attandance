@@ -220,7 +220,6 @@ router.get('/studentsreport', async (req, res) => {
 
 router.get('/studentprofile/:id', async (req, res) => {
         const  id  = req.params.id
-        console.log(id)
             try {
         if (req.session.isLogged == true) {
             const userInfo = req.session.data

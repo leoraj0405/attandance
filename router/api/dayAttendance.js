@@ -31,7 +31,6 @@ async function blockReport(req, res) {
 
 }
 async function getTodayAttendance(req, res) {
-    console.log('date')
     const date = req.body.date
     const {
         room, block
