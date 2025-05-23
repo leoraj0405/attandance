@@ -199,7 +199,7 @@
         document.getElementById('breadcrumbOl').innerHTML = blockCode
 
         function save() {
-                    document.getElementById('spinner').style.display = 'block';
+            document.getElementById('spinner').style.display = 'block';
             const students = document.querySelectorAll('.student');
 
             students.forEach((student) => {
@@ -237,7 +237,7 @@
 
                     fetch(`${mainUrl}/api/attendance`, requestOptions)
                         .then(async (response) => {
-                                    document.getElementById('spinner').style.display = 'none';
+                            document.getElementById('spinner').style.display = 'none';
                             if (response.status === 200) {
                                 success.style.display = 'block'
                             } else {
@@ -270,10 +270,10 @@
                 body: raw,
                 redirect: "follow"
             };
-                    document.getElementById('spinner').style.display = 'block';
+            document.getElementById('spinner').style.display = 'block';
             fetch(`${mainUrl}/api/attendance/todayattendance?room=${roomId}&block=${blockId}`, requestOptions)
                 .then(async (response) => {
-                            document.getElementById('spinner').style.display = 'none';
+                    document.getElementById('spinner').style.display = 'none';
                     if (response.status == 200) {
                         const data = await response.json()
                         data.forEach((item) => {
@@ -291,16 +291,6 @@
                                 }
                             }
                         })
-                    } else {
-                        error.style.display = 'block'
-                        if (response.status === 404 || response.status < 499) {
-                            error.innerHTML = 'Not founded or Client side error'
-                        } else if (response.status < 500) {
-                            error.innerHTML = 'Server error contact owner'
-                        } else {
-                            error.innerHTML = await response.text()
-                        }
-
                     }
                 });
         }

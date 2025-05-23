@@ -229,7 +229,6 @@ router.get('/studentprofile/:id', async (req, res) => {
             const mainUrl = process.env.MAIN_URL
             const response = await fetch(`${mainUrl}/api/student/${id}`)
             const data = await response.json()
-            console.log(data)
             res.render('pages/student/studentProfile.ejs', {  user, admin, profile, mainUrl, data })
         } else {
             res.redirect(`${process.env.MAIN_URL}sh/login`)
